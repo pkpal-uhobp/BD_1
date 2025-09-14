@@ -1,0 +1,242 @@
+Метод update_data() класса DB
+
+Назначение:
+Обновляет записи в указанной таблице, удовлетворяющие заданному условию. Выполняет DML-операцию UPDATE с использованием транзакций для обеспечения целостности данных.
+
+Параметры:
+- table_name (str): название таблицы, в которой обновляются записи
+  Примеры: "Books", "Readers", "Issued_Books"
+
+- condition (Dict[str, Any]): словарь с условиями поиска записей для обновления в формате {колонка: значение}
+  Примеры:
+    {"id_book": 1}
+    {"reader_id": 5, "actual_return_date": None}
+    {"genre": "Роман"}
+
+- new_values (Dict[str, Any]): словарь с новыми значениями полей в формате {колонка: новое_значение}
+  Примеры:
+    {"title": "Новое название", "deposit_amount": 600.00}
+    {"actual_return_date": "2023-12-15", "damage_type": "Царапина"}
+    {"discount_percent": 15}
+
+Возвращаемое значение:
+- bool: True - если операция выполнена успешно (даже если не обновлено ни одной записи)
+- bool: False - если произошла ошибка подключения, таблица не существует, невалидные данные или другая ошибка
+
+Выполняемые действия:
+
+1. Проверка подключения:
+   - Вызывает is_connected() для проверки наличия активного соединения
+   - Если нет подключения, возвращает False
+
+2. Проверка существования таблицы:
+   - Проверяет наличие table_name в self.tables
+   - Если таблица не определена в метаданных, возвращает False
+
+3. Проверка наличия данных для обновления:
+   - Проверяет что new_values не пустой словарь
+   - Если нет данных для обновления, возвращает False
+
+4. Построение SET условий:
+   - Проверяет существование колонок для обновления в таблице
+   - Формирует список SET условий с параметрами
+   - Логирует предупреждения для несуществующих колонок обновления
+
+5. Построение WHERE условий:
+   - Проверяет существование колонок в условиях поиска
+   - Формирует список WHERE условий с параметрами
+   - Логирует предупреждения для несуществующих колонок в WHERE
+
+6. Выполнение UPDATE операции:
+   - Создает UPDATE запрос с SET и WHERE условиями
+   - Выполняет запрос в транзакции (engine.begin())
+   - Получает количество обновленных записей через rowcount
+
+7. Логирование:
+   - INFO: "Выполнение DML: UPDATE \"{table_name}\" SET {list(new_values.keys())} WHERE {condition}" (перед выполнением)
+   - INFO: "Обновлено {updated_count} записей в таблице '{table_name}'" (если обновлены записи)
+   - INFO: "Условию {condition} не соответствует ни одна запись в таблице '{table_name}'" (если ничего не обновлено)
+   - ERROR: "Таблица '{table_name}' не определена в метаданных приложения"
+   - ERROR: "Нет данных для обновления"
+   - WARNING: "Предупреждение: колонки для обновления не существуют в таблице '{table_name}': {invalid_columns}"
+   - WARNING: "Предупреждение: колонки в условии WHERE не существуют: {invalid_where_columns}"
+   - ERROR: "Не указаны корректные условия WHERE для обновления"
+   - ERROR: "Ошибка при обновлении '{table_name}': {сообщение ошибки}"
+
+Примеры вызова:
+
+1. Обновление информации о книге:
+   db = DB()
+   if db.connect():
+       success = db.update_data("Books",
+                               {"id_book": 1},
+                               {"title": "Новое название книги",
+                                "daily_rental_rate": 15.00})
+       if success:
+           print("Информация о книге обновлена")
+       else:
+           print("Ошибка обновления информации о книге")
+
+2. Отметка возврата книги:
+   db = DB()
+   db.connect()
+   success = db.update_data("Issued_Books",
+                           {"issue_id": 1},
+                           {"actual_return_date": "2023-12-15",
+                            "damage_type": "Нет",
+                            "final_rental_cost": 150.00,
+                            "paid": True,
+                            "actual_rental_days": 15})
+   if success:
+           print("Книга отмечена как возвращенная")
+
+3. Обновление скидки читателя:
+   db = DB()
+   db.connect()
+   success = db.update_data("Readers",
+                           {"reader_id": 5},
+                           {"discount_category": "Ветеран",
+                            "discount_percent": 25})
+   if success:
+           print("Скидка читателя обновлена")
+
+4. Массовое обновление (все книги определенного жанра):
+   db = DB()
+   db.connect()
+   success = db.update_data("Books",
+                           {"genre": "Роман"},
+                           {"deposit_amount": 400.00})
+   if success:
+           print("Залог для всех романов обновлен")
+
+5. С обработкой ошибок:
+   db = DB()
+   try:
+       if db.connect():
+           # Попытка обновления с несуществующими колонками
+           success = db.update_data("Books",
+                                   {"id_book": 1},
+                                   {"nonexistent_column": "value"})
+           # Будет выведено предупреждение в лог
+
+           # Корректное обновление
+           success = db.update_data("Books",
+                                   {"id_book": 1},
+                                   {"title": "Обновленное название"})
+           if success:
+               print("Обновление выполнено")
+   except Exception as e:
+       print(f"Ошибка: {e}")
+
+6. Обновление с проверкой существования:
+   def update_reader_safely(db, reader_id, new_data):
+       # Проверяем существование читателя
+       if not db.record_exists("Readers", {"reader_id": reader_id}):
+           print("Читатель не найден")
+           return False
+
+       # Выполняем обновление
+       if db.update_data("Readers",
+                        {"reader_id": reader_id},
+                        new_data):
+           print("Информация о читателе обновлена")
+           return True
+       else:
+           print("Ошибка при обновлении информации о читателе")
+           return False
+
+Побочные эффекты:
+- Выполняет UPDATE-запрос к БД (модификация данных)
+- Запись DML-операций в лог-файл
+- Использование транзакций для обеспечения целостности
+- Изменение значений полей в записях таблицы
+- Возможное нарушение ограничений целостности при некорректных данных
+
+Особенности:
+- Использует транзакции для атомарности операций
+- Поддерживает составные условия поиска (AND) и обновления
+- Проверяет существование колонок перед выполнением
+- Потокобезопасный метод
+- Не выполняет валидацию значений (это делает _validate_data в других методах)
+
+Логирование операций:
+- INFO: "Выполнение DML: UPDATE \"{table_name}\" SET {list(new_values.keys())} WHERE {condition}"
+- INFO: "Обновлено {updated_count} записей в таблице '{table_name}'"
+- INFO: "Условию {condition} не соответствует ни одна запись в таблице '{table_name}'"
+- ERROR: "Таблица '{table_name}' не определена в метаданных приложения"
+- ERROR: "Нет данных для обновления"
+- WARNING: "Предупреждение: колонки для обновления не существуют в таблице '{table_name}': {invalid_columns}"
+- WARNING: "Предупреждение: колонки в условии WHERE не существуют: {invalid_where_columns}"
+- ERROR: "Не указаны корректные условия WHERE для обновления"
+- ERROR: "Ошибка при обновлении '{table_name}': {сообщение ошибки}"
+
+Ограничения:
+- Требует прав на UPDATE в указанной таблице
+- Условия объединяются логическим AND
+- Не поддерживает сложные условия (>, <, LIKE и т.д.)
+- Не выполняет автоматическую валидацию значений (кроме проверки существования колонок)
+- Не возвращает список обновленных записей (только количество)
+
+Рекомендации по использованию:
+- Проверяйте условия обновления перед выполнением
+- Используйте в комбинации с record_exists() для проверки существования записей
+- Для сложных обновлений используйте execute_query() с произвольным SQL
+- Будьте осторожны с массовыми обновлениями
+- Рассмотрите использование транзакций для комплексных операций
+
+Примеры условий и обновлений:
+- Поиск: {"id_book": 1}, Обновление: {"title": "Новое название"}
+- Поиск: {"reader_id": 5, "actual_return_date": None}, Обновление: {"actual_return_date": "2023-12-15"}
+- Поиск: {"genre": "Роман"}, Обновление: {"deposit_amount": 400.00}
+
+Пример комплексного использования:
+   def return_book(db, issue_id, return_date, damage_type="Нет", damage_fine=0):
+       # Проверяем существование выдачи
+       if not db.record_exists("Issued_Books", {"issue_id": issue_id}):
+           print("Выдача не найдена")
+           return False
+
+       # Получаем информацию о выдаче для расчета стоимости
+       issue_data = db.execute_query(
+           "SELECT book_id, issue_date FROM \"Issued_Books\" WHERE issue_id = :issue_id",
+           {"issue_id": issue_id},
+           fetch="one"
+       )
+
+       if not issue_data:
+           return False
+
+       # Рассчитываем стоимость аренды
+       from datetime import datetime
+       issue_date = datetime.strptime(issue_data['issue_date'], '%Y-%m-%d')
+       return_date_obj = datetime.strptime(return_date, '%Y-%m-%d')
+       rental_days = (return_date_obj - issue_date).days
+
+       # Получаем стоимость аренды книги
+       book_data = db.execute_query(
+           "SELECT daily_rental_rate FROM \"Books\" WHERE id_book = :book_id",
+           {"book_id": issue_data['book_id']},
+           fetch="one"
+       )
+
+       if not book_data:
+           return False
+
+       rental_cost = rental_days * float(book_data['daily_rental_rate']) + damage_fine
+
+       # Обновляем запись о возврате
+       success = db.update_data("Issued_Books",
+                               {"issue_id": issue_id},
+                               {
+                                   "actual_return_date": return_date,
+                                   "damage_type": damage_type,
+                                   "damage_fine": damage_fine,
+                                   "final_rental_cost": rental_cost,
+                                   "paid": True,
+                                   "actual_rental_days": rental_days
+                               })
+
+       if success:
+           print(f"Книга возвращена. Стоимость аренды: {rental_cost}")
+
+       return success
