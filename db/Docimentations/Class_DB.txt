@@ -1,0 +1,110 @@
+Метод __init__ класса DB
+
+Назначение:
+Инициализирует объект класса DB с параметрами подключения к базе данных PostgreSQL и настройками логирования.
+
+Параметры:
+
+1. host (str, по умолчанию "localhost")
+   - Адрес сервера базы данных
+   - Примеры: "127.0.0.1", "db.example.com", "192.168.1.50"
+
+2. port (int, по умолчанию 5432)
+   - Порт PostgreSQL сервера
+   - Стандартные значения: 5432 (PostgreSQL), 5433 (альтернативный)
+
+3. dbname (str, по умолчанию "library_db")
+   - Название базы данных для подключения
+   - Примеры: "library_db", "books_catalog", "my_database"
+
+4. user (str, по умолчанию "postgres")
+   - Имя пользователя БД с правами доступа
+   - Примеры: "postgres", "admin", "librarian", "db_user"
+
+5. password (str, по умолчанию "root")
+   - Пароль пользователя БД
+   - Примеры: "root", "password123", "secure_pass"
+
+6. sslmode (str, по умолчанию "prefer")
+   - Режим SSL-подключения
+   - Возможные значения:
+     * "disable" - SSL отключен
+     * "allow" - SSL разрешен, но не обязателен
+     * "prefer" - Предпочтительно SSL (по умолчанию)
+     * "require" - Требуется SSL
+     * "verify-ca" - Требуется SSL с проверкой CA
+     * "verify-full" - Полная проверка SSL
+
+7. connect_timeout (int, по умолчанию 5)
+   - Таймаут подключения в секундах
+   - Диапазон: 1-300 секунд
+   - Рекомендуется: 5-30 секунд
+
+8. log_file (str, по умолчанию "db_app.log")
+   - Имя файла для записи логов
+   - Примеры: "db_app.log", "database.log", "library_db.log"
+
+Инициализируемые атрибуты:
+
+- self.engine: Optional[Engine] = None
+  - Объект подключения SQLAlchemy
+
+- self.metadata: Optional[MetaData] = None
+  - Метаданные таблиц БД
+
+- self.tables: Dict[str, Table] = {}
+  - Словарь с описаниями таблиц
+
+- self.logger: logging.Logger
+  - Логгер для записи событий
+
+Примеры вызова:
+
+1. С параметрами по умолчанию:
+   db = DB()
+
+2. С пользовательскими параметрами:
+   db = DB(
+       host="192.168.1.100",
+       port=5432,
+       dbname="my_library",
+       user="librarian",
+       password="secure_password",
+       sslmode="require",
+       connect_timeout=10,
+       log_file="library_database.log"
+   )
+
+3. Минимальная конфигурация:
+   db = DB(host="localhost", dbname="books")
+
+4. Для удаленного сервера:
+   db = DB(
+       host="db.example.com",
+       port=5432,
+       dbname="production_db",
+       user="app_user",
+       password="app_password",
+       connect_timeout=15
+   )
+
+Входные данные (пример структуры):
+{
+    "host": "localhost",
+    "port": 5432,
+    "dbname": "library_db",
+    "user": "postgres",
+    "password": "root",
+    "sslmode": "prefer",
+    "connect_timeout": 5,
+    "log_file": "db_app.log"
+}
+
+Побочные эффекты:
+- Создается логгер с настройками
+- Настраивается вывод логов в файл и консоль
+- Инициализируются внутренние структуры данных
+- Записывается сообщение об инициализации в лог
+
+Логирование при инициализации:
+INFO: "Инициализация DB для {dbname} на {host}:{port}"
