@@ -1,11 +1,8 @@
 from sqlalchemy.engine import Engine
-from sqlalchemy import create_engine, MetaData, text, Column, Integer, String, Date, ForeignKey, CheckConstraint, \
-    Numeric, Table, inspect, UniqueConstraint
-from sqlalchemy import Table, Column, Integer, String, Numeric, Date, ForeignKey, CheckConstraint, Boolean, Enum, ARRAY, \
-    text
+from sqlalchemy import create_engine, MetaData, inspect, UniqueConstraint, CheckConstraint, Boolean, Enum, ARRAY
+from sqlalchemy import Table, Column, Integer, String, Numeric, Date, ForeignKey, text
 import logging
-from datetime import date, datetime
-from sqlalchemy.exc import SQLAlchemyError
+from datetime import date
 from typing import Optional, Dict, Any, List
 
 
