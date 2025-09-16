@@ -1,0 +1,140 @@
+Метод get_column_names() класса DB
+
+Назначение:
+Возвращает список названий всех колонок указанной таблицы. Использует SQLAlchemy inspector для получения информации о структуре таблицы.
+
+Параметры:
+- table_name (str): название таблицы, для которой нужно получить список колонок
+  Примеры: "Books", "Readers", "Issued_Books"
+
+Возвращаемое значение:
+- List[str]: список строк с названиями колонок (пустой список если таблица не существует или ошибка)
+- Пример: ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+
+Выполняемые действия:
+
+1. Проверка подключения:
+   - Вызывает is_connected() для проверки наличия активного соединения
+   - Если нет подключения, возвращает пустой список
+
+2. Проверка существования таблицы:
+   - Получает список всех таблиц через inspector
+   - Проверяет, существует ли запрашиваемая таблица
+
+3. Получение колонок:
+   - Вызывает inspector.get_columns(table_name) для получения информации о колонках
+   - Извлекает названия колонок из полученных данных
+
+4. Логирование:
+   - INFO: "Получение списка колонок для таблицы '{table_name}'..." (перед выполнением)
+   - INFO: "Получено {count} колонок для таблицы '{table_name}': {column_list}" (при успехе)
+   - ERROR: "Таблица '{table_name}' не существует в БД" (если таблица не найдена)
+   - ERROR: "Ошибка получения колонок таблицы '{table_name}': {сообщение ошибки}" (при исключениях)
+
+Примеры вызова:
+
+1. Базовое использование:
+   db = DB()
+   if db.connect():
+       columns = db.get_column_names("Books")
+       print(f"Колонки таблицы Books: {columns}")
+       # Вывод: ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+
+2. Проверка структуры таблицы:
+   db = DB()
+   db.connect()
+   books_columns = db.get_column_names("Books")
+   readers_columns = db.get_column_names("Readers")
+
+   print("Структура Books:", books_columns)
+   print("Структура Readers:", readers_columns)
+
+3. С обработкой ошибок:
+   db = DB()
+   try:
+       if db.connect():
+           columns = db.get_column_names("NonExistentTable")
+           if columns:
+               print(f"Колонки: {columns}")
+           else:
+               print("Таблица не найдена или ошибка получения данных")
+   except Exception as e:
+       print(f"Ошибка: {e}")
+
+4. Для диагностики таблиц:
+   def analyze_table_structure(db, table_name):
+       if not db.is_connected():
+           return
+
+       columns = db.get_column_names(table_name)
+       if not columns:
+           print(f"Таблица {table_name} не существует")
+           return
+
+       print(f"Таблица {table_name}:")
+       print(f"  Всего колонок: {len(columns)}")
+       for i, col in enumerate(columns, 1):
+           print(f"  {i}. {col}")
+
+5. Проверка соответствия ожидаемой структуры:
+   db = DB()
+   db.connect()
+   expected_books_columns = ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+   actual_books_columns = db.get_column_names("Books")
+
+   if set(expected_books_columns) == set(actual_books_columns):
+       print("Структура таблицы Books корректна")
+   else:
+       missing = set(expected_books_columns) - set(actual_books_columns)
+       extra = set(actual_books_columns) - set(expected_books_columns)
+       print(f"Несоответствия: отсутствуют {missing}, лишние {extra}")
+
+Побочные эффекты:
+- Выполняет запрос к системным таблицам БД для получения метаданных
+- Запись операций в лог-файл
+- Минимальная нагрузка на БД (только чтение метаданных)
+- Не модифицирует данные или структуру БД
+
+Особенности:
+- Только чтение - безопасная операция
+- Работает с любыми таблицами БД (не только определенными в metadata)
+- Возвращает только названия колонок (без типов и ограничений)
+- Учитывает регистр названий таблиц
+- Потокобезопасный метод
+
+Логирование операций:
+- INFO: "Получение списка колонок для таблицы '{table_name}'..."
+- INFO: "Получено {count} колонок для таблицы '{table_name}': {column_list}"
+- ERROR: "Таблица '{table_name}' не существует в БД"
+- ERROR: "Ошибка получения колонок таблицы '{table_name}': {сообщение ошибки}"
+
+Ограничения:
+- Требует прав на чтение системных метаданных
+- Работает только с существующими таблицами
+- Может не учитывать временные таблицы или представления
+- Время выполнения зависит от сложности структуры таблицы
+
+Рекомендации по использованию:
+- Используйте для проверки структуры таблиц перед операциями
+- Применяйте при валидации данных для вставки/обновления
+- Полезен для автоматического построения запросов
+- Можно использовать для диагностики изменений в схеме БД
+
+Примеры возвращаемых значений:
+- Для "Books": ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+- Для "Readers": ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+- Для "Issued_Books": ['issue_id', 'book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+- Для несуществующей таблицы: []
+- При ошибках: []
+
+Пример комплексного использования:
+   def validate_table_access(db, table_name, required_columns):
+       actual_columns = db.get_column_names(table_name)
+       if not actual_columns:
+           return False, f"Таблица {table_name} не существует"
+
+       missing_columns = set(required_columns) - set(actual_columns)
+       if missing_columns:
+           return False, f"Отсутствуют колонки: {missing_columns}"
+
+       return True, f"Таблица {table_name} доступна с нужными колонками"

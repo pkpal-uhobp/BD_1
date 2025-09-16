@@ -1,0 +1,75 @@
+Метод connect() класса DB
+
+Назначение:
+Устанавливает соединение с базой данных PostgreSQL, используя параметры, переданные в конструктор (__init__).
+Выполняет проверку подключения и инициализирует метаданные таблиц.
+
+Параметры:
+Метод не принимает параметров, использует значения, заданные при инициализации объекта:
+- self.host, self.port, self.dbname, self.user, self.password
+- self.sslmode, self.connect_timeout
+
+Возвращаемое значение:
+- bool: True - если подключение успешно установлено
+- bool: False - если произошла ошибка подключения
+
+Побочные эффекты:
+- Создаёт объект SQLAlchemy Engine
+- Инициализирует метаданные таблиц (_build_metadata())
+- Записывает в лог результат подключения
+- В случае ошибки устанавливает self.engine = None
+
+Примеры вызова:
+
+1. Базовый вызов:
+   db = DB()
+   success = db.connect()
+   if success:
+       print("Подключение установлено")
+   else:
+       print("Ошибка подключения")
+
+2. С пользовательскими параметрами:
+   db = DB(
+       host="192.168.1.100",
+       port=5432,
+       dbname="my_library",
+       user="librarian",
+       password="secure_password",
+       sslmode="require",
+       connect_timeout=10
+   )
+   if db.connect():
+       print("Подключено к удаленной БД")
+
+3. С обработкой ошибок:
+   db = DB()
+   try:
+       if db.connect():
+           print("Соединение установлено")
+       else:
+           print("Не удалось подключиться к БД")
+   except Exception as e:
+       print(f"Произошла ошибка: {e}")
+
+Входные данные (берутся из __init__):
+{
+    "host": "localhost",           # адрес сервера
+    "port": 5432,                 # порт PostgreSQL
+    "dbname": "library_db",       # имя базы данных
+    "user": "postgres",           # имя пользователя
+    "password": "root",           # пароль
+    "sslmode": "prefer",          # режим SSL
+    "connect_timeout": 5          # таймаут подключения в секундах
+}
+
+Формат строки подключения:
+postgresql+psycopg2://user:password@host:port/dbname?sslmode=sslmode&connect_timeout=timeout
+
+Пример строки подключения:
+postgresql+psycopg2://postgres:root@localhost:5432/library_db?sslmode=prefer&connect_timeout=5
+
+Логирование:
+- INFO: "Попытка подключения к БД..."
+- INFO: "Подключено к {dbname} на {host}:{port}" (при успехе)
+- ERROR: Человеко-понятное сообщение об ошибке (при неудаче)
