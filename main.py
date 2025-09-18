@@ -2,7 +2,7 @@ from db.Class_DB import DB
 
 import sys
 
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QLineEdit
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
 from ui.ui_main_rc import Ui_MainWindow
@@ -13,13 +13,18 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        # Устанавливаем значения по умолчанию для полей подключения
+        self.ui.host_lineEdit.setText("localhost")  # По умолчанию localhost
+        self.ui.port_lineEdit.setText("5432")  # Порт PostgreSQL по умолчанию
+        self.ui.user_lineEdit.setText("postgres")  # Имя пользователя по умолчанию
+        self.ui.password_lineEdit.setEchoMode(QLineEdit.Password)  # Пароль скрытый
+
         self.db = DB()
 
         self.log_model = QStandardItemModel()
         self.ui.log_listView.setModel(self.log_model)
 
-        # 👇 ДОБАВЬ ЭТО — сохраняем ссылку на tabWidget
-        self.tabWidget = self.ui.tabWidget  # ← Это важно!
+        self.tabWidget = self.ui.tabWidget
         self.tabWidget.currentChanged.connect(self.on_tab_changed)
 
         self.connect_signals()
@@ -31,12 +36,12 @@ class MainWindow(QMainWindow):
 
         # 👇 Новые кнопки
         self.ui.add_book_pushButton.clicked.connect(self.add_book)
-        # self.ui.delete_book_pushButton.clicked.connect(self.delete_book)
+        self.ui.delete_book_pushButton.clicked.connect(self.delete_book)
         # self.ui.edit_book_pushButton.clicked.connect(self.edit_book)
 
         # Аналогично для читателей и выдач
-        # self.ui.add_reader_pushButton_2.clicked.connect(self.add_reader)
-        # self.ui.delete_reader_pushButton.clicked.connect(self.delete_reader)
+        self.ui.add_reader_pushButton_2.clicked.connect(self.add_reader)
+        self.ui.delete_reader_pushButton.clicked.connect(self.delete_reader)
         # self.ui.edit_reader_pushButton.clicked.connect(self.edit_reader)
         #
         # self.ui.issue_book_pushButton.clicked.connect(self.issue_book)
@@ -122,12 +127,115 @@ class MainWindow(QMainWindow):
         else:
             self.add_log("❌ Ошибка добавления книги")
 
+    def add_reader(self):
+        firstName = self.ui.reader_first_name_lineEdit.text().strip()
+        middlName = self.ui.reader_middle_name_lineEdit.text().strip()
+        lastName = self.ui.reader_last_name_lineEdit.text().strip()
+        adress = self.ui.reader_address_lineEdit.text().strip()
+        phone = self.ui.reader_phone_lineEdit.text().strip()
+        disCat = self.ui.reader_discount_category_lineEdit.text().strip()
+        disPer = self.ui.reader_discount_percent_lineEdit.text().strip()
+        if not all([firstName, middlName, lastName, adress, phone, disCat, disPer]):
+            self.add_log("⚠️ Все поля должны быть заполнены!")
+            return
+
+        try:
+             disPer= int(disPer)
+        except ValueError:
+            self.add_log("Скидка - это число!")
+            return
+
+        if self.db.insert_data("Readers", {
+           "first_name": firstName,
+           "last_name": lastName,
+           "middle_name": middlName,
+            "address": adress,
+            "phone": phone,
+           "discount_category": disCat,
+           "discount_percent": disPer
+       }):
+            self.add_log(f"✅ Читатель '{lastName}' добавлен")
+            self.load_readers_data()  # Обновляем таблицу
+            self.clear_reader_inputs()  # Очищаем поля
+        else:
+            self.add_log("❌ Ошибка добавления книги")
+
+    def delete_book(self):
+        # Получаем выделенную строку прямо сейчас
+        selection = self.ui.book_tableView.selectionModel().selectedRows()
+
+        if not selection:
+            self.add_log("⚠️ Выберите книгу в таблице для удаления!")
+            return
+
+        # Берём первую выделенную строку (если выбрано несколько — удалим только первую)
+        row = selection[0].row()
+        model = self.ui.book_tableView.model()
+
+        # ID книги — в первом столбце (индекс 0)
+        book_id_item = model.item(row, 0)
+        if not book_id_item:
+            self.add_log("❌ Не удалось получить ID книги!")
+            return
+
+        try:
+            book_id = int(book_id_item.text())
+        except ValueError:
+            self.add_log("❌ ID книги не является числом!")
+            return
+
+        # Удаляем книгу
+        if self.db.delete_data("Books", {"id_book": book_id}):
+            self.add_log(f"✅ Книга с ID {book_id} успешно удалена")
+            self.load_books_data()  # Обновляем таблицу
+        else:
+            self.add_log(f"❌ Не удалось удалить книгу с ID {book_id}")
+
+    def delete_reader(self):
+        selection = self.ui.reader_tableView.selectionModel().selectedRows()
+
+        if not selection:
+            self.add_log("⚠️ Выберите читателя в таблице для удаления!")
+            return
+
+        row = selection[0].row()
+        model = self.ui.reader_tableView.model()
+
+        # ID книги — в первом столбце (индекс 0)
+        reader_id_item = model.item(row, 0)
+        if not reader_id_item:
+            self.add_log("❌ Не удалось получить ID читателя!")
+            return
+
+        try:
+            reader_id = int(reader_id_item.text())
+        except ValueError:
+            self.add_log("❌ ID не является числом!")
+            return
+
+        # Удаляем книгу
+        if self.db.delete_data("Readers", {"reader_id": reader_id}):
+            self.add_log(f"✅ Читатель с ID {reader_id} успешно удален")
+            self.load_readers_data()  # Обновляем таблицу
+        else:
+            self.add_log(f"❌ Не удалось удалить с ID {reader_id}")
+
+
     def clear_book_inputs(self):
         self.ui.book_name_lineEdit.clear()
         self.ui.book_author_lineEdit.clear()
         self.ui.book_genre_lineEdit.clear()
         self.ui.book_deposit_lineEdit.clear()
         self.ui.book_daily_rental_rate_lineEdit.clear()
+
+    def clear_reader_inputs(self):
+        self.ui.reader_first_name_lineEdit.clear()
+        self.ui.reader_middle_name_lineEdit.clear()
+        self.ui.reader_last_name_lineEdit.clear()
+        self.ui.reader_address_lineEdit.clear()
+        self.ui.reader_phone_lineEdit.clear()
+        self.ui.reader_discount_category_lineEdit.clear()
+        self.ui.reader_discount_percent_lineEdit.clear()
 
     def load_books_data(self):
         """Загрузка данных о книгах в таблицу book_tableView"""
@@ -149,9 +257,23 @@ class MainWindow(QMainWindow):
         self.ui.book_tableView.resizeColumnsToContents()
 
     def load_readers_data(self):
-        """Загрузка данных о читателях в таблицу"""
+        """Загрузка данных о книгах в таблицу book_tableView"""
         readers = self.db.get_table_data("Readers")
-        # Создание модели для таблицы
+        print(readers)
+        # Очищаем старую модель
+        model = QStandardItemModel()
+        model.setHorizontalHeaderLabels(["ID", "Фамилия", "Имя", "Отчество", "Адрес", "Телефон", "Категория скидки", "Процент скидки"])
+
+        for reader in readers:
+            row = []
+            for field in reader.keys():  # book — кортеж или список полей
+                item = QStandardItem(str(reader[field]))
+                item.setEditable(False)  # Только для просмотра
+                row.append(item)
+            model.appendRow(row)
+
+        self.ui.reader_tableView.setModel(model)
+        self.ui.reader_tableView.resizeColumnsToContents()
 
     def load_issued_books_data(self):
         """Загрузка данных о выданных книгах"""
