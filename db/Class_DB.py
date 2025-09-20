@@ -26,7 +26,7 @@ class DB:
         self.engine: Optional[Engine] = None
         self.metadata: Optional[MetaData] = None
         self.tables: Dict[str, Table] = {}
-        self.logger = logging.getLogger(f"DB_{dbname}")
+        self.logger = logging.getLogger(f"DB")
         self.logger.setLevel(logging.INFO)
         # Создаём обработчик для записи в файл
         file_handler = logging.FileHandler(log_file, encoding='utf-8')
@@ -126,8 +126,8 @@ class DB:
             Column("last_name", String(100), nullable=False),
             Column("first_name", String(100), nullable=False),
             Column("middle_name", String(100)),
-            Column("address", String),
-            Column("phone", String(20)),
+            Column("address", String,nullable=False),
+            Column("phone", String(20),nullable=False),
             Column("discount_category", DiscountCategory, default='Regular'),
             Column("discount_percent", Integer, default=0),
             UniqueConstraint("last_name", "first_name", "middle_name", "phone", name="uq_readers_full_info"),
@@ -135,16 +135,15 @@ class DB:
         )
         self.tables["Issued_Books"] = Table(
             "Issued_Books", self.metadata,
-            Column("issue_id", Integer, primary_key=True, autoincrement=True),
             Column("book_id", Integer, ForeignKey("Books.id_book", ondelete="CASCADE"), nullable=False),
             Column("reader_id", Integer, ForeignKey("Readers.reader_id", ondelete="CASCADE"), nullable=False),
             Column("issue_date", Date, nullable=False),
             Column("expected_return_date", Date, nullable=False),
             Column("actual_return_date", Date),
-            Column("damage_type", DamageType, default='None'),
-            Column("damage_fine", Numeric(10, 2), default=0),
+            Column("damage_type", DamageType, default='Нет', nullable=False),
+            Column("damage_fine", Numeric(10, 2), default=0, nullable=False),
             Column("final_rental_cost", Numeric(10, 2)),
-            Column("paid", Boolean, default=False),
+            Column("paid", Boolean, default=False, nullable=False),
             Column("actual_rental_days", Integer),
             CheckConstraint("damage_fine >= 0", name="chk_issued_damage_fine_non_negative"),
             CheckConstraint("actual_rental_days >= 0", name="chk_issued_duration_non_negative"),
@@ -307,6 +306,11 @@ class DB:
             with self.engine.connect() as conn:
                 result = conn.execute(table.select())
                 rows = [dict(row._mapping) for row in result]
+                for row in rows:
+                    for key, value in row.items():
+                        if isinstance(value, list):
+                            row[key] = ', '.join(value)
+
             msg = f"Получено {len(rows)} строк из таблицы '{table_name}'"
             self.logger.info(msg)
             return rows
@@ -429,7 +433,18 @@ class DB:
             # Вставка с транзакцией
             with self.engine.begin() as conn:
                 result = conn.execute(table.insert().values(**data))
-                inserted_id = result.inserted_primary_key[0] if result.inserted_primary_key else 'неизвестен'
+                # Проверяем, что вставка вернула первичный ключ
+                if result.inserted_primary_key is None:
+                    self.logger.error(
+                        f"Вставка в таблицу '{table_name}' не вернула идентификатор. Возможно, таблица не имеет автоинкрементного первичного ключа или произошла ошибка.")
+                    return False
+                if not result.inserted_primary_key:  # Пустой список?
+                    self.logger.error(f"Вставка в таблицу '{table_name}' вернула пустой список идентификаторов.")
+                    return False
+                inserted_id = result.inserted_primary_key[0]
+                if inserted_id is None:
+                    self.logger.error(f"Вставка в таблицу '{table_name}' вернула идентификатор None.")
+                    return False
                 msg = f"Успешно вставлена 1 запись в таблицу '{table_name}' (ID: {inserted_id})"
                 self.logger.info(msg)
                 return True
@@ -702,6 +717,31 @@ class DB:
             user_friendly_msg = self.format_db_error(e)
             self.logger.error(f"Ошибка выполнения SQL-запроса: {user_friendly_msg}")
             return None
+
+    def get_foreign_keys(self, table_name: str) -> List[Dict[str, Any]]:
+        """
+        Возвращает список внешних ключей для указанной таблицы.
+        Каждый элемент списка — словарь с ключами:
+            'constrained_columns': список локальных колонок (в table_name)
+            'referred_table': имя связанной таблицы
+            'referred_columns': список колонок в связанной таблице
+        """
+        if not self.is_connected():
+            return []
+        try:
+            inspector = inspect(self.engine)
+            existing_tables = inspector.get_table_names()
+            if table_name not in existing_tables:
+                self.logger.error(f"Таблица '{table_name}' не существует в БД")
+                return []
+
+            fks = inspector.get_foreign_keys(table_name)
+            self.logger.info(f"Получено {len(fks)} внешних ключей для таблицы '{table_name}': {fks}")
+            return fks
+        except Exception as e:
+            user_friendly_msg = self.format_db_error(e)
+            self.logger.error(f"Ошибка получения внешних ключей для таблицы '{table_name}': {user_friendly_msg}")
+            return []
 
     def get_joined_summary(
             self,
