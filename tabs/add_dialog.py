@@ -31,6 +31,8 @@ class AddRecordDialog(QDialog):
         self.setModal(True)
         self.resize(600, 700)
         self.input_widgets = {}
+        self.error_labels = {}  # Словарь для хранения меток ошибок
+        self.field_validity = {}  # Словарь для отслеживания валидности полей
 
         # Устанавливаем тёмную палитру
         self.set_dark_palette()
@@ -139,6 +141,11 @@ class AddRecordDialog(QDialog):
                 background: rgba(35, 35, 45, 0.9);
             }
 
+            QLineEdit.error, QTextEdit.error, QDateEdit.error, QDateTimeEdit.error, QComboBox.error {
+                border: 2px solid #ff5555;
+                background: rgba(75, 25, 35, 0.8);
+            }
+
             QTextEdit {
                 padding: 8px;
             }
@@ -231,6 +238,16 @@ class AddRecordDialog(QDialog):
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                 height: 0px;
             }
+
+            .error-label {
+                color: #ff5555;
+                font-size: 11px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 2px 5px;
+                background: rgba(255, 85, 85, 0.1);
+                border-radius: 4px;
+                margin-top: 2px;
+            }
         """)
 
     def init_ui(self):
@@ -321,32 +338,286 @@ class AddRecordDialog(QDialog):
         """Полностью очищает все поля ввода и пересоздаёт layout."""
         self._clear_layout(self.fields_layout)
         self.input_widgets.clear()
+        self.error_labels.clear()
+        self.field_validity.clear()
 
     def create_field_row(self, label_text, widget):
-        """Создает строку с меткой и виджетом ввода"""
+        """Создает строку с меткой, виджетом ввода и меткой ошибки"""
         row_widget = QWidget()
         row_widget.setObjectName("fieldRow")
         row_widget.setStyleSheet("""
             #fieldRow {
                 background: rgba(25, 25, 35, 0.3);
                 border-radius: 8px;
-                padding: 8px;
-                margin: 5px 0px;
+                padding: 12px;
+                margin: 8px 0px;
             }
         """)
 
-        row_layout = QHBoxLayout(row_widget)
-        row_layout.setContentsMargins(10, 5, 10, 5)
+        # Основной layout строки
+        row_layout = QVBoxLayout(row_widget)
+        row_layout.setContentsMargins(10, 8, 10, 8)
+        row_layout.setSpacing(5)
+
+        # Горизонтальный layout для метки и виджета
+        field_layout = QHBoxLayout()
+        field_layout.setContentsMargins(0, 0, 0, 0)
 
         label = QLabel(label_text)
         label.setMinimumWidth(180)
         label.setFont(QFont("Consolas", 11, QFont.Bold))
         label.setStyleSheet("color: #64ffda;")
 
-        row_layout.addWidget(label)
-        row_layout.addWidget(widget, 1)
+        field_layout.addWidget(label)
+        field_layout.addWidget(widget, 1)
 
-        return row_widget
+        # Метка для ошибки (изначально скрыта)
+        error_label = QLabel()
+        error_label.setObjectName("errorLabel")
+        error_label.setStyleSheet("""
+            #errorLabel {
+                color: #ff5555;
+                font-size: 11px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 2px 5px;
+                background: rgba(255, 85, 85, 0.1);
+                border-radius: 4px;
+                margin-left: 180px;
+            }
+        """)
+        error_label.setWordWrap(True)
+        error_label.hide()
+
+        row_layout.addLayout(field_layout)
+        row_layout.addWidget(error_label)
+
+        return row_widget, error_label
+
+    def set_field_error(self, field_name, error_message):
+        """Устанавливает сообщение об ошибке для поля"""
+        if field_name in self.error_labels:
+            if error_message:
+                self.error_labels[field_name].setText(error_message)
+                self.error_labels[field_name].show()
+                self.field_validity[field_name] = False
+
+                # Добавляем CSS класс для подсветки ошибки
+                widget = self.input_widgets[field_name]
+                if hasattr(widget, 'setStyleSheet'):
+                    current_style = widget.styleSheet()
+                    if 'error' not in current_style:
+                        widget.setStyleSheet(current_style + " border: 2px solid #ff5555;")
+            else:
+                self.clear_field_error(field_name)
+
+    def clear_field_error(self, field_name):
+        """Очищает ошибку для поля"""
+        if field_name in self.error_labels:
+            self.error_labels[field_name].hide()
+            self.field_validity[field_name] = True
+
+            # Убираем CSS класс ошибки
+            widget = self.input_widgets[field_name]
+            if hasattr(widget, 'setStyleSheet'):
+                # Восстанавливаем стандартные стили
+                if isinstance(widget, (QLineEdit, QTextEdit, QDateEdit, QDateTimeEdit)):
+                    widget.setStyleSheet("""
+                        background: rgba(25, 25, 35, 0.8);
+                        border: 2px solid #44475a;
+                        border-radius: 8px;
+                        padding: 12px;
+                        font-size: 14px;
+                        font-family: 'Consolas', 'Fira Code', monospace;
+                        color: #f8f8f2;
+                        selection-background-color: #64ffda;
+                        selection-color: #0a0a0f;
+                    """)
+                elif isinstance(widget, QComboBox):
+                    widget.setStyleSheet("""
+                        background: rgba(25, 25, 35, 0.8);
+                        border: 2px solid #44475a;
+                        border-radius: 8px;
+                        padding: 12px;
+                        font-size: 14px;
+                        font-family: 'Consolas', 'Fira Code', monospace;
+                        color: #f8f8f2;
+                        min-height: 20px;
+                    """)
+
+    def validate_field(self, display_name, widget, column):
+        """Валидирует одно поле и возвращает (is_valid, value, error_message)"""
+        col_name = self.REVERSE_COLUMN_HEADERS_MAP.get(display_name, display_name)
+
+        # Вспомогательные функции валидации
+        def validate_email(email):
+            pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            return re.match(pattern, email) is not None
+
+        def validate_phone(phone):
+            cleaned_phone = re.sub(r'\D', '', phone)
+            return 7 <= len(cleaned_phone) <= 15
+
+        def validate_safe_chars(text):
+            dangerous_patterns = [r';', r'--', r'/\*', r'\*/']
+            return not any(re.search(pattern, text, re.IGNORECASE) for pattern in dangerous_patterns)
+
+        def is_email_field(field_name):
+            email_indicators = ['email', 'e-mail', 'mail', 'почта']
+            return any(indicator in field_name.lower() for indicator in email_indicators)
+
+        def is_phone_field(field_name):
+            phone_indicators = ['phone', 'tel', 'telephone', 'mobile', 'телефон']
+            return any(indicator in field_name.lower() for indicator in phone_indicators)
+
+        try:
+            # ВАЛИДАЦИЯ ДЛЯ КОМБОБОКСОВ (ENUM)
+            if isinstance(widget, QComboBox) and (hasattr(column.type, 'enums') or isinstance(column.type, SQLEnum)):
+                value = widget.currentText().strip()
+                if not value:
+                    if not column.nullable:
+                        return False, None, "Обязательное поле"
+                    return True, None, ""
+                else:
+                    allowed_values = getattr(column.type, 'enums', [])
+                    if allowed_values and value not in allowed_values:
+                        return False, None, f"Допустимые значения: {', '.join(allowed_values)}"
+                    return True, value, ""
+
+            # ВАЛИДАЦИЯ ДЛЯ МАССИВОВ
+            elif isinstance(widget, QLineEdit) and isinstance(column.type, ARRAY):
+                text = widget.text().strip()
+                if not text:
+                    if not column.nullable:
+                        return False, None, "Обязательное поле"
+                    return True, [], ""
+
+                items = [item.strip() for item in text.split(":") if item.strip()]
+                if not items and not column.nullable:
+                    return False, None, "Не может быть пустым"
+
+                # Валидация элементов массива
+                validated_items = []
+                for i, item in enumerate(items):
+                    if isinstance(column.type.item_type, Integer):
+                        if not item.isdigit() and not (item.startswith('-') and item[1:].isdigit()):
+                            return False, None, f"Элемент {i + 1} должен быть целым числом"
+                        validated_items.append(int(item))
+                    elif isinstance(column.type.item_type, Numeric):
+                        if not re.match(r'^-?\d+(\.\d+)?$', item):
+                            return False, None, f"Элемент {i + 1} должен быть числом"
+                        validated_items.append(float(item))
+                    else:
+                        if not validate_safe_chars(item):
+                            return False, None, f"Элемент {i + 1} содержит запрещенные символы"
+                        validated_items.append(item)
+
+                return True, validated_items, ""
+
+            # ВАЛИДАЦИЯ ДЛЯ CHECKBOX (BOOLEAN)
+            elif isinstance(widget, QCheckBox):
+                return True, widget.isChecked(), ""
+
+            # ВАЛИДАЦИЯ ДЛЯ ДАТЫ
+            elif isinstance(widget, QDateEdit):
+                qdate = widget.date()
+                if not qdate.isValid():
+                    if not column.nullable:
+                        return False, None, "Требуется valid дата"
+                    return True, None, ""
+
+                current_date = QDate.currentDate()
+                if qdate < QDate(1900, 1, 1):
+                    return False, None, "Дата слишком старая"
+                if qdate > current_date.addYears(100):
+                    return False, None, "Дата слишком далекая в будущем"
+
+                return True, qdate.toString("yyyy-MM-dd"), ""
+
+            # ВАЛИДАЦИЯ ДЛЯ ДАТЫ И ВРЕМЕНИ
+            elif isinstance(widget, QDateTimeEdit):
+                qdatetime = widget.dateTime()
+                if not qdatetime.isValid():
+                    if not column.nullable:
+                        return False, None, "Требуется valid дата и время"
+                    return True, None, ""
+
+                return True, qdatetime.toString("yyyy-MM-dd HH:mm:ss"), ""
+
+            # ВАЛИДАЦИЯ ДЛЯ ТЕКСТОВЫХ ПОЛЕЙ
+            elif isinstance(widget, QTextEdit):
+                text = widget.toPlainText().strip()
+                if not text:
+                    if not column.nullable:
+                        return False, None, "Обязательное поле"
+                    return True, None, ""
+
+                if not validate_safe_chars(text):
+                    return False, None, "Содержит запрещенные символы"
+
+                return True, text, ""
+
+            # ВАЛИДАЦИЯ ДЛЯ ТЕКСТОВЫХ ПОЛЕЙ ВВОДА
+            elif isinstance(widget, QLineEdit):
+                text = widget.text().strip()
+                if not text:
+                    if not column.nullable:
+                        return False, None, "Обязательное поле"
+                    return True, None, ""
+
+                if not validate_safe_chars(text):
+                    return False, None, "Содержит запрещенные символы"
+
+                # Валидация для Integer
+                if isinstance(column.type, Integer):
+                    if not text.isdigit() and not (text.startswith('-') and text[1:].isdigit()):
+                        return False, None, "Должно быть целым числом"
+
+                    value = int(text)
+                    if hasattr(column.type, 'display_width'):
+                        max_val = 2 ** (column.type.display_width * 8 - 1) - 1
+                        if abs(value) > max_val:
+                            return False, None, f"Число слишком большое (макс: {max_val})"
+
+                    return True, value, ""
+
+                # Валидация для Numeric
+                elif isinstance(column.type, Numeric):
+                    if not re.match(r'^-?\d+(\.\d+)?$', text):
+                        return False, None, "Должно быть числом (например: 15 или 3.14)"
+
+                    try:
+                        value = float(text)
+                        if abs(value) > 10 ** 15:
+                            return False, None, "Число слишком большое"
+                        return True, value, ""
+                    except (ValueError, OverflowError):
+                        return False, None, "Некорректное числовое значение"
+
+                # Валидация для String
+                elif isinstance(column.type, String):
+                    max_length = getattr(column.type, 'length', None)
+                    if max_length and len(text) > max_length:
+                        return False, None, f"Превышена длина ({len(text)}/{max_length} символов)"
+
+                    # Специфическая валидация для email
+                    if is_email_field(display_name) and not validate_email(text):
+                        return False, None, "Некорректный email адрес"
+
+                    # Специфическая валидация для телефона
+                    if is_phone_field(display_name) and not validate_phone(text):
+                        return False, None, "Некорректный номер телефона"
+
+                    return True, text, ""
+
+                else:
+                    return True, text, ""
+
+            # НЕИЗВЕСТНЫЙ ТИП ВИДЖЕТА
+            else:
+                return False, None, "Неизвестный тип поля"
+
+        except Exception as e:
+            return False, None, f"Ошибка обработки: {str(e)}"
 
     def load_table_fields(self, table_name: str):
         """Загружает и отображает поля для выбранной таблицы."""
@@ -363,13 +634,13 @@ class AddRecordDialog(QDialog):
         table = self.db_instance.tables[table_name]
 
         for column in table.columns:
-            # Пропускаем автоинкрементные PK — они генерируются БД
+            # Пропускаем автоинкрементные PK
             if column.primary_key and column.autoincrement:
                 continue
 
             display_name = self.COLUMN_HEADERS_MAP.get(column.name, column.name)
 
-            # Определяем тип и создаём соответствующий виджет
+            # Создаем соответствующий виджет
             widget = None
             placeholder = ""
 
@@ -381,224 +652,172 @@ class AddRecordDialog(QDialog):
             elif isinstance(column.type, String):
                 widget = QLineEdit()
                 placeholder = "Введите текст"
+                # Подключаем валидацию в реальном времени для текстовых полей
+                widget.textChanged.connect(lambda text, dn=display_name: self.validate_real_time(dn))
             elif isinstance(column.type, Integer):
                 widget = QLineEdit()
                 placeholder = "Введите целое число"
+                widget.textChanged.connect(lambda text, dn=display_name: self.validate_real_time(dn))
             elif isinstance(column.type, Numeric):
                 widget = QLineEdit()
                 placeholder = "Введите число (с точкой)"
+                widget.textChanged.connect(lambda text, dn=display_name: self.validate_real_time(dn))
             elif isinstance(column.type, Boolean):
                 widget = QCheckBox("Да")
                 placeholder = ""
+                widget.stateChanged.connect(lambda state, dn=display_name: self.validate_real_time(dn))
             elif isinstance(column.type, Date):
                 widget = QDateEdit()
                 widget.setCalendarPopup(True)
                 widget.setDate(QDate.currentDate())
                 placeholder = "Выберите дату"
+                widget.dateChanged.connect(lambda date, dn=display_name: self.validate_real_time(dn))
             elif isinstance(column.type, DateTime):
                 widget = QDateTimeEdit()
                 widget.setCalendarPopup(True)
                 widget.setDateTime(QDateTime.currentDateTime())
                 placeholder = "Выберите дату и время"
+                widget.dateTimeChanged.connect(lambda datetime, dn=display_name: self.validate_real_time(dn))
             elif isinstance(column.type, ARRAY):
-                if isinstance(column.type.item_type, String):
-                    widget = QLineEdit()
-                    placeholder = "Введите значения через двоеточие: знач1:знач2"
-                else:
-                    widget = QLineEdit()
-                    placeholder = "Введите значения через двоеточие"
+                widget = QLineEdit()
+                placeholder = "Введите значения через двоеточие: знач1:знач2"
+                widget.textChanged.connect(lambda text, dn=display_name: self.validate_real_time(dn))
             elif isinstance(column.type, Text):
                 widget = QTextEdit()
                 widget.setMaximumHeight(80)
                 placeholder = "Введите текст"
+                widget.textChanged.connect(lambda: self.validate_real_time(display_name))
             else:
                 widget = QLineEdit()
                 placeholder = "Введите значение"
+                widget.textChanged.connect(lambda text, dn=display_name: self.validate_real_time(dn))
 
             if isinstance(widget, (QLineEdit, QTextEdit)) and placeholder:
                 widget.setPlaceholderText(placeholder)
 
-            # Добавляем строку в layout
-            field_row = self.create_field_row(f"{display_name}:", widget)
+            # Создаем строку с меткой ошибки
+            field_row, error_label = self.create_field_row(f"{display_name}:", widget)
             self.fields_layout.addWidget(field_row)
             self.input_widgets[display_name] = widget
+            self.error_labels[display_name] = error_label
+            self.field_validity[display_name] = True  # Изначально поле валидно
 
-        # Добавляем растягивающий элемент для выравнивания
         self.fields_layout.addStretch()
 
+    def validate_real_time(self, field_name):
+        """Валидация в реальном времени при изменении поля"""
+        if field_name not in self.input_widgets:
+            return
+
+        widget = self.input_widgets[field_name]
+        table_name = self.table_combo.currentText()
+
+        if table_name not in self.db_instance.tables:
+            return
+
+        table = self.db_instance.tables[table_name]
+        col_name = self.REVERSE_COLUMN_HEADERS_MAP.get(field_name, field_name)
+
+        try:
+            column = getattr(table.c, col_name)
+        except AttributeError:
+            return
+
+        is_valid, value, error_message = self.validate_field(field_name, widget, column)
+        self.set_field_error(field_name, error_message)
+
     def on_add_clicked(self):
+        """Обработчик нажатия кнопки добавления с валидацией"""
         table_name = self.table_combo.currentText()
         if not table_name:
             notification.notify(title="Ошибка", message="Выберите таблицу!", timeout=3)
             return
 
+        # Валидируем все поля перед отправкой
+        all_valid = True
         data = {}
         table = self.db_instance.tables[table_name]
 
         for display_name, widget in self.input_widgets.items():
-            # Находим реальное имя колонки по отображаемому
             col_name = self.REVERSE_COLUMN_HEADERS_MAP.get(display_name, display_name)
+
             try:
                 column = getattr(table.c, col_name)
             except AttributeError:
-                notification.notify(
-                    title="Ошибка",
-                    message=f"Колонка '{col_name}' не найдена в таблице '{table_name}'.",
-                    timeout=5
-                )
-                return
+                self.set_field_error(display_name, "Колонка не найдена в таблице")
+                all_valid = False
+                continue
 
-            # --- Валидация по типам ---
-            if isinstance(widget, QComboBox) and (hasattr(column.type, 'enums') or isinstance(column.type, SQLEnum)):
-                value = widget.currentText()
-                if not value:
-                    if not column.nullable:
-                        notification.notify(title="Ошибка", message=f"Поле '{display_name}' обязательно.", timeout=3)
-                        return
-                    else:
-                        data[col_name] = None
-                else:
-                    allowed_values = getattr(column.type, 'enums', [])
-                    if allowed_values and value not in allowed_values:
-                        notification.notify(
-                            title="Ошибка",
-                            message=f"Значение '{value}' не допустимо для поля '{display_name}'.",
-                            timeout=5
-                        )
-                        return
+            is_valid, value, error_message = self.validate_field(display_name, widget, column)
+
+            if not is_valid:
+                self.set_field_error(display_name, error_message)
+                all_valid = False
+            else:
+                self.clear_field_error(display_name)
+                if value is not None:
                     data[col_name] = value
 
-            elif isinstance(widget, QLineEdit) and isinstance(column.type, ARRAY):
-                text = widget.text().strip()
-                if not text:
-                    if not column.nullable:
-                        notification.notify(title="Ошибка", message=f"Поле '{display_name}' обязательно.", timeout=3)
-                        return
-                    data[col_name] = []
-                else:
-                    items = [item.strip() for item in text.split(":") if item.strip()]
-                    if not items and not column.nullable:
-                        notification.notify(title="Ошибка", message=f"Поле '{display_name}' не может быть пустым.",
-                                            timeout=3)
-                        return
-                    data[col_name] = items
+        # Проверка обязательных полей, которые могли быть пропущены
+        for column in table.columns:
+            if (not column.nullable and
+                    not column.primary_key and
+                    not column.autoincrement and
+                    column.name not in data):
 
-            elif isinstance(widget, QCheckBox):  # Boolean
-                data[col_name] = widget.isChecked()
+                display = self.COLUMN_HEADERS_MAP.get(column.name, column.name)
+                if display in self.input_widgets:  # Если поле есть в форме
+                    self.set_field_error(display, "Обязательное поле")
+                all_valid = False
 
-            elif isinstance(widget, QDateEdit):  # Date
-                qdate = widget.date()
-                if qdate.isValid():
-                    data[col_name] = qdate.toString("yyyy-MM-dd")
-                else:
-                    if not column.nullable:
-                        notification.notify(title="Ошибка", message=f"Поле '{display_name}' обязательно.", timeout=3)
-                        return
-                    else:
-                        data[col_name] = None
+        if not all_valid:
+            notification.notify(
+                title="❌ Ошибки валидации",
+                message="Исправьте ошибки в форме перед отправкой",
+                timeout=3
+            )
+            return
 
-            elif isinstance(widget, QDateTimeEdit):  # DateTime
-                qdatetime = widget.dateTime()
-                if qdatetime.isValid():
-                    data[col_name] = qdatetime.toString("yyyy-MM-dd HH:mm:ss")
-                else:
-                    if not column.nullable:
-                        notification.notify(title="Ошибка", message=f"Поле '{display_name}' обязательно.", timeout=3)
-                        return
-                    else:
-                        data[col_name] = None
-
-            elif isinstance(widget, QTextEdit):  # Text
-                text = widget.toPlainText().strip()
-                if not text:
-                    if not column.nullable:
-                        notification.notify(title="Ошибка", message=f"Поле '{display_name}' обязательно.", timeout=3)
-                        return
-                    data[col_name] = None
-                else:
-                    data[col_name] = text
-
-            elif isinstance(widget, QLineEdit):  # String / Integer / Numeric
-                text = widget.text().strip()
-                if not text:
-                    if not column.nullable:
-                        notification.notify(title="Ошибка", message=f"Поле '{display_name}' обязательно.", timeout=3)
-                        return
-                    data[col_name] = None
-                else:
-                    if isinstance(column.type, Integer):
-                        if not text.isdigit():
-                            notification.notify(
-                                title="Ошибка",
-                                message=f"Поле '{display_name}' должно быть целым числом.",
-                                timeout=3
+        # Проверка уникальности (если реализовано)
+        if hasattr(self.db_instance, 'check_existing_record'):
+            try:
+                for column in table.columns:
+                    if column.primary_key or column.unique:
+                        if column.name in data:
+                            exists = self.db_instance.check_existing_record(
+                                table_name,
+                                {column.name: data[column.name]}
                             )
-                            return
-                        data[col_name] = int(text)
-
-                    elif isinstance(column.type, Numeric):
-                        if not re.match(r'^-?\d+(\.\d+)?$', text):
-                            notification.notify(
-                                title="Ошибка",
-                                message=f"Поле '{display_name}' должно быть числом (например: 10 или 3.14).",
-                                timeout=3
-                            )
-                            return
-                        try:
-                            data[col_name] = float(text)
-                        except ValueError:
-                            notification.notify(
-                                title="Ошибка",
-                                message=f"Некорректное числовое значение в поле '{display_name}'.",
-                                timeout=3
-                            )
-                            return
-
-                    elif isinstance(column.type, String):
-                        max_length = getattr(column.type, 'length', None)
-                        if max_length and len(text) > max_length:
-                            notification.notify(
-                                title="Ошибка",
-                                message=f"Поле '{display_name}' не должно превышать {max_length} символов.",
-                                timeout=5
-                            )
-                            return
-                        data[col_name] = text
-
-                    else:
-                        data[col_name] = text
-
-            else:
-                notification.notify(
-                    title="Ошибка",
-                    message=f"Неизвестный тип виджета для поля '{display_name}'.",
-                    timeout=5
-                )
-                return
-
-        # Финальная валидация
-        for col in table.columns:
-            if not col.nullable and not col.primary_key and col.name not in data:
-                display = self.COLUMN_HEADERS_MAP.get(col.name, col.name)
-                notification.notify(
-                    title="Ошибка",
-                    message=f"Поле '{display}' обязательно для заполнения.",
-                    timeout=5
-                )
-                return
+                            if exists:
+                                display = self.COLUMN_HEADERS_MAP.get(column.name, column.name)
+                                notification.notify(
+                                    title="Ошибка уникальности",
+                                    message=f"Запись с таким значением '{display}' уже существует",
+                                    timeout=5
+                                )
+                                return
+            except Exception as e:
+                print(f"Ошибка проверки уникальности: {e}")
 
         # Вставляем данные
-        success = self.db_instance.insert_data(table_name, data)
-        if success:
-            notification.notify(
-                title="✅ Успех",
-                message=f"Запись успешно добавлена в таблицу '{table_name}'.",
-                timeout=5
-            )
-            self.accept()
-        else:
+        try:
+            success = self.db_instance.insert_data(table_name, data)
+            if success:
+                notification.notify(
+                    title="✅ Успех",
+                    message=f"Запись успешно добавлена в таблицу '{table_name}'",
+                    timeout=5
+                )
+                self.accept()
+            else:
+                notification.notify(
+                    title="❌ Ошибка базы данных",
+                    message=f"Не удалось добавить запись в таблицу '{table_name}'",
+                    timeout=5
+                )
+        except Exception as e:
             notification.notify(
                 title="❌ Ошибка",
-                message=f"Не удалось добавить запись. Проверьте логи (db/db_app.log).",
+                message=f"Ошибка при добавлении записи: {str(e)}",
                 timeout=5
             )

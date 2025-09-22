@@ -4,17 +4,13 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QLineEdit, QFormLayout
 )
-# Предполагается, что эти импорты корректны для вашей структуры проекта
 from tabs.menu import MainWindow
 from db.Class_DB import DB
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont, QColor, QPalette
 from plyer import notification
 
 
-# ================================
-# Окно подключения к БД
-# ================================
 class DBConnectionWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -29,7 +25,7 @@ class DBConnectionWindow(QMainWindow):
         central_widget.setObjectName("mainWidget")
 
         # Устанавливаем фиксированный размер окна
-        self.setFixedSize(500, 550)
+        self.setFixedSize(500, 650)
 
         # Главный макет
         main_layout = QVBoxLayout()
@@ -61,18 +57,37 @@ class DBConnectionWindow(QMainWindow):
         form_container = QWidget()
         form_container.setObjectName("formContainer")
         form_layout = QFormLayout()
-        form_layout.setSpacing(20)
+        form_layout.setSpacing(15)
         form_layout.setLabelAlignment(Qt.AlignRight)
-        form_layout.setVerticalSpacing(18)
+        form_layout.setVerticalSpacing(10)
         form_container.setLayout(form_layout)
 
-        # Создаем поля ввода
+        # Создаем поля ввода и метки ошибок
         self.host_input = QLineEdit("localhost")
+        self.host_error = QLabel("")
+        self.host_error.setObjectName("errorLabel")
+        self.host_error.setVisible(False)  # Скрываем ошибку изначально
+
         self.port_input = QLineEdit("5432")
+        self.port_error = QLabel("")
+        self.port_error.setObjectName("errorLabel")
+        self.port_error.setVisible(False)
+
         self.dbname_input = QLineEdit("library_db")
+        self.dbname_error = QLabel("")
+        self.dbname_error.setObjectName("errorLabel")
+        self.dbname_error.setVisible(False)
+
         self.user_input = QLineEdit("postgres")
+        self.user_error = QLabel("")
+        self.user_error.setObjectName("errorLabel")
+        self.user_error.setVisible(False)
+
         self.password_input = QLineEdit("password")
         self.password_input.setEchoMode(QLineEdit.Password)
+        self.password_error = QLabel("")
+        self.password_error.setObjectName("errorLabel")
+        self.password_error.setVisible(False)
 
         # Настройка полей ввода
         input_fields = [self.host_input, self.port_input, self.dbname_input, self.user_input, self.password_input]
@@ -80,15 +95,26 @@ class DBConnectionWindow(QMainWindow):
 
         for field, placeholder in zip(input_fields, placeholders):
             field.setPlaceholderText(placeholder)
-            field.setMinimumHeight(48)
+            field.setMinimumHeight(42)
             field.setObjectName("inputField")
+            # Подключаем валидацию при изменении текста с задержкой
+            field.textChanged.connect(self.schedule_validation)
 
-        # Добавляем поля в форму
+        # Добавляем поля и ошибки в форму
         form_layout.addRow(self.create_label("HOST:"), self.host_input)
+        form_layout.addRow("", self.host_error)
+
         form_layout.addRow(self.create_label("PORT:"), self.port_input)
+        form_layout.addRow("", self.port_error)
+
         form_layout.addRow(self.create_label("DATABASE:"), self.dbname_input)
+        form_layout.addRow("", self.dbname_error)
+
         form_layout.addRow(self.create_label("USER:"), self.user_input)
+        form_layout.addRow("", self.user_error)
+
         form_layout.addRow(self.create_label("PASSWORD:"), self.password_input)
+        form_layout.addRow("", self.password_error)
 
         # Кнопка подключения
         self.connect_button = QPushButton("ПОДКЛЮЧИТЬСЯ")
@@ -104,6 +130,12 @@ class DBConnectionWindow(QMainWindow):
         main_layout.addSpacing(25)
         main_layout.addWidget(self.connect_button)
         main_layout.addStretch()
+
+        # Таймер для отложенной валидации
+        self.validation_timer = QTimer()
+        self.validation_timer.setSingleShot(True)
+        self.validation_timer.timeout.connect(self.validate_all_fields_realtime)
+
         # Применяем стили
         self.apply_styles()
 
@@ -113,11 +145,176 @@ class DBConnectionWindow(QMainWindow):
         self.db_instance = None
         self.main_window = None
 
+        # Валидируем начальные значения
+        QTimer.singleShot(100, self.validate_all_fields_realtime)
+
     def create_label(self, text):
         """Создает стилизованную метку"""
         label = QLabel(text)
         label.setObjectName("formLabel")
         return label
+
+    def schedule_validation(self):
+        """Запускает отложенную валидацию"""
+        self.validation_timer.start(300)  # 300ms задержка
+
+    def validate_all_fields_realtime(self):
+        """Валидация всех полей в реальном времени"""
+        is_valid = True
+
+        # Хост
+        host = self.host_input.text().strip()
+        host_error = self.get_host_error(host)
+        if host_error:
+            is_valid = False
+            self.host_error.setText(host_error)
+            self.host_error.setVisible(True)
+            self.set_field_error_style(self.host_input, True)
+        else:
+            self.host_error.setVisible(False)
+            self.set_field_error_style(self.host_input, False)
+
+        # Порт
+        port = self.port_input.text().strip()
+        port_error = self.get_port_error(port)
+        if port_error:
+            is_valid = False
+            self.port_error.setText(port_error)
+            self.port_error.setVisible(True)
+            self.set_field_error_style(self.port_input, True)
+        else:
+            self.port_error.setVisible(False)
+            self.set_field_error_style(self.port_input, False)
+
+        # Имя базы данных
+        dbname = self.dbname_input.text().strip()
+        dbname_error = self.get_dbname_error(dbname)
+        if dbname_error:
+            is_valid = False
+            self.dbname_error.setText(dbname_error)
+            self.dbname_error.setVisible(True)
+            self.set_field_error_style(self.dbname_input, True)
+        else:
+            self.dbname_error.setVisible(False)
+            self.set_field_error_style(self.dbname_input, False)
+
+        # Пользователь
+        user = self.user_input.text().strip()
+        user_error = self.get_user_error(user)
+        if user_error:
+            is_valid = False
+            self.user_error.setText(user_error)
+            self.user_error.setVisible(True)
+            self.set_field_error_style(self.user_input, True)
+        else:
+            self.user_error.setVisible(False)
+            self.set_field_error_style(self.user_input, False)
+
+        # Пароль
+        password = self.password_input.text()
+        password_error = self.get_password_error(password)
+        if password_error:
+            is_valid = False
+            self.password_error.setText(password_error)
+            self.password_error.setVisible(True)
+            self.set_field_error_style(self.password_input, True)
+        else:
+            self.password_error.setVisible(False)
+            self.set_field_error_style(self.password_input, False)
+
+        # Активируем/деактивируем кнопку
+        self.connect_button.setEnabled(is_valid)
+
+    def set_field_error_style(self, field, has_error):
+        """Устанавливает стиль поля в зависимости от наличия ошибки"""
+        if has_error:
+            field.setStyleSheet("""
+                #inputField {
+                    background: rgba(25, 25, 35, 0.8);
+                    border: 2px solid #ff5555;
+                    border-radius: 8px;
+                    padding: 12px;
+                    font-size: 13px;
+                    font-family: 'Consolas', 'Fira Code', monospace;
+                    color: #f8f8f2;
+                }
+                #inputField:focus {
+                    background: rgba(35, 35, 45, 0.9);
+                    border: 2px solid #ff5555;
+                    border-radius: 8px;
+                }
+            """)
+        else:
+            field.setStyleSheet("""
+                #inputField {
+                    background: rgba(25, 25, 35, 0.8);
+                    border: 2px solid #44475a;
+                    border-radius: 8px;
+                    padding: 12px;
+                    font-size: 13px;
+                    font-family: 'Consolas', 'Fira Code', monospace;
+                    color: #f8f8f2;
+                }
+                #inputField:hover {
+                    border: 2px solid #6272a4;
+                    background: rgba(30, 30, 40, 0.9);
+                }
+                #inputField:focus {
+                    background: rgba(35, 35, 45, 0.9);
+                    border: 2px solid #64ffda;
+                    border-radius: 8px;
+                }
+            """)
+
+    def get_host_error(self, host):
+        """Валидация хоста"""
+        if not host:
+            return "Хост не может быть пустым"
+        elif len(host) > 255:
+            return "Хост слишком длинный (макс. 255 символов)"
+        elif not all(c.isalnum() or c in '.-_' for c in host):
+            return "Хост содержит недопустимые символы"
+        return ""
+
+    def get_port_error(self, port):
+        """Валидация порта"""
+        if not port:
+            return "Порт не может быть пустым"
+        elif not port.isdigit():
+            return "Порт должен быть числом"
+        else:
+            port_num = int(port)
+            if port_num < 1 or port_num > 65535:
+                return "Порт должен быть в диапазоне 1-65535"
+        return ""
+
+    def get_dbname_error(self, dbname):
+        """Валидация имени базы данных"""
+        if not dbname:
+            return "Имя базы данных не может быть пустым"
+        elif len(dbname) > 63:
+            return "Имя базы данных слишком длинное (макс. 63 символа)"
+        elif not dbname[0].isalpha():
+            return "Имя базы данных должно начинаться с буквы"
+        elif not all(c.isalnum() or c == '_' for c in dbname):
+            return "Имя базы данных может содержать только буквы, цифры и подчеркивания"
+        return ""
+
+    def get_user_error(self, user):
+        """Валидация пользователя"""
+        if not user:
+            return "Имя пользователя не может быть пустым"
+        elif len(user) > 63:
+            return "Имя пользователя слишком длинное (макс. 63 символа)"
+        elif not all(c.isalnum() or c in '_-' for c in user):
+            return "Имя пользователя содержит недопустимые символы"
+        return ""
+
+    def get_password_error(self, password):
+        """Валидация пароля"""
+        if len(password) > 100:
+            return "Пароль слишком длинный (макс. 100 символов)"
+        return ""
 
     def set_dark_palette(self):
         """Устанавливает тёмную цветовую палитру"""
@@ -168,42 +365,26 @@ class DBConnectionWindow(QMainWindow):
                 border: none;
             }
 
-            /* Поля ввода */
-            #inputField {
-                background: rgba(25, 25, 35, 0.8);
-                border: 2px solid #44475a;
-                border-radius: 8px;
-                padding: 14px;
-                font-size: 13px;
-                font-family: 'Consolas', 'Fira Code', monospace;
-                color: #f8f8f2;
-                selection-background-color: #64ffda;
-                selection-color: #0a0a0f;
-            }
-
-            #inputField:hover {
-                border: 2px solid #6272a4;
-                background: rgba(30, 30, 40, 0.9);
-            }
-
-
-            #inputField:focus {
-                background: rgba(35, 35, 45, 0.9);
-                border: 2px solid #64ffda;
-                border-radius: 8px;
-            }
-
-            #inputField::placeholder {
-                color: #6272a4;
-                font-style: italic;
+            /* Метки ошибок */
+            #errorLabel {
+                color: #ff5555;
+                font-size: 11px;
+                font-weight: bold;
+                padding: 3px 5px;
+                background: rgba(255, 85, 85, 0.1);
+                border-radius: 4px;
+                border-left: 3px solid #ff5555;
+                margin-top: 2px;
+                min-height: 18px;
             }
 
             /* Контейнер формы */
             #formContainer {
                 background: rgba(15, 15, 25, 0.6);
                 border-radius: 15px;
-                padding: 30px;
+                padding: 25px;
             }
+
             /* Кнопка подключения */
             #connectButton {
                 background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
@@ -265,10 +446,30 @@ class DBConnectionWindow(QMainWindow):
 
     def on_connect_clicked(self):
         """Обработчик клика по кнопке подключения"""
+        # Финальная проверка перед подключением
+        self.validate_all_fields_realtime()
+
+        # Проверяем, есть ли ошибки
+        has_errors = any([
+            self.host_error.text(),
+            self.port_error.text(),
+            self.dbname_error.text(),
+            self.user_error.text(),
+            self.password_error.text()
+        ])
+
+        if has_errors:
+            notification.notify(
+                title="Ошибки ввода",
+                message="Пожалуйста, исправьте ошибки в форме перед подключением",
+                timeout=5
+            )
+            return
+
         # Меняем текст кнопки во время подключения
         self.connect_button.setText("🔄 ПОДКЛЮЧЕНИЕ...")
         self.connect_button.setEnabled(False)
-        QApplication.processEvents() # Обновляем UI
+        QApplication.processEvents()
 
         # Запускаем подключение
         self.connect_to_database()
@@ -282,17 +483,6 @@ class DBConnectionWindow(QMainWindow):
         user = self.user_input.text().strip()
         password = self.password_input.text()
 
-        # Валидация порта
-        if not port.isdigit():
-            notification.notify(
-                title="Ошибка ввода",
-                message="Порт должен быть числом!",
-                timeout=5
-            )
-            self.connect_button.setText("ПОДКЛЮЧИТЬСЯ")
-            self.connect_button.setEnabled(True)
-            return
-
         port = int(port)
 
         # Настройка логгера
@@ -300,7 +490,6 @@ class DBConnectionWindow(QMainWindow):
         logger.setLevel(logging.DEBUG)
         logger.handlers.clear()
 
-        # Убедимся, что директория db существует, или логируем в текущую
         try:
             file_handler = logging.FileHandler("db/db_app.log", encoding='utf-8')
             log_file_path = "db/db_app.log"
@@ -325,6 +514,7 @@ class DBConnectionWindow(QMainWindow):
 
         # Подключение
         connected = db.connect()
+
         # Показываем уведомление
         if connected:
             notification.notify(
@@ -345,16 +535,10 @@ class DBConnectionWindow(QMainWindow):
             self.connect_button.setText("ПОДКЛЮЧИТЬСЯ")
             self.connect_button.setEnabled(True)
 
-# ================================
-# Запуск приложения
-# ================================
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-    # Устанавливаем стиль Fusion для лучшего отображения тёмной темы
     app.setStyle("Fusion")
-
     window = DBConnectionWindow()
     window.show()
-
     sys.exit(app.exec())

@@ -7,6 +7,7 @@ from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, 
 from plyer import notification
 from PySide6.QtGui import QFont, QPalette, QColor
 from PySide6.QtCore import Qt
+import re
 
 
 class DeleteRecordDialog(QDialog):
@@ -18,6 +19,8 @@ class DeleteRecordDialog(QDialog):
         self.COLUMN_HEADERS_MAP = COLUMN_HEADERS_MAP
         self.REVERSE_COLUMN_HEADERS_MAP = REVERSE_COLUMN_HEADERS_MAP
         self.condition_widgets = {}  # {col_name: widget}
+        self.error_labels = {}  # {col_name: QLabel} для отображения ошибок
+        self.validation_errors = {}  # {col_name: error_message}
 
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
@@ -139,6 +142,11 @@ class DeleteRecordDialog(QDialog):
                 background: rgba(35, 35, 45, 0.9);
             }
 
+            QLineEdit.invalid, QDateEdit.invalid {
+                border: 2px solid #ff5555;
+                background: rgba(75, 25, 35, 0.8);
+            }
+
             QLineEdit::placeholder, QDateEdit::placeholder {
                 color: #6272a4;
                 font-style: italic;
@@ -203,6 +211,17 @@ class DeleteRecordDialog(QDialog):
 
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                 height: 0px;
+            }
+
+            .error-label {
+                color: #ff5555;
+                font-size: 11px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 2px 5px;
+                background: rgba(75, 25, 35, 0.3);
+                border-radius: 4px;
+                margin-top: 2px;
             }
         """)
 
@@ -294,13 +313,16 @@ class DeleteRecordDialog(QDialog):
         """Полностью очищает все поля ввода."""
         self._clear_layout(self.fields_layout)
         self.condition_widgets.clear()
+        self.error_labels.clear()
+        self.validation_errors.clear()
 
-    def create_field_row(self, label_text, widget):
-        """Создает строку с меткой и виджетом ввода"""
-        row_widget = QWidget()
-        row_widget.setObjectName("fieldRow")
-        row_widget.setStyleSheet("""
-            #fieldRow {
+    def create_field_row(self, label_text, widget, column_name):
+        """Создает строку с меткой, виджетом ввода и меткой ошибки"""
+        # Основной контейнер для всего поля
+        main_widget = QWidget()
+        main_widget.setObjectName("fieldMain")
+        main_widget.setStyleSheet("""
+            #fieldMain {
                 background: rgba(25, 25, 35, 0.3);
                 border-radius: 8px;
                 padding: 8px;
@@ -308,8 +330,15 @@ class DeleteRecordDialog(QDialog):
             }
         """)
 
+        # Вертикальный layout для метки, поля ввода и ошибки
+        main_layout = QVBoxLayout(main_widget)
+        main_layout.setContentsMargins(10, 5, 10, 5)
+        main_layout.setSpacing(5)
+
+        # Горизонтальный layout для метки и поля ввода
+        row_widget = QWidget()
         row_layout = QHBoxLayout(row_widget)
-        row_layout.setContentsMargins(10, 5, 10, 5)
+        row_layout.setContentsMargins(0, 0, 0, 0)
 
         label = QLabel(label_text)
         label.setMinimumWidth(180)
@@ -319,7 +348,135 @@ class DeleteRecordDialog(QDialog):
         row_layout.addWidget(label)
         row_layout.addWidget(widget, 1)
 
-        return row_widget
+        # Метка для отображения ошибки (изначально скрыта)
+        error_label = QLabel("")
+        error_label.setObjectName("errorLabel")
+        error_label.setStyleSheet(".error-label { color: #ff5555; }")
+        error_label.setFont(QFont("Consolas", 9))
+        error_label.setWordWrap(True)
+        error_label.setVisible(False)
+
+        # Добавляем в основной layout
+        main_layout.addWidget(row_widget)
+        main_layout.addWidget(error_label)
+
+        # Сохраняем ссылку на метку ошибки
+        self.error_labels[column_name] = error_label
+
+        return main_widget
+
+    def validate_integer(self, text, column_name):
+        """Валидация целочисленных значений"""
+        if not text.strip():
+            return None, None  # Пустое значение допустимо
+
+        # Проверка на целое число
+        if not re.match(r'^-?\d+$', text):
+            return None, f"Поле '{column_name}' должно содержать целое число"
+
+        # Проверка на переполнение
+        try:
+            value = int(text)
+            if value < -2147483648 or value > 2147483647:
+                return None, f"Число выходит за пределы диапазона (-2147483648 до 2147483647)"
+            return value, None
+        except ValueError:
+            return None, f"Некорректное целое число в поле '{column_name}'"
+
+    def validate_numeric(self, text, column_name):
+        """Валидация числовых значений с плавающей точкой"""
+        if not text.strip():
+            return None, None  # Пустое значение допустимо
+
+        # Проверка на число (включая отрицательные и с плавающей точкой)
+        if not re.match(r'^-?\d*\.?\d+$', text):
+            return None, f"Поле '{column_name}' должно содержать число"
+
+        # Проверка на переполнение
+        try:
+            value = float(text)
+            return value, None
+        except ValueError:
+            return None, f"Некорректное число в поле '{column_name}'"
+
+    def validate_string_length(self, text, column):
+        """Валидация длины строки"""
+        if not text.strip():
+            return None, None  # Пустое значение допустимо
+
+        if hasattr(column.type, 'length') and column.type.length:
+            if len(text) > column.type.length:
+                return None, f"Длина текста превышает максимальную ({column.type.length} символов)"
+
+        return text, None
+
+    def validate_array(self, text, column_name):
+        """Валидация массива строк"""
+        if not text.strip():
+            return None, None  # Пустое значение допустимо
+
+        items = [item.strip() for item in text.split(",") if item.strip()]
+
+        # Проверка каждого элемента массива
+        for i, item in enumerate(items):
+            if not item:
+                return None, f"Элемент {i + 1} массива '{column_name}' не может быть пустым"
+            if len(item) > 255:  # Ограничение длины элемента массива
+                return None, f"Элемент {i + 1} массива слишком длинный (макс. 255 символов)"
+
+        return items, None
+
+    def validate_date(self, date_edit, column_name):
+        """Валидация даты"""
+        if not date_edit.date().isValid() or date_edit.date().year() == 2000:
+            return None, None  # Не заданная дата допустима
+
+        # Проверка на разумные пределы дат
+        current_date = QDate.currentDate()
+        min_date = QDate(1900, 1, 1)
+
+        if date_edit.date() < min_date:
+            return None, f"Дата не может быть раньше 1900 года"
+
+        if date_edit.date() > current_date.addYears(10):  # +10 лет в будущее
+            return None, f"Дата не может быть более чем на 10 лет в будущем"
+
+        return date_edit.date().toString("yyyy-MM-dd"), None
+
+    def update_field_validation_ui(self, column_name, is_valid=True, error_message=""):
+        """Обновляет UI для отображения статуса валидации"""
+        widget = self.condition_widgets.get(column_name)
+        error_label = self.error_labels.get(column_name)
+
+        if not widget or not error_label:
+            return
+
+        # Обновляем стиль поля ввода
+        if is_valid:
+            widget.setStyleSheet("""
+                background: rgba(25, 25, 35, 0.8);
+                border: 2px solid #44475a;
+                border-radius: 8px;
+                padding: 12px;
+                color: #f8f8f2;
+            """)
+        else:
+            widget.setStyleSheet("""
+                background: rgba(75, 25, 35, 0.8);
+                border: 2px solid #ff5555;
+                border-radius: 8px;
+                padding: 12px;
+                color: #f8f8f2;
+            """)
+
+        # Обновляем метку ошибки
+        if error_message:
+            error_label.setText(error_message)
+            error_label.setStyleSheet(".error-label { color: #ff5555; }")
+            error_label.setVisible(True)
+        else:
+            error_label.setText("")
+            error_label.setVisible(False)
 
     def load_table_fields(self, table_name: str):
         """Загружает и отображает поля условий для выбранной таблицы."""
@@ -343,44 +500,148 @@ class DeleteRecordDialog(QDialog):
                 widget = QComboBox()
                 widget.addItem("")  # пустой элемент = не задано
                 widget.addItems(column.type.enums)
+                # Добавляем валидацию при изменении значения
+                widget.currentTextChanged.connect(lambda text, col=column: self.validate_field(col))
 
             elif isinstance(column.type, ARRAY) and isinstance(column.type.item_type, String):
                 widget = QLineEdit()
                 widget.setPlaceholderText("Введите через запятую или оставьте пустым")
+                # Добавляем валидацию при изменении текста
+                widget.textChanged.connect(lambda text, col=column: self.validate_field(col))
 
             elif isinstance(column.type, Boolean):
                 widget = QComboBox()
                 widget.addItem("")  # не задано
                 widget.addItem("Да", True)
                 widget.addItem("Нет", False)
+                # Добавляем валидацию при изменении значения
+                widget.currentIndexChanged.connect(lambda idx, col=column: self.validate_field(col))
 
             elif isinstance(column.type, Date):
                 widget = QDateEdit()
                 widget.setCalendarPopup(True)
                 widget.setSpecialValueText("Не задано")
                 widget.setDate(QDate(2000, 1, 1))  # маркер "не задано"
+                # Добавляем валидацию при изменении даты
+                widget.dateChanged.connect(lambda date, col=column: self.validate_field(col))
 
-            elif isinstance(column.type, (Integer, Numeric)):
+            elif isinstance(column.type, Integer):
+                widget = QLineEdit()
+                widget.setPlaceholderText("Целое число или оставьте пустым")
+                # Добавляем валидацию при изменении текста
+                widget.textChanged.connect(lambda text, col=column: self.validate_field(col))
+
+            elif isinstance(column.type, Numeric):
                 widget = QLineEdit()
                 widget.setPlaceholderText("Число или оставьте пустым")
+                # Добавляем валидацию при изменении текста
+                widget.textChanged.connect(lambda text, col=column: self.validate_field(col))
 
             elif isinstance(column.type, String):
                 widget = QLineEdit()
                 widget.setPlaceholderText("Текст или оставьте пустым")
+                # Добавляем валидацию при изменении текста
+                widget.textChanged.connect(lambda text, col=column: self.validate_field(col))
 
             else:
                 widget = QLineEdit()
                 widget.setPlaceholderText("Значение или оставьте пустым")
+                # Добавляем валидацию при изменении текста
+                widget.textChanged.connect(lambda text, col=column: self.validate_field(col))
 
-            # Добавляем строку в layout
-            field_row = self.create_field_row(f"{display_name}:", widget)
+            # Создаем строку с полем ввода и меткой ошибки
+            field_row = self.create_field_row(f"{display_name}:", widget, column.name)
             self.fields_layout.addWidget(field_row)
             self.condition_widgets[column.name] = widget
 
         # Добавляем растягивающий элемент для выравнивания
         self.fields_layout.addStretch()
 
+    def validate_field(self, column):
+        """Валидирует отдельное поле и обновляет его UI"""
+        widget = self.condition_widgets.get(column.name)
+        if not widget:
+            return True
+
+        value = None
+        error_message = None
+
+        try:
+            if isinstance(widget, QComboBox) and isinstance(column.type, SQLEnum):
+                value = widget.currentText()
+                if value:  # Пустое значение допустимо
+                    if value not in column.type.enums:
+                        error_message = f"Значение должно быть одним из: {', '.join(column.type.enums)}"
+
+            elif isinstance(widget, QLineEdit) and isinstance(column.type, ARRAY):
+                text = widget.text().strip()
+                value, error_message = self.validate_array(text, column.name)
+
+            elif isinstance(widget, QComboBox) and isinstance(column.type, Boolean):
+                # Для Boolean всегда валидно, так как значения предопределены
+                index = widget.currentIndex()
+                if index > 0:  # пропускаем "не задано"
+                    value = widget.currentData()
+
+            elif isinstance(widget, QDateEdit):
+                value, error_message = self.validate_date(widget, column.name)
+
+            elif isinstance(widget, QLineEdit):
+                text = widget.text().strip()
+
+                if isinstance(column.type, Integer):
+                    value, error_message = self.validate_integer(text, column.name)
+                elif isinstance(column.type, Numeric):
+                    value, error_message = self.validate_numeric(text, column.name)
+                elif isinstance(column.type, String):
+                    value, error_message = self.validate_string_length(text, column)
+                else:
+                    # Для неизвестных типов принимаем любое значение
+                    value = text if text else None
+
+        except Exception as e:
+            error_message = f"Ошибка валидации: {str(e)}"
+
+        # Обновляем UI и сохраняем ошибку
+        is_valid = error_message is None
+        self.update_field_validation_ui(column.name, is_valid, error_message)
+
+        if error_message:
+            self.validation_errors[column.name] = error_message
+        elif column.name in self.validation_errors:
+            del self.validation_errors[column.name]
+
+        return is_valid
+
+    def validate_all_fields(self):
+        """Валидирует все поля и возвращает результат"""
+        self.validation_errors.clear()
+
+        table_name = self.table_combo.currentText()
+        if table_name not in self.db_instance.tables:
+            return False
+
+        table = self.db_instance.tables[table_name]
+        all_valid = True
+
+        for column in table.columns:
+            if not self.validate_field(column):
+                all_valid = False
+
+        return all_valid
+
     def on_delete_clicked(self):
+        # Валидируем все поля перед удалением
+        if not self.validate_all_fields():
+            error_text = "\n".join([f"• {error}" for error in self.validation_errors.values()])
+            QMessageBox.warning(
+                self,
+                "Ошибки валидации",
+                f"Обнаружены ошибки в полях ввода:\n\n{error_text}\n\nПожалуйста, исправьте ошибки и попробуйте снова.",
+                QMessageBox.Ok
+            )
+            return
+
         table_name = self.table_combo.currentText()
         if not table_name:
             notification.notify(title="Ошибка", message="Выберите таблицу!", timeout=3)
@@ -416,24 +677,9 @@ class DeleteRecordDialog(QDialog):
                 text = widget.text().strip()
                 if text:
                     if isinstance(column.type, Integer):
-                        if not text.isdigit():
-                            notification.notify(
-                                title="Ошибка",
-                                message=f"Поле '{col_name}' должно быть целым числом.",
-                                timeout=3
-                            )
-                            return
                         condition[col_name] = int(text)
                     elif isinstance(column.type, Numeric):
-                        try:
-                            condition[col_name] = float(text)
-                        except ValueError:
-                            notification.notify(
-                                title="Ошибка",
-                                message=f"Поле '{col_name}' должно быть числом.",
-                                timeout=3
-                            )
-                            return
+                        condition[col_name] = float(text)
                     else:
                         condition[col_name] = text
 
