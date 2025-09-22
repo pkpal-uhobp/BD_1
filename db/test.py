@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from Class_DB import DB
 
 def fill_test_data(db):

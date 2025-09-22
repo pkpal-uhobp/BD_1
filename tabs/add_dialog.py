@@ -1,29 +1,12 @@
-import sys
+from sqlalchemy import DateTime, Text
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QToolBar, QPushButton, QLabel,
-    QVBoxLayout, QWidget, QMessageBox, QTableWidget, QTableWidgetItem, QSizePolicy, QWidgetAction, QTableView
-)
-from sqlalchemy import (
-    String, Integer, Float, Boolean, Date, DateTime, Enum, ARRAY, Numeric, Text
-)
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QRadioButton, QButtonGroup,
-    QComboBox, QPushButton, QLabel, QMessageBox
-)
-from decimal import Decimal
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QCheckBox,
-    QDateEdit, QPushButton, QScrollArea, QWidget, QTextEdit, QLineEdit, QDateTimeEdit
-)
-from PySide6.QtCore import Qt, QDate, QDateTime, QTime
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QCheckBox,
+    QDateEdit, QPushButton, QScrollArea, QWidget, QTextEdit, QLineEdit, QDateTimeEdit)
+from PySide6.QtCore import QDate, QDateTime
 from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, String
 import re
-
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QAction, QStandardItem, QStandardItemModel
 from plyer import notification
 
-from db.Class_DB import DB
 
 class AddRecordDialog(QDialog):
     """Модальное окно для добавления записи в выбранную таблицу БД."""
@@ -183,7 +166,7 @@ class AddRecordDialog(QDialog):
         for display_name, widget in self.input_widgets.items():
             # Находим реальное имя колонки по отображаемому
             col_name = self.REVERSE_COLUMN_HEADERS_MAP.get(display_name,
-                                                   display_name)  # 👈 ИСПРАВЛЕНО: не нужно искать в цикле!
+                                                           display_name)  # 👈 ИСПРАВЛЕНО: не нужно искать в цикле!
             try:
                 column = getattr(table.c, col_name)
             except AttributeError:

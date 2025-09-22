@@ -1,56 +1,8 @@
-import sys
-from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QToolBar, QPushButton, QLabel,
-    QVBoxLayout, QWidget, QMessageBox, QTableWidget, QTableWidgetItem, QSizePolicy, QWidgetAction, QTableView
-)
-from sqlalchemy import (
-    String, Integer, Float, Boolean, Date, DateTime, Enum, ARRAY, Numeric, Text
-)
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QRadioButton, QButtonGroup,
-    QComboBox, QPushButton, QLabel, QMessageBox, QListWidgetItem,QListWidget
-)
-from decimal import Decimal
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QCheckBox,
-    QDateEdit, QPushButton, QScrollArea, QWidget, QTextEdit, QLineEdit, QDateTimeEdit
-)
-from PySide6.QtCore import Qt, QDate, QDateTime, QTime
-from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, String
-import re
-
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QAction, QStandardItem, QStandardItemModel
-from plyer import notification
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QRadioButton,
-    QButtonGroup, QPushButton, QListWidget, QListWidgetItem, QMessageBox,
-    QTabWidget, QWidget, QLineEdit, QCheckBox
-)
-from PySide6.QtCore import Qt
+    QButtonGroup, QPushButton, QWidget)
 from plyer import notification
-from typing import List, Dict, Any, Tuple
-from db.Class_DB import DB
-
-
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QRadioButton,
-    QButtonGroup, QPushButton, QListWidget, QListWidgetItem, QMessageBox,
-    QScrollArea, QWidget, QLineEdit
-)
-from PySide6.QtCore import Qt
-from plyer import notification
-from typing import List, Dict, Any, Tuple
-
-
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QRadioButton,
-    QButtonGroup, QPushButton, QListWidget, QListWidgetItem, QMessageBox,
-    QScrollArea, QWidget, QLineEdit
-)
-from PySide6.QtCore import Qt
-from plyer import notification
-from typing import List, Dict, Any, Tuple
+from typing import Tuple
 
 
 class ShowTableDialog(QDialog):

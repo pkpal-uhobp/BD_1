@@ -1,29 +1,16 @@
-import sys
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QToolBar, QPushButton, QLabel,
-    QVBoxLayout, QWidget, QMessageBox, QTableWidget, QTableWidgetItem, QSizePolicy, QWidgetAction, QTableView
-)
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QRadioButton, QButtonGroup,
-    QComboBox, QPushButton, QLabel, QMessageBox
-)
-from decimal import Decimal
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QCheckBox,
-    QDateEdit, QPushButton, QScrollArea, QWidget
-)
-from PySide6.QtCore import Qt, QDate
-from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, String
-import re
-from datetime import date
+    QMainWindow, QToolBar, QSizePolicy, QWidgetAction, QTableView,
+    QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton, QWidget)
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QAction, QStandardItem, QStandardItemModel
+from PySide6.QtGui import QStandardItem, QStandardItemModel
+from decimal import Decimal
+from datetime import date
 from plyer import notification
+# Импорты из локальных модулей (предполагается, что структура проекта такая)
 from tabs.add_dialog import AddRecordDialog
 from tabs.delete_dialog import DeleteRecordDialog
 from tabs.update_dialog import EditRecordDialog
 from tabs.get_table import ShowTableDialog
-from db.Class_DB import DB
 
 
 class MainWindow(QMainWindow):
@@ -274,7 +261,8 @@ class MainWindow(QMainWindow):
                 self._clear_layout(item.layout())
 
     def edit_data(self):
-        dialog = EditRecordDialog(self.db_instance, self.COLUMN_HEADERS_MAP, self.REVERSE_COLUMN_HEADERS_MAP, parent=self)
+        dialog = EditRecordDialog(self.db_instance, self.COLUMN_HEADERS_MAP, self.REVERSE_COLUMN_HEADERS_MAP,
+                                  parent=self)
         dialog.exec()
         self._display_data_in_table()
 
@@ -284,7 +272,8 @@ class MainWindow(QMainWindow):
         self._display_data_in_table()
 
     def delete_data(self):
-        dialog = DeleteRecordDialog(self.db_instance, self.COLUMN_HEADERS_MAP, self.REVERSE_COLUMN_HEADERS_MAP, parent=self)
+        dialog = DeleteRecordDialog(self.db_instance, self.COLUMN_HEADERS_MAP, self.REVERSE_COLUMN_HEADERS_MAP,
+                                    parent=self)
         dialog.exec()
         self._display_data_in_table()
 
@@ -327,7 +316,6 @@ class MainWindow(QMainWindow):
 
         # Перезагружаем данные с новой сортировкой
         self._display_data_in_table()
-
 
     def show_table(self):
         dialog = ShowTableDialog(self.db_instance, parent=self)
@@ -476,6 +464,7 @@ class MainWindow(QMainWindow):
                 sort_order = Qt.AscendingOrder if is_asc else Qt.DescendingOrder
 
         self.data_table.horizontalHeader().setSortIndicator(sort_col_index, sort_order)
+
     def logout(self):
         reply = QMessageBox.question(
             self,
@@ -498,10 +487,10 @@ class MainWindow(QMainWindow):
             try:
                 self.db_instance.disconnect()
                 notification.notify(
-                        title="Информация",
-                        message="Отключение от базы данных выполнено.",
-                        timeout=5
-                    )
+                    title="Информация",
+                    message="Отключение от базы данных выполнено.",
+                    timeout=5
+                )
             except Exception as e:
                 notification.notify(
                     title="Ошибка",

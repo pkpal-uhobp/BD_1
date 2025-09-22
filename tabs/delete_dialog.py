@@ -1,29 +1,10 @@
-import sys
+from PySide6.QtWidgets import QMessageBox
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QToolBar, QPushButton, QLabel,
-    QVBoxLayout, QWidget, QMessageBox, QTableWidget, QTableWidgetItem, QSizePolicy, QWidgetAction, QTableView
-)
-from sqlalchemy import (
-    String, Integer, Float, Boolean, Date, DateTime, Enum, ARRAY, Numeric, Text
-)
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QRadioButton, QButtonGroup,
-    QComboBox, QPushButton, QLabel, QMessageBox
-)
-from decimal import Decimal
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QCheckBox,
-    QDateEdit, QPushButton, QScrollArea, QWidget, QTextEdit, QLineEdit, QDateTimeEdit
-)
-from PySide6.QtCore import Qt, QDate, QDateTime, QTime
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox,
+    QDateEdit, QPushButton, QScrollArea, QWidget, QLineEdit)
+from PySide6.QtCore import QDate
 from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, String
-import re
-
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QAction, QStandardItem, QStandardItemModel
 from plyer import notification
-
-from db.Class_DB import DB
 
 
 class DeleteRecordDialog(QDialog):
@@ -33,7 +14,7 @@ class DeleteRecordDialog(QDialog):
         super().__init__(parent)
         self.db_instance = db_instance
         self.COLUMN_HEADERS_MAP = COLUMN_HEADERS_MAP
-        self.REVERSE_COLUMN_HEADERS_MAP=REVERSE_COLUMN_HEADERS_MAP
+        self.REVERSE_COLUMN_HEADERS_MAP = REVERSE_COLUMN_HEADERS_MAP
         self.condition_widgets = {}  # {col_name: widget}
 
         if not self.db_instance or not self.db_instance.is_connected():
