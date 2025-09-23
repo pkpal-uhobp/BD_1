@@ -193,7 +193,7 @@ class EditRecordDialog(QDialog):
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 font-family: 'Consolas', 'Fira Code', monospace;
-                min-height: 40px;
+                min-height: 30px;
             }
 
             QPushButton:hover {
@@ -243,9 +243,9 @@ class EditRecordDialog(QDialog):
 
             #tableContainer, #searchContainer, #updateContainer {
                 background: rgba(15, 15, 25, 0.6);
-                border-radius: 10px;
                 padding: 15px;
                 margin: 5px 0;
+                border: none;
             }
 
             #fieldRow {
@@ -253,6 +253,16 @@ class EditRecordDialog(QDialog):
                 border-radius: 8px;
                 padding: 8px;
                 margin: 5px 0px;
+            }
+
+            .section-label {
+                color: #8892b0;
+                font-size: 14px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 10px 0;
+                border-bottom: 2px solid #ff79c6;
+                margin-bottom: 10px;
             }
         """)
 
@@ -262,7 +272,7 @@ class EditRecordDialog(QDialog):
         layout.setSpacing(15)
 
         # Заголовок
-        title_label = QLabel("✏️ РЕДАКТИРОВАНИЕ ДАННЫХ")
+        title_label = QLabel("РЕДАКТИРОВАНИЕ ДАННЫХ")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setFont(QFont("Consolas", 16, QFont.Bold))
         title_label.setStyleSheet("color: #64ffda; padding: 10px;")
@@ -273,8 +283,9 @@ class EditRecordDialog(QDialog):
         table_container.setObjectName("tableContainer")
         table_layout = QVBoxLayout(table_container)
 
-        table_label = QLabel("📊 Выберите таблицу:")
+        table_label = QLabel("Выберите таблицу:")
         table_label.setFont(QFont("Consolas", 12, QFont.Bold))
+        table_label.setProperty("class", "section-label")
         self.table_combo = QComboBox()
         self.table_combo.setMinimumHeight(35)
 
@@ -294,8 +305,9 @@ class EditRecordDialog(QDialog):
         layout.addWidget(table_container)
 
         # Область условий поиска
-        search_label = QLabel("🔍 Условия поиска записи:")
+        search_label = QLabel("Условия поиска записи:")
         search_label.setFont(QFont("Consolas", 12, QFont.Bold))
+        search_label.setProperty("class", "section-label")
         layout.addWidget(search_label)
 
         self.search_container = QWidget()
@@ -305,12 +317,13 @@ class EditRecordDialog(QDialog):
         scroll_area_search = QScrollArea()
         scroll_area_search.setWidgetResizable(True)
         scroll_area_search.setWidget(self.search_container)
-        scroll_area_search.setMaximumHeight(200)
+        scroll_area_search.setMinimumHeight(145)  # Установим одинаковую минимальную высоту
         layout.addWidget(scroll_area_search)
 
         # Область новых значений
-        update_label = QLabel("🔄 Новые значения:")
+        update_label = QLabel("Новые значения:")
         update_label.setFont(QFont("Consolas", 12, QFont.Bold))
+        update_label.setProperty("class", "section-label")
         layout.addWidget(update_label)
 
         self.update_container = QWidget()
@@ -320,7 +333,7 @@ class EditRecordDialog(QDialog):
         scroll_area_update = QScrollArea()
         scroll_area_update.setWidgetResizable(True)
         scroll_area_update.setWidget(self.update_container)
-        scroll_area_update.setMinimumHeight(250)
+        scroll_area_update.setMinimumHeight(145)  # Установим одинаковую минимальную высоту
         layout.addWidget(scroll_area_update)
 
         # Загружаем поля для первой таблицы
@@ -331,8 +344,8 @@ class EditRecordDialog(QDialog):
 
         # Кнопки
         buttons_layout = QHBoxLayout()
-        self.btn_search = QPushButton("🔎 НАЙТИ ЗАПИСЬ")
-        self.btn_update = QPushButton("💾 СОХРАНИТЬ ИЗМЕНЕНИЯ")
+        self.btn_search = QPushButton("НАЙТИ ЗАПИСЬ")
+        self.btn_update = QPushButton("СОХРАНИТЬ ИЗМЕНЕНИЯ")
         self.btn_update.setEnabled(False)
 
         self.btn_search.setCursor(Qt.PointingHandCursor)
@@ -346,6 +359,14 @@ class EditRecordDialog(QDialog):
         # Подключаем обработчики
         self.btn_search.clicked.connect(self.on_search_clicked)
         self.btn_update.clicked.connect(self.on_update_clicked)
+
+        # Подключаем сигналы изменения полей для активации кнопки сохранения
+        self.connect_update_widgets_signals()
+
+    def connect_update_widgets_signals(self):
+        """Подключает сигналы изменения полей для активации кнопки сохранения"""
+        # Этот метод будет вызываться после загрузки полей таблицы
+        pass
 
     def create_field_row(self, label_text, widget):
         """Создает строку с меткой и виджетом ввода"""
@@ -415,9 +436,39 @@ class EditRecordDialog(QDialog):
             self.update_layout.addWidget(field_row)
             self.update_widgets[display_name] = widget
 
+            # Подключаем сигналы изменения для каждого виджета
+            if isinstance(widget, QLineEdit):
+                widget.textChanged.connect(self.check_update_button_state)
+            elif isinstance(widget, QComboBox):
+                widget.currentTextChanged.connect(self.check_update_button_state)
+            elif isinstance(widget, QDateEdit):
+                widget.dateChanged.connect(self.check_update_button_state)
+            elif isinstance(widget, QCheckBox):
+                widget.stateChanged.connect(self.check_update_button_state)
+
         # Добавляем растягивающие элементы
         self.search_layout.addStretch()
         self.update_layout.addStretch()
+
+    def check_update_button_state(self):
+        """Проверяет состояние полей и активирует/деактивирует кнопку сохранения"""
+        # Кнопка должна быть активна, если запись найдена и есть изменения в полях
+        # или если поля заполнены (даже если запись еще не найдена)
+        has_data = self.has_update_data()
+        self.btn_update.setEnabled(has_data and self.found_record_id is not None)
+
+    def has_update_data(self):
+        """Проверяет, есть ли данные для обновления в полях"""
+        for widget in self.update_widgets.values():
+            if isinstance(widget, QLineEdit) and widget.text().strip():
+                return True
+            elif isinstance(widget, QComboBox) and widget.currentText():
+                return True
+            elif isinstance(widget, QDateEdit) and widget.date().isValid():
+                return True
+            elif isinstance(widget, QCheckBox):
+                return True  # Чекбокс всегда имеет значение
+        return False
 
     def create_search_widget(self, column):
         """Создает виджет для условия поиска на основе типа столбца."""
@@ -544,8 +595,8 @@ class EditRecordDialog(QDialog):
             # Заполняем поля формы данными из записи
             self.populate_update_fields(record, table_name)
 
-            # Разблокируем кнопку сохранения
-            self.btn_update.setEnabled(True)
+            # Проверяем состояние кнопки сохранения
+            self.check_update_button_state()
 
             notification.notify(
                 title="✅ Найдено",

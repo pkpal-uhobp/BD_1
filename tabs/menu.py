@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
     def __init__(self, db_instance=None):
         super().__init__()
         self.db_instance = db_instance
-        self.setWindowTitle("LIBRARY MANAGEMENT SYSTEM")
+        self.setWindowTitle("СИСТЕМА УПРАВЛЕНИЯ БИБЛИОТЕКОЙ")
         self.setGeometry(200, 100, 1200, 800)
 
         # Устанавливаем тёмную палитру
@@ -41,11 +41,11 @@ class MainWindow(QMainWindow):
         header_layout = QVBoxLayout()
         header_widget.setLayout(header_layout)
 
-        title_label = QLabel("📚 LIBRARY MANAGEMENT SYSTEM")
+        title_label = QLabel("СИСТЕМА УПРАВЛЕНИЯ БИБЛИОТЕКОЙ")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setObjectName("titleLabel")
 
-        subtitle_label = QLabel("Управление базой данных библиотеки")
+        subtitle_label = QLabel("")
         subtitle_label.setAlignment(Qt.AlignCenter)
         subtitle_label.setObjectName("subtitleLabel")
 
@@ -143,11 +143,11 @@ class MainWindow(QMainWindow):
         left_widget.setLayout(left_layout)
 
         # Кнопка: Создать схему
-        btn_create_schema = self.create_toolbar_button("🗃️ Создать схему", self.create_schema, "#64ffda")
+        btn_create_schema = self.create_toolbar_button("Создать схему", self.create_schema, "#64ffda")
         left_layout.addWidget(btn_create_schema)
 
         # Кнопка: Удалить схему
-        btn_drop_schema = self.create_toolbar_button("🗑️ Удалить схему", self.drop_schema, "#ff6b6b")
+        btn_drop_schema = self.create_toolbar_button("Удалить схему", self.drop_schema, "#50fa7b")
         left_layout.addWidget(btn_drop_schema)
 
         toolbar.addWidget(left_widget)
@@ -162,19 +162,21 @@ class MainWindow(QMainWindow):
         center_widget.setLayout(center_layout)
 
         # Кнопка: Добавить данные
-        btn_add_data = self.create_toolbar_button("➕ Добавить", self.add_data, "#50fa7b")
+        btn_add_data = self.create_toolbar_button("Добавить", self.add_data, "#ff79c6")
+        btn_add_data.setObjectName("add_data")
         center_layout.addWidget(btn_add_data)
 
+
         # Кнопка: Изменить данные
-        btn_edit_data = self.create_toolbar_button("✏️ Изменить", self.edit_data, "#ffb86c")
+        btn_edit_data = self.create_toolbar_button("Изменить", self.edit_data, "#ff6b6b")
         center_layout.addWidget(btn_edit_data)
 
         # Кнопка: Удалить данные
-        btn_delete_data = self.create_toolbar_button("➖ Удалить", self.delete_data, "#ff79c6")
+        btn_delete_data = self.create_toolbar_button("Удалить", self.delete_data, "#50fa7b")
         center_layout.addWidget(btn_delete_data)
 
         # Кнопка: Вывести таблицу
-        btn_show_table = self.create_toolbar_button("📊 Показать таблицу", self.show_table, "#8be9fd")
+        btn_show_table = self.create_toolbar_button("Показать таблицу", self.show_table, "#8be9fd")
         center_layout.addWidget(btn_show_table)
 
         toolbar.addWidget(center_widget)
@@ -194,7 +196,7 @@ class MainWindow(QMainWindow):
         right_widget.setLayout(right_layout)
 
         # Кнопка: Отключиться
-        btn_logout = self.create_toolbar_button("🔌 Отключиться", self.logout, "#ff5555")
+        btn_logout = self.create_toolbar_button("Отключиться", self.logout, "#ff5555")
         right_layout.addWidget(btn_logout)
 
         toolbar.addWidget(right_widget)
@@ -235,6 +237,8 @@ class MainWindow(QMainWindow):
                                           stop: 1 {color}40);
                 padding: 7px 11px;
             }}
+            
+    
         """)
         return button
 
@@ -288,7 +292,8 @@ class MainWindow(QMainWindow):
         self.data_table.setHorizontalScrollMode(QTableView.ScrollPerPixel)
         self.data_table.setWordWrap(True)
         self.data_table.setVisible(False)
-
+        self.data_table.verticalHeader().setDefaultSectionSize(40)  # Высота строки в пикселях
+        self.data_table.verticalHeader().setMinimumSectionSize(30)  # Минимальная высота
         table_layout.addWidget(self.data_table)
         layout.addWidget(table_container, 1)  # Растягиваем таблицу
 
@@ -314,6 +319,10 @@ class MainWindow(QMainWindow):
                 padding: 20px;
                 margin-bottom: 10px;
             }
+            
+            #add_data {
+                background: #000000;
+            }
 
             #titleLabel {
                 font-size: 28px;
@@ -321,14 +330,8 @@ class MainWindow(QMainWindow):
                 color: #64ffda;
                 font-family: 'Consolas', 'Fira Code', monospace;
                 letter-spacing: 2px;
-                margin-bottom: 5px;
-            }
-
-            #subtitleLabel {
-                font-size: 14px;
-                color: #8892b0;
-                font-family: 'Consolas', 'Fira Code', monospace;
-                letter-spacing: 1px;
+                padding-top: 10px;
+            
             }
 
             /* Панель инструментов */
@@ -342,8 +345,7 @@ class MainWindow(QMainWindow):
 
             /* Виджет статуса */
             #statusWidget {
-                background: rgba(25, 25, 35, 0.6);
-                border: 1px solid #6272a4;
+               background: rgba(15, 15, 25, 0.8);
                 border-radius: 8px;
                 padding: 12px 20px;
                 margin: 10px 0;
@@ -376,11 +378,10 @@ class MainWindow(QMainWindow):
                 font-weight: bold;
                 color: #64ffda;
                 font-family: 'Consolas', 'Fira Code', monospace;
-                padding: 10px;
-                margin-bottom: 15px;
+                padding: 20px;
                 background: rgba(10, 10, 15, 0.5);
                 border-radius: 8px;
-                border: 1px solid #64ffda40;
+                border: none;
             }
 
             /* Таблица */
@@ -390,7 +391,7 @@ class MainWindow(QMainWindow):
                 border-radius: 8px;
                 gridline-color: #44475a;
                 font-family: 'Consolas', 'Fira Code', monospace;
-                font-size: 12px;
+                font-size: 16px;
             }
 
             #dataTable::item {
