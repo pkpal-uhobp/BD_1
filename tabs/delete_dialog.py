@@ -157,7 +157,7 @@ class DeleteRecordDialog(QDialog):
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 font-family: 'Consolas', 'Fira Code', monospace;
-                min-height: 50px;
+                min-height: 30px;
             }
 
             QPushButton:hover {
@@ -224,8 +224,9 @@ class DeleteRecordDialog(QDialog):
         table_container.setStyleSheet("""
             #tableContainer {
                 background: rgba(15, 15, 25, 0.6);
-                border-radius: 10px;
+            
                 padding: 15px;
+                border: none;
             }
         """)
         table_layout = QVBoxLayout(table_container)
@@ -276,7 +277,7 @@ class DeleteRecordDialog(QDialog):
         self.table_combo.currentTextChanged.connect(self.load_table_fields)
 
         # Кнопка удаления
-        self.btn_delete = QPushButton("🗑️ УДАЛИТЬ ЗАПИСИ")
+        self.btn_delete = QPushButton("УДАЛИТЬ ЗАПИСИ")
         self.btn_delete.setCursor(Qt.PointingHandCursor)
         self.btn_delete.clicked.connect(self.on_delete_clicked)
         layout.addWidget(self.btn_delete)

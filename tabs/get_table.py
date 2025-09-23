@@ -21,7 +21,7 @@ class ShowTableDialog(QDialog):
 
         self.setWindowTitle("Параметры запроса")
         self.setModal(True)
-        self.resize(500, 300)
+        self.resize(500, 600)
 
         # Устанавливаем тёмную палитру
         self.set_dark_palette()
@@ -163,8 +163,8 @@ class ShowTableDialog(QDialog):
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 font-family: 'Consolas', 'Fira Code', monospace;
-                min-height: 40px;
-                min-width: 100px;
+                min-height: 30px;
+                min-width: 50px;
             }
 
             QPushButton:hover {
@@ -188,7 +188,7 @@ class ShowTableDialog(QDialog):
 
             #tableContainer, #joinContainer {
                 background: rgba(15, 15, 25, 0.6);
-                border-radius: 10px;
+                border: none;
                 padding: 15px;
                 margin: 5px 0;
             }
@@ -199,6 +199,12 @@ class ShowTableDialog(QDialog):
                 padding: 15px;
                 margin: 5px 0;
             }
+            
+            #btn_cancel {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #ff6b6b, 
+                                          stop: 1 #ff5252);
+            }
         """)
 
     def init_ui(self):
@@ -207,7 +213,7 @@ class ShowTableDialog(QDialog):
         layout.setSpacing(15)
 
         # Заголовок
-        title_label = QLabel("📊 ПАРАМЕТРЫ ЗАПРОСА")
+        title_label = QLabel("ПАРАМЕТРЫ ЗАПРОСА")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setFont(QFont("Consolas", 16, QFont.Bold))
         title_label.setStyleSheet("color: #64ffda; padding: 10px;")
@@ -220,8 +226,8 @@ class ShowTableDialog(QDialog):
 
         # Радиокнопки выбора режима
         self.radio_group = QButtonGroup(self)
-        self.radio_single = QRadioButton("📋 Обычная таблица")
-        self.radio_join = QRadioButton("🔗 Сводная таблица (JOIN)")
+        self.radio_single = QRadioButton("Обычная таблица")
+        self.radio_join = QRadioButton("Сводная таблица (JOIN)")
         self.radio_single.setChecked(True)
 
         self.radio_group.addButton(self.radio_single)
@@ -247,8 +253,9 @@ class ShowTableDialog(QDialog):
         buttons_layout = QHBoxLayout()
         buttons_layout.addStretch()
 
-        self.btn_ok = QPushButton("✅ ОК")
-        self.btn_cancel = QPushButton("❌ ОТМЕНА")
+        self.btn_ok = QPushButton("ОК")
+        self.btn_cancel = QPushButton("ОТМЕНА")
+        self.btn_cancel.setObjectName("btn_cancel")
         self.btn_ok.setCursor(Qt.PointingHandCursor)
         self.btn_cancel.setCursor(Qt.PointingHandCursor)
         self.btn_ok.clicked.connect(self.on_ok_clicked)
@@ -286,6 +293,7 @@ class ShowTableDialog(QDialog):
         label1.setFont(QFont("Consolas", 12, QFont.Bold))
         self.join_combo_left = QComboBox()
         self.join_combo_left.setMinimumHeight(35)
+        self.join_combo_left.setFixedWidth(300)
         table_names = self.db_instance.get_table_names() or []
         self.join_combo_left.addItems(table_names)
 
@@ -298,6 +306,7 @@ class ShowTableDialog(QDialog):
         label2.setFont(QFont("Consolas", 12, QFont.Bold))
         self.join_combo_right = QComboBox()
         self.join_combo_right.setMinimumHeight(35)
+        self.join_combo_left.setFixedWidth(300)
         self.join_combo_right.addItems(table_names)
 
         row2_layout.addWidget(label2)
