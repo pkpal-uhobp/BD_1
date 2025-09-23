@@ -49,7 +49,7 @@ class DBConnectionWindow(QMainWindow):
         db_icon.setAlignment(Qt.AlignCenter)
         db_icon.setStyleSheet("color: #64ffda;")
 
-        title_label = QLabel("LIBRARY CONNECTION")
+        title_label = QLabel("ПОДКЛЮЧЕНИЕ БИБЛИОТЕКИ")
         title_label.setFont(QFont("Consolas", 16, QFont.Bold))
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet("color: #64ffda; letter-spacing: 2px; padding-right: 50px;")
@@ -153,7 +153,7 @@ class DBConnectionWindow(QMainWindow):
                 background: rgba(10, 10, 15, 0.7);
                 border-radius: 12px;
                 border: 1px solid #64ffda;
-                padding: 15px;
+                padding: 25px;
             }
 
             /* Метки формы */

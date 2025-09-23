@@ -143,11 +143,11 @@ class MainWindow(QMainWindow):
         left_widget.setLayout(left_layout)
 
         # Кнопка: Создать схему
-        btn_create_schema = self.create_toolbar_button("Создать схему", self.create_schema, "#0")
+        btn_create_schema = self.create_toolbar_button("Создать схему", self.create_schema, "#64ffda")
         left_layout.addWidget(btn_create_schema)
 
         # Кнопка: Удалить схему
-        btn_drop_schema = self.create_toolbar_button("Удалить схему", self.drop_schema, "#0")
+        btn_drop_schema = self.create_toolbar_button("Удалить схему", self.drop_schema, "#50fa7b")
         left_layout.addWidget(btn_drop_schema)
 
         toolbar.addWidget(left_widget)
@@ -162,21 +162,21 @@ class MainWindow(QMainWindow):
         center_widget.setLayout(center_layout)
 
         # Кнопка: Добавить данные
-        btn_add_data = self.create_toolbar_button("Добавить", self.add_data, "#0")
+        btn_add_data = self.create_toolbar_button("Добавить", self.add_data, "#ff79c6")
         btn_add_data.setObjectName("add_data")
         center_layout.addWidget(btn_add_data)
 
 
         # Кнопка: Изменить данные
-        btn_edit_data = self.create_toolbar_button("Изменить", self.edit_data, "#0")
+        btn_edit_data = self.create_toolbar_button("Изменить", self.edit_data, "#ff6b6b")
         center_layout.addWidget(btn_edit_data)
 
         # Кнопка: Удалить данные
-        btn_delete_data = self.create_toolbar_button("Удалить", self.delete_data, "#0")
+        btn_delete_data = self.create_toolbar_button("Удалить", self.delete_data, "#50fa7b")
         center_layout.addWidget(btn_delete_data)
 
         # Кнопка: Вывести таблицу
-        btn_show_table = self.create_toolbar_button("Показать таблицу", self.show_table, "#0")
+        btn_show_table = self.create_toolbar_button("Показать таблицу", self.show_table, "#8be9fd")
         center_layout.addWidget(btn_show_table)
 
         toolbar.addWidget(center_widget)
@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
         right_widget.setLayout(right_layout)
 
         # Кнопка: Отключиться
-        btn_logout = self.create_toolbar_button("Отключиться", self.logout, "#0")
+        btn_logout = self.create_toolbar_button("Отключиться", self.logout, "#ff5555")
         right_layout.addWidget(btn_logout)
 
         toolbar.addWidget(right_widget)
