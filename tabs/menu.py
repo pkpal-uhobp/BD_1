@@ -1,19 +1,17 @@
 from PySide6.QtWidgets import (
     QMainWindow, QToolBar, QSizePolicy, QWidgetAction, QTableView,
     QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton, QWidget,
-    QHBoxLayout  # Добавленная строка
+    QHBoxLayout, QApplication
 )
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QStandardItem, QStandardItemModel
+from PySide6.QtGui import QStandardItem, QStandardItemModel, QPalette, QColor
 from decimal import Decimal
 from datetime import date
 from plyer import notification
-# Импорты из локальных модулей (предполагается, что структура проекта такая)
 from tabs.add_dialog import AddRecordDialog
 from tabs.delete_dialog import DeleteRecordDialog
 from tabs.update_dialog import EditRecordDialog
 from tabs.get_table import ShowTableDialog
-
 
 class MainWindow(QMainWindow):
     def __init__(self, db_instance=None):
@@ -110,7 +108,6 @@ class MainWindow(QMainWindow):
 
     def set_dark_palette(self):
         """Устанавливает тёмную цветовую палитру"""
-        from PySide6.QtGui import QPalette, QColor
         dark_palette = QPalette()
         dark_palette.setColor(QPalette.Window, QColor(18, 18, 24))
         dark_palette.setColor(QPalette.WindowText, QColor(240, 240, 240))
@@ -147,7 +144,7 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(btn_create_schema)
 
         # Кнопка: Удалить схему
-        btn_drop_schema = self.create_toolbar_button("Удалить схему", self.drop_schema, "#50fa7b")
+        btn_drop_schema = self.create_toolbar_button("Удалить схему", self.drop_schema, "#ff6b6b")
         left_layout.addWidget(btn_drop_schema)
 
         toolbar.addWidget(left_widget)
@@ -236,8 +233,6 @@ class MainWindow(QMainWindow):
                                           stop: 1 {color}40);
                 padding: 7px 11px;
             }}
-
-
         """)
         return button
 
@@ -291,10 +286,10 @@ class MainWindow(QMainWindow):
         self.data_table.setHorizontalScrollMode(QTableView.ScrollPerPixel)
         self.data_table.setWordWrap(True)
         self.data_table.setVisible(False)
-        self.data_table.verticalHeader().setDefaultSectionSize(40)  # Высота строки в пикселях
-        self.data_table.verticalHeader().setMinimumSectionSize(30)  # Минимальная высота
+        self.data_table.verticalHeader().setDefaultSectionSize(40)
+        self.data_table.verticalHeader().setMinimumSectionSize(30)
         table_layout.addWidget(self.data_table)
-        layout.addWidget(table_container, 1)  # Растягиваем таблицу
+        layout.addWidget(table_container, 1)
 
         # Подключаем обработчик клика по заголовку
         self.data_table.horizontalHeader().sectionClicked.connect(self.on_header_clicked)
@@ -330,7 +325,6 @@ class MainWindow(QMainWindow):
                 font-family: 'Consolas', 'Fira Code', monospace;
                 letter-spacing: 2px;
                 padding-top: 10px;
-
             }
 
             /* Панель инструментов */
@@ -427,6 +421,46 @@ class MainWindow(QMainWindow):
                 color: #0a0a0f;
             }
 
+            /* Стилизация QMessageBox */
+            QMessageBox {
+                background-color: #1a1a2e;
+                color: #f8f8f2;
+                border: 1px solid #44475a;
+                border-radius: 8px;
+            }
+
+            QMessageBox QLabel {
+                color: #f8f8f2;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                font-size: 14px;
+            }
+
+            QMessageBox QPushButton {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #64ffda, 
+                                          stop: 1 #00bcd4);
+                border: none;
+                border-radius: 6px;
+                color: #0a0a0f;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 8px 16px;
+                min-width: 80px;
+            }
+
+            QMessageBox QPushButton:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #50e3c2, 
+                                          stop: 1 #00acc1);
+                border: 1px solid #64ffda;
+            }
+
+            QMessageBox QPushButton:pressed {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #3bc1a8, 
+                                          stop: 1 #00838f);
+            }
+
             /* Скроллбары */
             QScrollBar:vertical {
                 border: none;
@@ -469,13 +503,11 @@ class MainWindow(QMainWindow):
             }
         """)
 
-    # === Остальные методы остаются без изменений ===
-
     def create_schema(self):
         """Создаёт схему и таблицы в БД."""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="Ошибка",
+                title="❌ Ошибка подключения",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -500,19 +532,22 @@ class MainWindow(QMainWindow):
         """Удаляет схему и все таблицы из БД."""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="Ошибка",
+                title="❌ Ошибка подключения",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
             return
 
-        reply = QMessageBox.warning(
-            self,
-            "Подтверждение удаления",
-            "Вы уверены, что хотите УДАЛИТЬ ВСЮ СХЕМУ и ВСЕ ДАННЫЕ?\nЭто действие необратимо!",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
+        # Стилизованный QMessageBox
+        msg = QMessageBox(self)
+        msg.setWindowTitle("⚠️ Подтверждение удаления")
+        msg.setText("Вы уверены, что хотите УДАЛИТЬ ВСЮ СХЕМУ и ВСЕ ДАННЫЕ?\nЭто действие необратимо!")
+        msg.setIcon(QMessageBox.Warning)
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg.setDefaultButton(QMessageBox.No)
+        # Применяем стили
+        msg.setStyleSheet(self.styleSheet())
+        reply = msg.exec()
 
         if reply != QMessageBox.Yes:
             return
@@ -728,13 +763,17 @@ class MainWindow(QMainWindow):
         self.data_table.horizontalHeader().setSortIndicator(sort_col_index, sort_order)
 
     def logout(self):
-        reply = QMessageBox.question(
-            self,
-            "Подтверждение",
-            "Вы действительно хотите отключиться?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
+        # Стилизованный QMessageBox
+        msg = QMessageBox(self)
+        msg.setWindowTitle("⚠️ Подтверждение")
+        msg.setText("Вы действительно хотите отключиться?")
+        msg.setIcon(QMessageBox.Question)
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg.setDefaultButton(QMessageBox.No)
+        # Применяем стили
+        msg.setStyleSheet(self.styleSheet())
+        reply = msg.exec()
+
         if reply == QMessageBox.Yes:
             from main import DBConnectionWindow
             self.login_window = DBConnectionWindow()
@@ -749,13 +788,13 @@ class MainWindow(QMainWindow):
             try:
                 self.db_instance.disconnect()
                 notification.notify(
-                    title="Информация",
+                    title="ℹ️ Информация",
                     message="Отключение от базы данных выполнено.",
                     timeout=5
                 )
             except Exception as e:
                 notification.notify(
-                    title="Ошибка",
+                    title="❌ Ошибка",
                     message=f"Ошибка при отключении от базы данных: {e}",
                     timeout=5
                 )
