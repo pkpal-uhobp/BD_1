@@ -8,7 +8,8 @@ import re
 from plyer import notification
 from PySide6.QtGui import QFont, QPalette, QColor
 from PySide6.QtCore import Qt
-
+from PySide6.QtGui import QRegularExpressionValidator
+from PySide6.QtCore import QRegularExpression
 
 class AddRecordDialog(QDialog):
     """Модальное окно для добавления записи в выбранную таблицу БД."""
@@ -382,9 +383,17 @@ class AddRecordDialog(QDialog):
                 widget.addItems(column.type.enums)
                 widget.setEditable(False)
                 placeholder = "Выберите значение"
+                widget.setPlaceholderText(placeholder)
             elif isinstance(column.type, String):
-                widget = QLineEdit()
-                placeholder = "Введите текст"
+                if (column.name != "phone"):
+                    widget = QLineEdit()
+                    placeholder = "Введите текст"
+                else:
+                    widget = QLineEdit()
+                    placeholder = "Введите номер телефона"
+                    widget.setMaxLength(50)
+                    widget.setInputMask("+7 (000) 000-00-00")
+
             elif isinstance(column.type, Integer):
                 widget = QLineEdit()
                 placeholder = "Введите целое число"

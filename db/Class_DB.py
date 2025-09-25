@@ -401,10 +401,11 @@ class DB:
     def insert_data(self, table_name: str, data: Dict[str, Any]) -> bool:
         """
         Вставляет одну запись в указанную таблицу.
-        Логирует DML-операции и ошибки, выводит человеко-понятные сообщения.
+        Автоматически находит и использует минимальный свободный ID.
         """
         if not self.is_connected():
             return False
+
         # Валидация данных
         validation_errors = self._validate_data(table_name, data)
         if validation_errors:
@@ -413,8 +414,11 @@ class DB:
                 full_msg = f"  - {err}"
                 self.logger.warning(full_msg)
             return False
+
         try:
             table = self.tables[table_name]
+            pk_column = self._get_primary_key_column(table_name)
+
             # Проверка внешних ключей (для Issued_Books)
             if table_name == "Issued_Books":
                 book_id = data.get("book_id")
@@ -428,30 +432,88 @@ class DB:
                     print(msg)
                     self.logger.error(msg)
                     return False
-            # Логируем DML-операцию
-            self.logger.info(f"Выполнение DML: INSERT INTO \"{table_name}\" ({list(data.keys())})")
-            # Вставка с транзакцией
+
+            # Находим минимальный свободный ID
+            free_id = self._find_min_free_id(table_name)
+            if free_id is None:
+                self.logger.error("Не удалось найти свободный ID")
+                return False
+
+            # Добавляем найденный ID в данные
+            data_with_id = data.copy()
+            data_with_id[pk_column] = free_id
+
+            self.logger.info(f"Выполнение DML: INSERT INTO \"{table_name}\" с ID {free_id}")
+
             with self.engine.begin() as conn:
-                result = conn.execute(table.insert().values(**data))
-                # Проверяем, что вставка вернула первичный ключ
-                if result.inserted_primary_key is None:
-                    self.logger.error(
-                        f"Вставка в таблицу '{table_name}' не вернула идентификатор. Возможно, таблица не имеет автоинкрементного первичного ключа или произошла ошибка.")
-                    return False
-                if not result.inserted_primary_key:  # Пустой список?
-                    self.logger.error(f"Вставка в таблицу '{table_name}' вернула пустой список идентификаторов.")
-                    return False
-                inserted_id = result.inserted_primary_key[0]
-                if inserted_id is None:
-                    self.logger.error(f"Вставка в таблицу '{table_name}' вернула идентификатор None.")
-                    return False
-                msg = f"Успешно вставлена 1 запись в таблицу '{table_name}' (ID: {inserted_id})"
+                # Используем простой SQL для вставки с конкретным ID
+                columns = ", ".join([f'"{col}"' for col in data_with_id.keys()])
+                placeholders = ", ".join([f":{col}" for col in data_with_id.keys()])
+                sql = f'INSERT INTO "{table_name}" ({columns}) VALUES ({placeholders})'
+
+                result = conn.execute(text(sql), data_with_id)
+                msg = f"Успешно вставлена запись в таблицу '{table_name}' с ID: {free_id}"
                 self.logger.info(msg)
                 return True
+
         except Exception as e:
             user_friendly_msg = self.format_db_error(e)
             self.logger.error(f"Ошибка при вставке в '{table_name}': {user_friendly_msg}")
             return False
+
+    def _find_min_free_id(self, table_name: str) -> int:
+        """Находит минимальный свободный ID в таблице"""
+        try:
+            pk_column = self._get_primary_key_column(table_name)
+
+            with self.engine.connect() as conn:
+                # Находим максимальный ID
+                max_id_result = conn.execute(text(f'SELECT MAX("{pk_column}") FROM "{table_name}"'))
+                max_id = max_id_result.scalar() or 0
+
+                # Если таблица пустая, начинаем с 1
+                if max_id == 0:
+                    return 1
+
+                # Ищем первую дыру в последовательности ID
+                result = conn.execute(text(f"""
+                    SELECT MIN(series.id) 
+                    FROM generate_series(1, {max_id + 1}) AS series(id)
+                    WHERE series.id NOT IN (SELECT "{pk_column}" FROM "{table_name}")
+                """))
+
+                free_id = result.scalar()
+                return free_id if free_id is not None else max_id + 1
+
+        except Exception as e:
+            self.logger.error(f"Ошибка при поиске свободного ID: {e}")
+            # В случае ошибки возвращаем следующий ID после максимального
+            try:
+                with self.engine.connect() as conn:
+                    max_id_result = conn.execute(text(f'SELECT MAX("{pk_column}") FROM "{table_name}"'))
+                    max_id = max_id_result.scalar() or 0
+                    return max_id + 1
+            except:
+                return 1
+
+    def _get_primary_key_column(self, table_name: str) -> str:
+        """Возвращает имя первичного ключа таблицы"""
+        try:
+            table = self.tables[table_name]
+            for column in table.columns:
+                if column.primary_key:
+                    return column.name
+            # Стандартные имена PK для твоих таблиц
+            if table_name == "Books":
+                return "id_book"
+            elif table_name == "Readers":
+                return "reader_id"
+            elif table_name == "Issued_Books":
+                return "issue_id"
+            else:
+                return "id"
+        except:
+            return "id"
 
     def record_exists(self, table_name: str, condition: Dict[str, Any]) -> bool:
         """

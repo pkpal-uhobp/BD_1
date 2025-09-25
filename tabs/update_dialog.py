@@ -493,8 +493,15 @@ class EditRecordDialog(QDialog):
             widget = QLineEdit()
             widget.setPlaceholderText("Число или оставьте пустым")
         elif isinstance(column.type, String):
-            widget = QLineEdit()
-            widget.setPlaceholderText("Текст или оставьте пустым")
+
+            if (column.name != "phone"):
+                widget = QLineEdit()
+                widget.setPlaceholderText("Текст или оставьте пустым")
+            else:
+                widget = QLineEdit()
+                placeholder = "Введите номер телефона или оставьте пустым"
+                widget.setMaxLength(50)
+                widget.setInputMask("+7 (000) 000-00-00")
         else:
             widget = QLineEdit()
             widget.setPlaceholderText("Значение или оставьте пустым")
@@ -519,7 +526,12 @@ class EditRecordDialog(QDialog):
             widget = QLineEdit()
             widget.setPlaceholderText("Число")
         elif isinstance(column.type, String):
-            widget = QLineEdit()
+            if (column.name != "phone"):
+                widget = QLineEdit()
+            else:
+                widget = QLineEdit()
+                widget.setMaxLength(50)
+                widget.setInputMask("+7 (000) 000-00-00")
         else:
             widget = QLineEdit()
             widget.setPlaceholderText("Новое значение")
@@ -642,7 +654,31 @@ class EditRecordDialog(QDialog):
             elif isinstance(widget, QLineEdit):
                 text = widget.text().strip()
                 if text:
-                    if isinstance(column.type, Integer):
+                    # Проверка для поля телефона - только полный номер
+                    if col_name in ("phone", "phone_number", "telephone"):
+                        # Проверяем, что номер введен полностью (19 символов в формате +7 (999) 123-45-67)
+                        if len(text) == 19 and text.startswith("+7 (") and text[9] == ")" and text[13] == "-" and text[
+                            16] == "-":
+                            # Убираем форматирование для поиска в БД (оставляем только цифры)
+                            phone_digits = ''.join(filter(str.isdigit, text))
+                            if len(phone_digits) == 11:  # +7 и 10 цифр
+                                condition[col_name] = text
+                            else:
+                                notification.notify(
+                                    title="Предупреждение",
+                                    message=f"Номер телефона должен быть введен полностью: +7 (999) 123-45-67",
+                                    timeout=3
+                                )
+                        else:
+                            # Если номер неполный, не добавляем в условия
+                            notification.notify(
+                                title="Предупреждение",
+                                message=f"Для поиска по телефону введите номер полностью",
+                                timeout=3
+                            )
+                            continue  # Пропускаем это поле
+
+                    elif isinstance(column.type, Integer):
                         if not text.isdigit():
                             notification.notify(
                                 title="Ошибка",
@@ -651,6 +687,7 @@ class EditRecordDialog(QDialog):
                             )
                             return None
                         condition[col_name] = int(text)
+
                     elif isinstance(column.type, Numeric):
                         try:
                             condition[col_name] = float(text)
@@ -665,7 +702,6 @@ class EditRecordDialog(QDialog):
                         condition[col_name] = text
 
         return condition
-
     def populate_update_fields(self, record, table_name):
         """Автозаполняет поля для редактирования на основе найденной записи."""
         table = self.db_instance.tables[table_name]

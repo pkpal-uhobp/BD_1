@@ -166,7 +166,6 @@ class MainWindow(QMainWindow):
         btn_add_data.setObjectName("add_data")
         center_layout.addWidget(btn_add_data)
 
-
         # Кнопка: Изменить данные
         btn_edit_data = self.create_toolbar_button("Изменить", self.edit_data, "#ff6b6b")
         center_layout.addWidget(btn_edit_data)
@@ -237,8 +236,8 @@ class MainWindow(QMainWindow):
                                           stop: 1 {color}40);
                 padding: 7px 11px;
             }}
-            
-    
+
+
         """)
         return button
 
@@ -319,7 +318,7 @@ class MainWindow(QMainWindow):
                 padding: 20px;
                 margin-bottom: 10px;
             }
-            
+
             #add_data {
                 background: #000000;
             }
@@ -331,7 +330,7 @@ class MainWindow(QMainWindow):
                 font-family: 'Consolas', 'Fira Code', monospace;
                 letter-spacing: 2px;
                 padding-top: 10px;
-            
+
             }
 
             /* Панель инструментов */
