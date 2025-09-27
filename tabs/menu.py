@@ -159,6 +159,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(spacer_action)
 
         """Правая группа: системные кнопки — только одна кнопка 'Отключиться'"""
+        toolbar.addSeparator()
         right_widget = QWidget()
         right_layout = QHBoxLayout()
         right_layout.setSpacing(10)
