@@ -112,46 +112,59 @@ class MainWindow(QMainWindow):
         toolbar.setMovable(False)
         toolbar.setMinimumHeight(70)
         self.addToolBar(toolbar)
+
         """Левая группа: операции с базой"""
         left_widget = QWidget()
         left_layout = QHBoxLayout()
         left_layout.setSpacing(10)
         left_layout.setContentsMargins(15, 8, 15, 8)
         left_widget.setLayout(left_layout)
-        """Кнопка: Создать схему"""
+
         btn_create_schema = self.create_toolbar_button("Создать схему", self.create_schema, "#0")
         left_layout.addWidget(btn_create_schema)
-        """Кнопка: Удалить схему"""
+
         btn_drop_schema = self.create_toolbar_button("Удалить схему", self.drop_schema, "#0")
         left_layout.addWidget(btn_drop_schema)
+
         toolbar.addWidget(left_widget)
         toolbar.addSeparator()
+
         """Центральная группа: операции с данными"""
         center_widget = QWidget()
         center_layout = QHBoxLayout()
         center_layout.setSpacing(8)
         center_layout.setContentsMargins(15, 8, 15, 8)
         center_widget.setLayout(center_layout)
+
         btn_add_data = self.create_toolbar_button("Добавить", self.add_data, "#0")
         btn_add_data.setObjectName("add_data")
         center_layout.addWidget(btn_add_data)
+
         btn_edit_data = self.create_toolbar_button("Изменить", self.edit_data, "#0")
         center_layout.addWidget(btn_edit_data)
+
         btn_delete_data = self.create_toolbar_button("Удалить", self.delete_data, "#0")
         center_layout.addWidget(btn_delete_data)
+
         btn_show_table = self.create_toolbar_button("Показать таблицу", self.show_table, "#0")
         center_layout.addWidget(btn_show_table)
+
         toolbar.addWidget(center_widget)
+
+        # 🔹 Добавляем растягивающийся спейсер — он "заберёт" всё свободное пространство и отодвинет кнопку вправо
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         spacer_action = QWidgetAction(toolbar)
         spacer_action.setDefaultWidget(spacer)
-        """Правая группа: системные кнопки"""
+        toolbar.addAction(spacer_action)
+
+        """Правая группа: системные кнопки — только одна кнопка 'Отключиться'"""
         right_widget = QWidget()
         right_layout = QHBoxLayout()
         right_layout.setSpacing(10)
         right_layout.setContentsMargins(15, 8, 15, 8)
         right_widget.setLayout(right_layout)
+
         btn_logout = self.create_toolbar_button("Отключиться", self.logout, "#0")
         right_layout.addWidget(btn_logout)
 
