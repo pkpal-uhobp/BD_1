@@ -13,64 +13,48 @@ from tabs.delete_dialog import DeleteRecordDialog
 from tabs.update_dialog import EditRecordDialog
 from tabs.get_table import ShowTableDialog
 
+
 class MainWindow(QMainWindow):
     def __init__(self, db_instance=None):
         super().__init__()
         self.db_instance = db_instance
         self.setWindowTitle("СИСТЕМА УПРАВЛЕНИЯ БИБЛИОТЕКОЙ")
         self.setGeometry(200, 100, 1200, 800)
-
-        # Устанавливаем тёмную палитру
+        """Устанавливаем тёмную палитру"""
         self.set_dark_palette()
-
-        # Центральный виджет
+        """Центральный виджет"""
         central_widget = QWidget()
         central_widget.setObjectName("mainWidget")
         self.setCentralWidget(central_widget)
-
         layout = QVBoxLayout()
         layout.setContentsMargins(30, 20, 30, 20)
         layout.setSpacing(20)
         central_widget.setLayout(layout)
-
-        # Заголовок приложения
+        """Заголовок приложения"""
         header_widget = QWidget()
         header_widget.setObjectName("headerWidget")
         header_layout = QVBoxLayout()
         header_widget.setLayout(header_layout)
-
         title_label = QLabel("СИСТЕМА УПРАВЛЕНИЯ БИБЛИОТЕКОЙ")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setObjectName("titleLabel")
-
         subtitle_label = QLabel("")
         subtitle_label.setAlignment(Qt.AlignCenter)
         subtitle_label.setObjectName("subtitleLabel")
-
         header_layout.addWidget(title_label)
         header_layout.addWidget(subtitle_label)
         layout.addWidget(header_widget)
-
-        # Панель инструментов с улучшенным дизайном
         self.setup_enhanced_toolbar()
-
-        # Виджет статуса подключения
+        """Виджет статуса подключения"""
         self.setup_connection_status(layout)
-
-        # Таблица для просмотра данных
         self.setup_data_table(layout)
-
-        # Применяем стили
         self.apply_styles()
-
-        # Инициализация переменных
         self.sort_order = {}
         self.current_table_data = []
         self.last_table_name = None
         self.last_join_params = None
         self.sort = {}
-
-        # Словари для преобразования заголовков
+        """Словари для преобразования заголовков"""
         self.COLUMN_HEADERS_MAP = {
             # === Книги ===
             "book_id": "ID Книги (в выдаче)",
@@ -79,7 +63,6 @@ class MainWindow(QMainWindow):
             "genre": "Жанр книги",
             "deposit_amount": "Залог (₽)",
             "daily_rental_rate": "Цена аренды в день (₽)",
-
             # === Читатели ===
             "reader_id": "ID Читателя",
             "first_name": "Имя читателя",
@@ -89,7 +72,6 @@ class MainWindow(QMainWindow):
             "phone": "Телефон читателя",
             "discount_category": "Категория скидки",
             "discount_percent": "Процент скидки (%)",
-
             # === Выдачи ===
             "id_book": "ID Книги",
             "reader_id=": "ID Читателя (в выдаче)",
@@ -102,7 +84,6 @@ class MainWindow(QMainWindow):
             "paid": "Оплачено",
             "actual_rental_days": "Фактические дни аренды",
         }
-
         self.REVERSE_COLUMN_HEADERS_MAP = {display_name: db_name for db_name, display_name in
                                            self.COLUMN_HEADERS_MAP.items()}
 
@@ -131,68 +112,47 @@ class MainWindow(QMainWindow):
         toolbar.setMovable(False)
         toolbar.setMinimumHeight(70)
         self.addToolBar(toolbar)
-
-        # Левая группа: операции с базой
+        """Левая группа: операции с базой"""
         left_widget = QWidget()
         left_layout = QHBoxLayout()
         left_layout.setSpacing(10)
         left_layout.setContentsMargins(15, 8, 15, 8)
         left_widget.setLayout(left_layout)
-
-        # Кнопка: Создать схему
-        btn_create_schema = self.create_toolbar_button("Создать схему", self.create_schema, "#64ffda")
+        """Кнопка: Создать схему"""
+        btn_create_schema = self.create_toolbar_button("Создать схему", self.create_schema, "#0")
         left_layout.addWidget(btn_create_schema)
-
-        # Кнопка: Удалить схему
-        btn_drop_schema = self.create_toolbar_button("Удалить схему", self.drop_schema, "#ff6b6b")
+        """Кнопка: Удалить схему"""
+        btn_drop_schema = self.create_toolbar_button("Удалить схему", self.drop_schema, "#0")
         left_layout.addWidget(btn_drop_schema)
-
         toolbar.addWidget(left_widget)
-
         toolbar.addSeparator()
-
-        # Центральная группа: операции с данными
+        """Центральная группа: операции с данными"""
         center_widget = QWidget()
         center_layout = QHBoxLayout()
         center_layout.setSpacing(8)
         center_layout.setContentsMargins(15, 8, 15, 8)
         center_widget.setLayout(center_layout)
-
-        # Кнопка: Добавить данные
-        btn_add_data = self.create_toolbar_button("Добавить", self.add_data, "#ff79c6")
+        btn_add_data = self.create_toolbar_button("Добавить", self.add_data, "#0")
         btn_add_data.setObjectName("add_data")
         center_layout.addWidget(btn_add_data)
-
-        # Кнопка: Изменить данные
-        btn_edit_data = self.create_toolbar_button("Изменить", self.edit_data, "#ff6b6b")
+        btn_edit_data = self.create_toolbar_button("Изменить", self.edit_data, "#0")
         center_layout.addWidget(btn_edit_data)
-
-        # Кнопка: Удалить данные
-        btn_delete_data = self.create_toolbar_button("Удалить", self.delete_data, "#50fa7b")
+        btn_delete_data = self.create_toolbar_button("Удалить", self.delete_data, "#0")
         center_layout.addWidget(btn_delete_data)
-
-        # Кнопка: Вывести таблицу
-        btn_show_table = self.create_toolbar_button("Показать таблицу", self.show_table, "#8be9fd")
+        btn_show_table = self.create_toolbar_button("Показать таблицу", self.show_table, "#0")
         center_layout.addWidget(btn_show_table)
-
         toolbar.addWidget(center_widget)
-
-        # Растягивающийся спейсер
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         spacer_action = QWidgetAction(toolbar)
         spacer_action.setDefaultWidget(spacer)
-        toolbar.addAction(spacer_action)
-
-        # Правая группа: системные кнопки
+        """Правая группа: системные кнопки"""
         right_widget = QWidget()
         right_layout = QHBoxLayout()
         right_layout.setSpacing(10)
         right_layout.setContentsMargins(15, 8, 15, 8)
         right_widget.setLayout(right_layout)
-
-        # Кнопка: Отключиться
-        btn_logout = self.create_toolbar_button("Отключиться", self.logout, "#ff5555")
+        btn_logout = self.create_toolbar_button("Отключиться", self.logout, "#0")
         right_layout.addWidget(btn_logout)
 
         toolbar.addWidget(right_widget)
@@ -204,7 +164,6 @@ class MainWindow(QMainWindow):
         button.setMinimumWidth(120)
         button.setCursor(Qt.PointingHandCursor)
         button.clicked.connect(callback)
-
         button.setStyleSheet(f"""
             QPushButton {{
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -242,40 +201,32 @@ class MainWindow(QMainWindow):
         status_widget.setObjectName("statusWidget")
         status_layout = QHBoxLayout()
         status_widget.setLayout(status_layout)
-
         status_icon = QLabel("🔗")
         status_icon.setObjectName("statusIcon")
-
         status_text = QLabel("Подключено к базе данных")
         status_text.setObjectName("statusText")
-
         status_layout.addWidget(status_icon)
         status_layout.addWidget(status_text)
         status_layout.addStretch()
-
         layout.addWidget(status_widget)
 
     def setup_data_table(self, layout):
         """Настраивает таблицу для отображения данных"""
-        # Контейнер для таблицы
         table_container = QWidget()
         table_container.setObjectName("tableContainer")
         table_layout = QVBoxLayout()
         table_container.setLayout(table_layout)
-
-        # Заголовок таблицы
+        """Заголовок таблицы"""
         table_header = QLabel("ДАННЫЕ БАЗЫ ДАННЫХ")
         table_header.setObjectName("tableHeader")
         table_header.setAlignment(Qt.AlignCenter)
         table_layout.addWidget(table_header)
-
-        # Таблица
+        """Таблица"""
         self.data_table = QTableView()
         self.data_table.setObjectName("dataTable")
         self.table_model = QStandardItemModel()
         self.data_table.setModel(self.table_model)
-
-        # Настройки таблицы
+        """Настройки таблицы"""
         self.data_table.setAlternatingRowColors(True)
         self.data_table.setEditTriggers(QTableView.NoEditTriggers)
         self.data_table.setSelectionBehavior(QTableView.SelectRows)
@@ -291,7 +242,7 @@ class MainWindow(QMainWindow):
         table_layout.addWidget(self.data_table)
         layout.addWidget(table_container, 1)
 
-        # Подключаем обработчик клика по заголовку
+        """Подключаем обработчик клика по заголовку"""
         self.data_table.horizontalHeader().sectionClicked.connect(self.on_header_clicked)
 
     def apply_styles(self):

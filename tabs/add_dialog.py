@@ -196,7 +196,7 @@ class AddRecordDialog(QDialog):
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 font-family: 'Consolas', 'Fira Code', monospace;
-                min-height: 50px;
+                min-height: 30px;
             }
 
             QPushButton:hover {
@@ -287,6 +287,7 @@ class AddRecordDialog(QDialog):
                 background: rgba(15, 15, 25, 0.6);
                 border-radius: 10px;
                 padding: 15px;
+                border: none;
             }
         """)
         table_layout = QVBoxLayout(table_container)
@@ -337,7 +338,7 @@ class AddRecordDialog(QDialog):
         self.table_combo.currentTextChanged.connect(self.load_table_fields)
 
         # Кнопка добавления
-        self.btn_add = QPushButton("✅ ДОБАВИТЬ ЗАПИСЬ")
+        self.btn_add = QPushButton(" ДОБАВИТЬ ЗАПИСЬ")
         self.btn_add.setCursor(Qt.PointingHandCursor)
         self.btn_add.clicked.connect(self.on_add_clicked)
         layout.addWidget(self.btn_add)

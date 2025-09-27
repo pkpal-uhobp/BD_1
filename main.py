@@ -4,7 +4,6 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QLineEdit, QFormLayout
 )
-# Предполагается, что эти импорты корректны для вашей структуры проекта
 from tabs.menu import MainWindow
 from db.Class_DB import DB
 from PySide6.QtCore import Qt, QTimer, QEvent
@@ -12,52 +11,36 @@ from PySide6.QtGui import QFont, QColor, QPalette
 from plyer import notification
 
 
-# ================================
-# Окно подключения к БД
-# ================================
 class DBConnectionWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Подключение к базе данных")
-
-        # Устанавливаем тёмную палитру для всего приложения
+        """Устанавливаем тёмную палитру для всего приложения"""
         self.set_dark_palette()
-
-        # Центральный виджет
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         central_widget.setObjectName("mainWidget")
-
-        # Устанавливаем фиксированный размер окна
-        self.setFixedSize(500, 550)
-
-        # Главный макет
+        """Устанавливаем фиксированный размер окна"""
+        self.setFixedSize(500, 700)
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(40, 30, 40, 30)
         main_layout.setSpacing(25)
         central_widget.setLayout(main_layout)
-
-        # Заголовок с иконкой базы данных
         title_container = QWidget()
         title_container.setObjectName("titleContainer")
         title_layout = QHBoxLayout()
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_container.setLayout(title_layout)
-
         db_icon = QLabel("🕮")
         db_icon.setFont(QFont("Arial", 28, QFont.Bold))
         db_icon.setAlignment(Qt.AlignCenter)
         db_icon.setStyleSheet("color: #64ffda;")
-
         title_label = QLabel("ПОДКЛЮЧЕНИЕ БИБЛИОТЕКИ")
         title_label.setFont(QFont("Consolas", 16, QFont.Bold))
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet("color: #64ffda; letter-spacing: 2px; padding-right: 50px;")
-
         title_layout.addWidget(db_icon)
         title_layout.addWidget(title_label)
-
-        # Контейнер для формы
         form_container = QWidget()
         form_container.setObjectName("formContainer")
         form_layout = QFormLayout()
@@ -65,33 +48,24 @@ class DBConnectionWindow(QMainWindow):
         form_layout.setLabelAlignment(Qt.AlignRight)
         form_layout.setVerticalSpacing(18)
         form_container.setLayout(form_layout)
-
-        # Создаем поля ввода и метки ошибок
+        """ Создаем поля ввода и метки ошибок"""
         self.host_input = QLineEdit("localhost")
         self.host_error = QLabel("")
         self.host_error.setObjectName("errorLabel")
         self.host_error.setVisible(False)
-
         self.port_input = QLineEdit("5432")
         self.port_error = QLabel("")
         self.port_error.setObjectName("errorLabel")
         self.port_error.setVisible(False)
-
-        # Создаем поле DATABASE — НЕРЕДАКТИРУЕМОЕ
         self.dbname_input = QLineEdit("library_db")
         self.dbname_input.setReadOnly(True)
         self.dbname_input.setCursor(Qt.ForbiddenCursor)
-        self.dbname_input.setToolTip("Это поле нельзя изменить")
-
-        # Метка ошибки (будет использоваться для сообщения)
         self.dbname_error = QLabel("")
         self.dbname_error.setObjectName("errorLabel")
         self.dbname_error.setVisible(False)
-
-        # Устанавливаем событийный фильтр
+        """Устанавливаем событийный фильтр"""
         self.dbname_input.installEventFilter(self)
-
-        # Настройка стиля
+        """Настройка стиля"""
         self.dbname_input.setStyleSheet("""
                    background: rgba(25, 25, 35, 0.8);
                    border: 2px solid #44475a;
@@ -106,67 +80,50 @@ class DBConnectionWindow(QMainWindow):
         self.dbname_error = QLabel("")
         self.dbname_error.setObjectName("errorLabel")
         self.dbname_error.setVisible(False)
-
         self.user_input = QLineEdit("postgres")
         self.user_error = QLabel("")
         self.user_error.setObjectName("errorLabel")
         self.user_error.setVisible(False)
-
         self.password_input = QLineEdit("root")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_error = QLabel("")
         self.password_error.setObjectName("errorLabel")
         self.password_error.setVisible(False)
-
-        # Настройка полей ввода
         input_fields = [self.host_input, self.port_input, self.dbname_input, self.user_input, self.password_input]
         placeholders = ["server host", "5432", "database name", "username", "password"]
-
         for field, placeholder in zip(input_fields, placeholders):
             field.setPlaceholderText(placeholder)
             field.setMinimumHeight(48)
             field.setObjectName("inputField")
             field.textChanged.connect(self.schedule_validation)
-
-        # Добавляем поля и ошибки в форму
+        """Добавляем поля и ошибки в форму"""
         form_layout.addRow(self.create_label("HOST:"), self.host_input)
         form_layout.addRow("", self.host_error)
-
         form_layout.addRow(self.create_label("PORT:"), self.port_input)
         form_layout.addRow("", self.port_error)
-
         form_layout.addRow(self.create_label("DATABASE:"), self.dbname_input)
         form_layout.addRow("", self.dbname_error)
-
         form_layout.addRow(self.create_label("USER:"), self.user_input)
         form_layout.addRow("", self.user_error)
-
         form_layout.addRow(self.create_label("PASSWORD:"), self.password_input)
         form_layout.addRow("", self.password_error)
-
-        # Кнопка подключения
         self.connect_button = QPushButton("ПОДКЛЮЧИТЬСЯ")
         self.connect_button.setMinimumHeight(55)
         self.connect_button.setCursor(Qt.PointingHandCursor)
         self.connect_button.clicked.connect(self.on_connect_clicked)
         self.connect_button.setObjectName("connectButton")
-
-        # Добавляем элементы в основной layout
+        """Добавляем элементы в основной layout"""
         main_layout.addWidget(title_container)
         main_layout.addSpacing(20)
         main_layout.addWidget(form_container)
         main_layout.addSpacing(25)
         main_layout.addWidget(self.connect_button)
         main_layout.addStretch()
-        # Применяем стили
         self.apply_styles()
-
-        ## Таймер для отложенной валидации
+        """Таймер для отложенной валидации"""
         self.validation_timer = QTimer()
         self.validation_timer.setSingleShot(True)
         self.validation_timer.timeout.connect(self.validate_all_fields_realtime)
-
-        # Инициализация переменных
         self.last_table_name = None
         self.last_join_params = None
         self.db_instance = None
@@ -177,7 +134,7 @@ class DBConnectionWindow(QMainWindow):
             'user': True,
             'password': True
         }
-        # Валидируем начальные значения
+        """Валидируем начальные значения"""
         QTimer.singleShot(100, self.validate_all_fields_realtime)
 
     def create_label(self, text):
@@ -201,7 +158,6 @@ class DBConnectionWindow(QMainWindow):
         dark_palette.setColor(QPalette.BrightText, QColor(64, 255, 218))
         dark_palette.setColor(QPalette.Highlight, QColor(64, 255, 218))
         dark_palette.setColor(QPalette.HighlightedText, QColor(18, 18, 24))
-
         self.setPalette(dark_palette)
 
     def apply_styles(self):
@@ -344,16 +300,13 @@ class DBConnectionWindow(QMainWindow):
 
     def on_connect_clicked(self):
         """Обработчик клика по кнопке подключения"""
-        # Финальная проверка
         self.validate_all_fields_realtime()
-
         has_errors = any([
             not self.field_valid['host'],
             not self.field_valid['port'],
             not self.field_valid['user'],
             not self.field_valid['password']
         ])
-
         if has_errors:
             notification.notify(
                 title="Ошибки ввода",
@@ -361,7 +314,6 @@ class DBConnectionWindow(QMainWindow):
                 timeout=5
             )
             return
-
         self.connect_button.setText("ПОДКЛЮЧЕНИЕ...")
         self.connect_button.setEnabled(False)
         QApplication.processEvents()
@@ -369,21 +321,17 @@ class DBConnectionWindow(QMainWindow):
 
     def connect_to_database(self):
         """Подключение к базе данных"""
-        # Сбор параметров
         host = self.host_input.text().strip()
         port = self.port_input.text().strip()
         dbname = self.dbname_input.text().strip()
         user = self.user_input.text().strip()
         password = self.password_input.text()
-
         port = int(port)
-
-        # Настройка логгера
+        """Настройка логгера"""
         logger = logging.getLogger("DB")
         logger.setLevel(logging.DEBUG)
         logger.handlers.clear()
-
-        # Убедимся, что директория db существует, или логируем в текущую
+        """Убедимся, что директория db существует, или логируем в текущую"""
         try:
             file_handler = logging.FileHandler("db/db_app.log", encoding='utf-8')
             log_file_path = "db/db_app.log"
@@ -395,8 +343,6 @@ class DBConnectionWindow(QMainWindow):
             logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         )
         logger.addHandler(file_handler)
-
-        # Создание DB
         db = DB(
             host=host,
             port=port,
@@ -405,10 +351,7 @@ class DBConnectionWindow(QMainWindow):
             password=password,
             log_file=log_file_path
         )
-
-        # Подключение
         connected = db.connect()
-        # Показываем уведомление
         if connected:
             notification.notify(
                 title="✅ Успешное подключение",
@@ -433,8 +376,6 @@ class DBConnectionWindow(QMainWindow):
 
     def validate_all_fields_realtime(self):
         is_valid = True
-
-        # Хост
         host = self.host_input.text().strip()
         host_error = self.get_host_error(host)
         if host_error:
@@ -447,8 +388,6 @@ class DBConnectionWindow(QMainWindow):
             self.field_valid['host'] = True
             self.host_error.setVisible(False)
             self.set_field_error_style(self.host_input, False)
-
-        # Порт
         port = self.port_input.text().strip()
         port_error = self.get_port_error(port)
         if port_error:
@@ -461,12 +400,8 @@ class DBConnectionWindow(QMainWindow):
             self.field_valid['port'] = True
             self.port_error.setVisible(False)
             self.set_field_error_style(self.port_input, False)
-
-        # База данных — не проверяем (нередактируемое)
         self.dbname_error.setVisible(False)
         self.set_field_error_style(self.dbname_input, False)
-
-        # Пользователь
         user = self.user_input.text().strip()
         user_error = self.get_user_error(user)
         if user_error:
@@ -479,8 +414,6 @@ class DBConnectionWindow(QMainWindow):
             self.field_valid['user'] = True
             self.user_error.setVisible(False)
             self.set_field_error_style(self.user_input, False)
-
-        # Пароль
         password = self.password_input.text()
         password_error = self.get_password_error(password)
         if password_error:
@@ -493,7 +426,6 @@ class DBConnectionWindow(QMainWindow):
             self.field_valid['password'] = True
             self.password_error.setVisible(False)
             self.set_field_error_style(self.password_input, False)
-
         self.connect_button.setEnabled(is_valid)
 
     def set_field_error_style(self, field, has_error):
@@ -594,16 +526,11 @@ class DBConnectionWindow(QMainWindow):
     def hide_readonly_message(self):
         """Скрывает сообщение при потере фокуса"""
         self.dbname_error.setVisible(False)
-# ================================
-# Запуск приложения
-# ================================
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-    # Устанавливаем стиль Fusion для лучшего отображения тёмной темы
     app.setStyle("Fusion")
-
     window = DBConnectionWindow()
     window.show()
-
     sys.exit(app.exec())
