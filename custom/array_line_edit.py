@@ -233,14 +233,39 @@ class ArrayEditDialog(QDialog):
     # ------------------------ ВАЛИДАЦИЯ -----------------------------
 
     def validate_single_field(self, widget):
-        """Простая локальная валидация — не допускаем пустые элементы"""
+        """Проверяет значение поля в зависимости от типа (если задано)."""
         value = widget.text().strip()
+        expected_type = self.item_constraints.get("type", "").lower()
+
+        # Пустое значение — ошибка
         if not value:
             self.set_field_error(widget, "❌ Элемент не может быть пустым")
             self.field_validity[widget] = False
-        else:
-            self.clear_field_error(widget)
-            self.field_validity[widget] = True
+            return
+
+        # Проверка по типу (если указан)
+        if expected_type:
+            try:
+                if expected_type in ("int", "integer"):
+                    int(value)
+                elif expected_type in ("float", "double", "numeric"):
+                    float(value)
+                elif expected_type in ("bool", "boolean"):
+                    if value.lower() not in ("true", "false", "1", "0"):
+                        raise ValueError("Некорректное булево значение")
+                elif expected_type in ("date", "datetime"):
+                    # Проверим формат YYYY-MM-DD
+                    from datetime import datetime
+                    datetime.strptime(value, "%Y-%m-%d")
+                # строки не требуют проверки
+            except Exception:
+                self.set_field_error(widget, f"❌ Неверный формат для типа {expected_type}")
+                self.field_validity[widget] = False
+                return
+
+        # Если всё ок — очищаем ошибку
+        self.clear_field_error(widget)
+        self.field_validity[widget] = True
 
     def validate_and_accept(self):
         """Валидирует все поля перед сохранением"""
@@ -267,7 +292,7 @@ class ArrayEditDialog(QDialog):
 
     def addField(self, value=""):
         """Добавляет новое поле ввода и метку ошибки в один контейнер."""
-        # Вертикальный контейнер для поля, метки и ошибки
+        # Контейнер для поля, метки и ошибки
         field_wrapper = QWidget()
         wrapper_layout = QVBoxLayout(field_wrapper)
         wrapper_layout.setContentsMargins(0, 0, 0, 0)
@@ -277,32 +302,46 @@ class ArrayEditDialog(QDialog):
         input_row_layout = QHBoxLayout()
         label = QLabel(f"Элемент {len(self.input_widgets) + 1}:")
         label.setStyleSheet("color: #64ffda; font-family: Consolas;")
+
         input_field = QLineEdit()
         input_field.setText("" if value is None else str(value))
+
+        # 🧠 Если в constraints передан тип — показываем подсказку
+        expected_type = self.item_constraints.get("type", "").lower()
+        if expected_type:
+            type_label = {
+                "int": "целое число",
+                "integer": "целое число",
+                "float": "вещественное число",
+                "double": "вещественное число",
+                "numeric": "вещественное число",
+                "bool": "булево значение (True/False)",
+                "boolean": "булево значение (True/False)",
+                "date": "дата (ГГГГ-ММ-ДД)"
+            }.get(expected_type, "строка")
+            input_field.setPlaceholderText(f"Тип: {type_label}")
+
         input_field.textChanged.connect(lambda: self.validate_single_field(input_field))
 
         input_row_layout.addWidget(label)
         input_row_layout.addWidget(input_field)
 
-        # Метка для ошибки (под полем)
+        # Метка ошибки
         error_label = QLabel()
         error_label.setProperty("class", "error-label")
         error_label.setWordWrap(True)
         error_label.hide()
 
-        # Добавляем всё в вертикальный layout
         wrapper_layout.addLayout(input_row_layout)
         wrapper_layout.addWidget(error_label)
-
-        # Добавляем этот контейнер в основной layout полей
         self.fields_layout.addWidget(field_wrapper)
 
-        # Сохраняем ссылки
+        # Сохраняем
         self.input_widgets.append((input_field, field_wrapper))
         self.error_labels[input_field] = error_label
-        self.field_validity[input_field] = True # По умолчанию поле валидно
+        self.field_validity[input_field] = True
 
-        # Активируем кнопку удаления, если больше одного поля
+        # Активируем кнопку удаления, если больше одного
         self.remove_button.setEnabled(len(self.input_widgets) > 1)
 
     def removeField(self):

@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QMainWindow, QToolBar, QSizePolicy, QWidgetAction, QTableView,
     QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton, QWidget,
-    QHBoxLayout, QApplication
+    QHBoxLayout, QApplication, QMenu
 )
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QStandardItem, QStandardItemModel, QPalette, QColor
@@ -136,19 +136,85 @@ class MainWindow(QMainWindow):
         center_layout.setContentsMargins(15, 8, 15, 8)
         center_widget.setLayout(center_layout)
 
-        btn_add_data = self.create_toolbar_button("Добавить", self.add_data, "#0")
-        btn_add_data.setObjectName("add_data")
-        center_layout.addWidget(btn_add_data)
+        # === 📋 Выпадающая кнопка "Действия" ===
+        actions_button = QPushButton("📋 Действия ▼")
+        actions_menu = QMenu(actions_button)
 
-        btn_edit_data = self.create_toolbar_button("Изменить", self.edit_data, "#0")
-        center_layout.addWidget(btn_edit_data)
+        # Добавляем пункты меню
+        actions_menu.addAction("📗 Добавить", lambda: self.add_data())
+        actions_menu.addAction("✏️ Изменить", lambda: self.edit_data())
+        actions_menu.addAction("🗑 Удалить", lambda: self.delete_data())
 
-        btn_delete_data = self.create_toolbar_button("Удалить", self.delete_data, "#0")
-        center_layout.addWidget(btn_delete_data)
+        # Применяем стиль
+        self.style_dropdown_button(actions_button, actions_menu)
 
-        btn_show_table = self.create_toolbar_button("Показать таблицу", self.show_table, "#0")
-        center_layout.addWidget(btn_show_table)
+        # Назначаем меню кнопке
+        actions_button.setMenu(actions_menu)
+        center_layout.addWidget(actions_button)
 
+
+        alter_menu_button = QPushButton("Структура ▼")
+        alter_menu_button.setMinimumHeight(45)
+        alter_menu_button.setMinimumWidth(160)
+        alter_menu_button.setCursor(Qt.PointingHandCursor)
+
+        alter_menu = QMenu(alter_menu_button)
+        alter_menu_button.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                            stop: 0 #0a0a0f, 
+                                            stop: 1 #1a1a2e);
+                border: 2px solid #64ffda60;
+                border-radius: 8px;
+                color: #f8f8f2;
+                font-size: 13px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 8px 12px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                            stop: 0 #1a1a2e,
+                                            stop: 1 #2a2a3a);
+                border: 2px solid #64ffda;
+                color: #64ffda;
+            }
+            QPushButton:pressed {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                            stop: 0 #3bc1a8, 
+                                            stop: 1 #00838f);
+                color: #0a0a0f;
+            }
+        """)
+
+        alter_menu = QMenu(alter_menu_button)
+        alter_menu.setStyleSheet("""
+            QMenu {
+                background-color: rgba(15, 15, 25, 0.95);
+                color: #f8f8f2;
+                border: 1px solid #64ffda80;
+                border-radius: 10px;
+                padding: 6px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+            }
+            QMenu::item {
+                padding: 10px 20px;
+                border-radius: 6px;
+                margin: 2px;
+            }
+            QMenu::item:selected {
+                background-color: #64ffda40;
+                color: #64ffda;
+            }
+        """)
+
+        alter_menu.addAction("➕ Добавить столбец", lambda: self.alter_table_action("add"))
+        alter_menu.addAction("➖ Удалить столбец", lambda: self.alter_table_action("drop"))
+        alter_menu.addAction("✏️ Переименовать столбец", lambda: self.alter_table_action("rename"))
+        alter_menu.addAction("🔁 Изменить тип столбца", lambda: self.alter_table_action("type"))
+
+        alter_menu_button.setMenu(alter_menu)
+        center_layout.addWidget(alter_menu_button)
         toolbar.addWidget(center_widget)
 
         # 🔹 Добавляем растягивающийся спейсер — он "заберёт" всё свободное пространство и отодвинет кнопку вправо
@@ -157,6 +223,8 @@ class MainWindow(QMainWindow):
         spacer_action = QWidgetAction(toolbar)
         spacer_action.setDefaultWidget(spacer)
         toolbar.addAction(spacer_action)
+        btn_show_table = self.create_toolbar_button("Показать таблицу", self.show_table, "#0")
+        center_layout.addWidget(btn_show_table)
 
         """Правая группа: системные кнопки — только одна кнопка 'Отключиться'"""
         toolbar.addSeparator()
@@ -209,6 +277,54 @@ class MainWindow(QMainWindow):
         """)
         return button
 
+    def style_dropdown_button(self, button, menu):
+        """Применяет единый неон-тёмный стиль к выпадающим кнопкам"""
+        button.setMinimumHeight(45)
+        button.setMinimumWidth(160)
+        button.setCursor(Qt.PointingHandCursor)
+        button.setStyleSheet("""
+            QPushButton {
+                background-color: #0a0a0f;
+                border: 2px solid #5effa1;
+                border-radius: 10px;
+                color: #ffffff;
+                font-size: 13px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 8px 16px;
+            }
+            QPushButton:hover {
+                background-color: #1a1a2e;
+                border: 2px solid #00ff88;
+                color: #00ff88;
+            }
+            QPushButton:pressed {
+                background-color: #002b1a;
+                border: 2px solid #00cc77;
+                color: #aaffdd;
+                padding: 7px 15px;
+            }
+        """)
+
+        menu.setStyleSheet("""
+            QMenu {
+                background-color: rgba(15, 15, 25, 0.95);
+                color: #f8f8f2;
+                border: 1px solid #00ff88;
+                border-radius: 10px;
+                padding: 6px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+            }
+            QMenu::item {
+                padding: 10px 20px;
+                border-radius: 6px;
+                margin: 2px;
+            }
+            QMenu::item:selected {
+                background-color: #00ff8840;
+                color: #00ff88;
+            }
+        """)
     def setup_connection_status(self, layout):
         """Создает виджет статуса подключения"""
         status_widget = QWidget()
@@ -625,29 +741,27 @@ class MainWindow(QMainWindow):
                 sort_columns=sort_columns
             )
             self.current_table_data = data
-
         elif mode == 'join':
             left_table = self.sort.get('left_table')
             right_table = self.sort.get('right_table')
             join_on = self.sort.get('join_on')
+            join_type = self.sort.get('join_type', 'INNER')  # Получаем тип соединения, по умолчанию INNER
             columns = self.sort.get('columns')
             sort_columns = self.sort.get('sort_columns')
-
             if not all([left_table, right_table, join_on, columns, sort_columns]):
                 self.table_model.clear()
                 self.table_model.setHorizontalHeaderLabels(["Ошибка: недостаточно параметров для join-запроса"])
                 self.data_table.setVisible(True)
                 return
-
             data = self.db_instance.get_joined_summary(
                 left_table=left_table,
                 right_table=right_table,
                 join_on=join_on,
+                join_type=join_type,  # Передаём тип соединения
                 columns=columns,
                 sort_columns=sort_columns
             )
             self.current_table_data = data
-
         else:
             self.table_model.clear()
             self.table_model.setHorizontalHeaderLabels(["Неизвестный режим отображения"])
@@ -726,6 +840,43 @@ class MainWindow(QMainWindow):
                 sort_order = Qt.AscendingOrder if is_asc else Qt.DescendingOrder
 
         self.data_table.horizontalHeader().setSortIndicator(sort_col_index, sort_order)
+
+    def alter_table_action(self, action_type):
+        """Обрабатывает действия из выпадающего списка ALTER TABLE"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="❌ Ошибка подключения",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+
+        action_texts = {
+            "add": "Добавление нового столбца",
+            "drop": "Удаление существующего столбца",
+            "rename": "Переименование столбца",
+            "type": "Изменение типа столбца"
+        }
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"ALTER TABLE — {action_texts.get(action_type, 'Действие')}")
+        dialog.setModal(True)
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        label = QLabel(f"Вы выбрали: {action_texts.get(action_type, 'Неизвестное действие')}")
+        label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(label)
+
+        info = QLabel("🔧 Здесь можно реализовать логику изменения структуры таблицы (ALTER TABLE).")
+        info.setWordWrap(True)
+        layout.addWidget(info)
+
+        close_btn = QPushButton("Закрыть")
+        close_btn.clicked.connect(dialog.close)
+        layout.addWidget(close_btn)
+
+        dialog.exec()
 
     def logout(self):
         # Стилизованный QMessageBox

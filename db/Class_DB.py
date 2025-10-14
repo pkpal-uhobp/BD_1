@@ -697,6 +697,7 @@ class DB:
             self.logger.error(f"⚠️ Ошибка получения внешних ключей '{table_name}': {self.format_db_error(e)}")
             return []
 
+
     def get_joined_summary(
             self,
             left_table: str,
@@ -719,9 +720,27 @@ class DB:
 
             left, right = self.tables[left_table], self.tables[right_table]
 
-            # Выбор колонок
+            # ✅ ИСПРАВЛЕНО: Правильно обрабатываем список столбцов с префиксами
             if columns:
-                selected_cols = [text(col) for col in columns]
+                selected_cols = []
+                for col_str in columns:
+                    if '.' in col_str:
+                        prefix, column_name = col_str.split('.', 1)
+                        if prefix == 't1' and hasattr(left.c, column_name):
+                            selected_cols.append(getattr(left.c, column_name))
+                        elif prefix == 't2' and hasattr(right.c, column_name):
+                            selected_cols.append(getattr(right.c, column_name))
+                        else:
+                            self.logger.error(f"❌ Не удалось разобрать столбец для SELECT: {col_str}")
+                            return []  # Прерываем, если столбец невалидный
+                    else: # Если префикса нет (на всякий случай)
+                        if hasattr(left.c, col_str):
+                            selected_cols.append(getattr(left.c, col_str))
+                        elif hasattr(right.c, col_str):
+                            selected_cols.append(getattr(right.c, col_str))
+                        else:
+                            self.logger.error(f"❌ Столбец '{col_str}' не найден ни в одной из таблиц.")
+                            return []
             else:
                 selected_cols = list(left.c) + list(right.c)
 
@@ -752,7 +771,7 @@ class DB:
                     else:
                         self.logger.warning(f"⚠️ Колонка '{col}' не найдена в '{left_table}' или '{right_table}'")
 
-            # ORDER BY
+            # ORDER BY (эта часть уже была написана правильно)
             if sort_columns:
                 order_exprs = []
                 for col, asc_order in sort_columns:

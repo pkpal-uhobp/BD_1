@@ -7,6 +7,7 @@ from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, 
 from plyer import notification
 from PySide6.QtGui import QFont, QPalette, QColor
 from PySide6.QtCore import Qt
+from custom.array_line_edit import ArrayLineEdit
 import re
 
 
@@ -20,7 +21,7 @@ class EditRecordDialog(QDialog):
         self.REVERSE_COLUMN_HEADERS_MAP = REVERSE_COLUMN_HEADERS_MAP
         self.setWindowTitle("Редактирование данных")
         self.setModal(True)
-        self.resize(600, 700)
+        self.resize(1600, 700)
 
         # Устанавливаем тёмную палитру
         self.set_dark_palette()
@@ -361,12 +362,25 @@ class EditRecordDialog(QDialog):
         table_layout.addWidget(self.table_combo)
         layout.addWidget(table_container)
 
-        # Область условий поиска
-        search_label = QLabel("Условия поиска записи:")
-        search_label.setFont(QFont("Consolas", 12, QFont.Bold))
-        search_label.setProperty("class", "section-label")
-        layout.addWidget(search_label)
+        # === ДВУХКОЛОНОЧНОЕ РАЗМЕЩЕНИЕ ===
 
+        # Заголовки над столбцами
+        headers_layout = QHBoxLayout()
+        left_header = QLabel("Условия поиска записи:")
+        right_header = QLabel("Новые значения:")
+
+        for header in (left_header, right_header):
+            header.setFont(QFont("Consolas", 12, QFont.Bold))
+            header.setProperty("class", "section-label")
+
+        headers_layout.addWidget(left_header)
+        headers_layout.addWidget(right_header)
+        layout.addLayout(headers_layout)
+
+        # Контейнеры для поиска и обновления (левая и правая колонка)
+        columns_layout = QHBoxLayout()
+
+        # --- Левая колонка (поиск)
         self.search_container = QWidget()
         self.search_container.setObjectName("searchContainer")
         self.search_layout = QVBoxLayout(self.search_container)
@@ -374,15 +388,11 @@ class EditRecordDialog(QDialog):
         scroll_area_search = QScrollArea()
         scroll_area_search.setWidgetResizable(True)
         scroll_area_search.setWidget(self.search_container)
-        scroll_area_search.setMinimumHeight(145)
-        layout.addWidget(scroll_area_search)
+        scroll_area_search.setMinimumHeight(250)
 
-        # Область новых значений
-        update_label = QLabel("Новые значения:")
-        update_label.setFont(QFont("Consolas", 12, QFont.Bold))
-        update_label.setProperty("class", "section-label")
-        layout.addWidget(update_label)
+        columns_layout.addWidget(scroll_area_search, 1)
 
+        # --- Правая колонка (обновление)
         self.update_container = QWidget()
         self.update_container.setObjectName("updateContainer")
         self.update_layout = QVBoxLayout(self.update_container)
@@ -390,8 +400,12 @@ class EditRecordDialog(QDialog):
         scroll_area_update = QScrollArea()
         scroll_area_update.setWidgetResizable(True)
         scroll_area_update.setWidget(self.update_container)
-        scroll_area_update.setMinimumHeight(145)
-        layout.addWidget(scroll_area_update)
+        scroll_area_update.setMinimumHeight(250)
+
+        columns_layout.addWidget(scroll_area_update, 1)
+
+        # Добавляем двухколоночный layout в общий layout
+        layout.addLayout(columns_layout)
 
         # Загружаем поля для первой таблицы
         self.load_table_fields(self.table_combo.currentText())
@@ -508,7 +522,7 @@ class EditRecordDialog(QDialog):
             widget.setStyleSheet(self.styleSheet())
 
     def validate_field(self, display_name, widget, column, table_name):
-        """Валидирует одно поле и возвращает (is_valid, value, error_message, success_message)"""
+        """Валидирует поле, включая ArrayLineEdit."""
         import re
 
         def validate_email(email):
@@ -520,179 +534,79 @@ class EditRecordDialog(QDialog):
             return 7 <= len(cleaned_phone) <= 15
 
         def validate_safe_chars(text):
-            dangerous_patterns = [r';', r'--', r'/\*', r'\*/']
-            return not any(re.search(pattern, text, re.IGNORECASE) for pattern in dangerous_patterns)
-
-        def is_email_field(field_name):
-            email_indicators = ['email', 'e-mail', 'mail', 'почта']
-            return any(indicator in field_name.lower() for indicator in email_indicators)
-
-        def is_phone_field(field_name):
-            phone_indicators = ['phone', 'tel', 'telephone', 'mobile', 'телефон']
-            return any(indicator in field_name.lower() for indicator in phone_indicators)
+            bad = [r';', r'--', r'/\*', r'\*/']
+            return not any(re.search(p, text, re.IGNORECASE) for p in bad)
 
         try:
             # ENUM
-            if isinstance(widget, QComboBox) and (hasattr(column.type, 'enums') or isinstance(column.type, SQLEnum)):
+            if isinstance(widget, QComboBox) and hasattr(column.type, "enums"):
                 value = widget.currentText().strip()
-                if not value:
-                    if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
-                    return True, None, "", ""
-                else:
-                    allowed_values = getattr(column.type, 'enums', [])
-                    if allowed_values and value not in allowed_values:
-                        return False, None, f"❌ Допустимые значения: {', '.join(allowed_values)}", ""
-                    return True, value, "", f"✅ Выбрано: {value}"
+                if not value and not column.nullable:
+                    return False, None, "⚠️ Обязательное поле", ""
+                return True, value, "", f"✅ {value}"
 
-            # ARRAY
-            elif isinstance(widget, QLineEdit) and isinstance(column.type, ARRAY):
-                text = widget.text().strip()
-                if not text:
-                    if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
-                    return True, [], "", ""
-                items = [item.strip() for item in text.split(":") if item.strip()]
-                if not items and not column.nullable:
-                    return False, None, "❌ Не может быть пустым", ""
-
-                validated_items = []
-                for i, item in enumerate(items):
-                    if isinstance(column.type.item_type, Integer):
-                        if not item.isdigit() and not (item.startswith('-') and item[1:].isdigit()):
-                            return False, None, f"❌ Элемент {i + 1} должен быть целым числом", ""
-                        validated_items.append(int(item))
-                    elif isinstance(column.type.item_type, Numeric):
-                        if not re.match(r'^-?\d+(\.\d+)?$', item):
-                            return False, None, f"❌ Элемент {i + 1} должен быть числом", ""
-                        validated_items.append(float(item))
-                    else:
-                        if not validate_safe_chars(item):
-                            return False, None, f"❌ Элемент {i + 1} содержит запрещенные символы", ""
-                        validated_items.append(item)
-
-                # Проверка: длина массива > 0 (для Books.authors)
-                if table_name == "Books" and column.name == "authors" and len(validated_items) == 0:
-                    return False, None, "❌ Массив авторов не может быть пустым", ""
-
-                return True, validated_items, "", f"✅ {len(validated_items)} элементов"
+            # ARRAY (ArrayLineEdit)
+            elif isinstance(widget, ArrayLineEdit):
+                values = widget.getArray()
+                if not values and not column.nullable:
+                    return False, None, "⚠️ Обязательное поле", ""
+                return True, values, "", f"✅ {len(values)} элементов"
 
             # BOOLEAN
             elif isinstance(widget, QCheckBox):
-                return True, widget.isChecked(), "", "✅ Установлено" if widget.isChecked() else "☑️ Не установлено"
+                return True, widget.isChecked(), "", "✅ Да" if widget.isChecked() else "☑️ Нет"
 
             # DATE
             elif isinstance(widget, QDateEdit):
-                qdate = widget.date()
-                if not qdate.isValid():
-                    if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
-                    return True, None, "", ""
-                current_date = QDate.currentDate()
-                if qdate < QDate(1900, 1, 1):
-                    return False, None, "❌ Дата слишком старая", ""
-                if qdate > current_date.addYears(100):
-                    return False, None, "❌ Дата слишком далекая в будущем", ""
-
-                # Проверка для Issued_Books: даты должны быть >= issue_date
-                if table_name == "Issued_Books":
-                    issue_date_widget = self.update_widgets.get("Дата выдачи")
-                    if issue_date_widget and issue_date_widget.date().isValid():
-                        issue_date = issue_date_widget.date()
-                        if qdate < issue_date:
-                            if column.name == "expected_return_date":
-                                return False, None, "❌ Ожидаемая дата возврата должна быть позже даты выдачи", ""
-                            elif column.name == "actual_return_date":
-                                return False, None, "❌ Фактическая дата возврата должна быть позже даты выдачи", ""
-
-                return True, qdate.toString("yyyy-MM-dd"), "", f"✅ {qdate.toString('dd.MM.yyyy')}"
+                qd = widget.date()
+                if not qd.isValid() and not column.nullable:
+                    return False, None, "⚠️ Обязательное поле", ""
+                return True, qd.toString("yyyy-MM-dd"), "", f"✅ {qd.toString('dd.MM.yyyy')}"
 
             # TEXT
             elif isinstance(widget, QTextEdit):
                 text = widget.toPlainText().strip()
-                if not text:
-                    if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
-                    return True, None, "", ""
+                if not text and not column.nullable:
+                    return False, None, "⚠️ Обязательное поле", ""
                 if not validate_safe_chars(text):
-                    return False, None, "❌ Содержит запрещенные символы", ""
+                    return False, None, "❌ Содержит запрещённые символы", ""
                 return True, text, "", f"✅ {len(text)} символов"
 
-            # LINEEDIT (String, Integer, Numeric)
+            # LINEEDIT
             elif isinstance(widget, QLineEdit):
                 text = widget.text().strip()
-                if not text:
-                    if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
-                    return True, None, "", ""
-
+                if not text and not column.nullable:
+                    return False, None, "⚠️ Обязательное поле", ""
                 if not validate_safe_chars(text):
-                    return False, None, "❌ Содержит запрещенные символы", ""
+                    return False, None, "❌ Содержит запрещённые символы", ""
 
-                # INTEGER
                 if isinstance(column.type, Integer):
                     if not text.isdigit() and not (text.startswith('-') and text[1:].isdigit()):
                         return False, None, "❌ Должно быть целым числом", ""
-                    value = int(text)
-                    # CheckConstraint: discount_percent BETWEEN 0 AND 100
-                    if table_name == "Readers" and column.name == "discount_percent":
-                        if value < 0 or value > 100:
-                            return False, None, "❌ Скидка должна быть от 0 до 100%", ""
-                    # CheckConstraint: actual_rental_days >= 0
-                    elif table_name == "Issued_Books" and column.name == "actual_rental_days":
-                        if value < 0:
-                            return False, None, "❌ Дни не могут быть отрицательными", ""
-                    return True, value, "", f"✅ Целое: {value}"
+                    return True, int(text), "", f"✅ {text}"
 
-                # NUMERIC
                 elif isinstance(column.type, Numeric):
                     if not re.match(r'^-?\d+(\.\d+)?$', text):
-                        return False, None, "❌ Должно быть числом (например: 15 или 3.14)", ""
-                    try:
-                        value = float(text)
-                        # CheckConstraint: deposit_amount >= 0
-                        if table_name == "Books" and column.name == "deposit_amount":
-                            if value < 0:
-                                return False, None, "❌ Залог не может быть отрицательным", ""
-                        # CheckConstraint: daily_rental_rate > 0
-                        elif table_name == "Books" and column.name == "daily_rental_rate":
-                            if value <= 0:
-                                return False, None, "❌ Стоимость аренды должна быть больше 0", ""
-                        # CheckConstraint: damage_fine >= 0
-                        elif table_name == "Issued_Books" and column.name == "damage_fine":
-                            if value < 0:
-                                return False, None, "❌ Штраф не может быть отрицательным", ""
-                        # CheckConstraint: final_rental_cost >= 0 (если указано)
-                        elif table_name == "Issued_Books" and column.name == "final_rental_cost":
-                            if value < 0:
-                                return False, None, "❌ Стоимость аренды не может быть отрицательной", ""
-                        # Проверка точности NUMERIC(10,2)
-                        if abs(value) > 99999999.99:
-                            return False, None, "❌ Слишком большое число (макс. 99999999.99)", ""
-                        return True, value, "", f"✅ Число: {value}"
-                    except (ValueError, OverflowError):
-                        return False, None, "❌ Некорректное числовое значение", ""
+                        return False, None, "❌ Некорректное число", ""
+                    return True, float(text), "", f"✅ {text}"
 
-                # STRING
                 elif isinstance(column.type, String):
-                    max_length = getattr(column.type, 'length', None)
-                    if max_length and len(text) > max_length:
-                        return False, None, f"❌ Превышена длина ({len(text)}/{max_length} символов)", ""
-                    # Специфическая валидация
-                    if is_email_field(display_name) and not validate_email(text):
-                        return False, None, "❌ Некорректный email адрес", ""
-                    if is_phone_field(display_name) and not validate_phone(text):
+                    max_len = getattr(column.type, 'length', None)
+                    if max_len and len(text) > max_len:
+                        return False, None, f"❌ Превышена длина ({len(text)}/{max_len})", ""
+                    if "email" in display_name.lower() and not validate_email(text):
+                        return False, None, "❌ Некорректный email", ""
+                    if "phone" in display_name.lower() and not validate_phone(text):
                         return False, None, "❌ Некорректный номер телефона", ""
                     return True, text, "", f"✅ {len(text)} символов"
 
-                else:
-                    return True, text, "", f"✅ Текст: {text}"
+                return True, text, "", f"✅ {text}"
 
             else:
                 return False, None, "❌ Неизвестный тип поля", ""
 
         except Exception as e:
-            return False, None, f"❌ Ошибка валидации: {str(e)}", ""
+            return False, None, f"❌ Ошибка: {str(e)}", ""
 
     def validate_date_constraints_real_time(self):
         """Перепроверяет все даты в Issued_Books при изменении любой из них."""
@@ -871,58 +785,94 @@ class EditRecordDialog(QDialog):
         return False
 
     def create_search_widget(self, column):
-        """Создает виджет для условия поиска на основе типа столбца."""
-        if isinstance(column.type, SQLEnum):
+        """Создает виджет для условия поиска на основе типа столбца (включая ArrayLineEdit)."""
+        col_type = column.type
+
+        # ENUM
+        if hasattr(col_type, "enums"):
             widget = QComboBox()
             widget.addItem("")  # пустой вариант — не фильтровать
-            widget.addItems(column.type.enums)
-        elif isinstance(column.type, ARRAY) and isinstance(column.type.item_type, String):
-            widget = QLineEdit()
-            widget.setPlaceholderText("Введите через двоеточие или оставьте пустым")
-        elif isinstance(column.type, Boolean):
+            widget.addItems(col_type.enums)
+            return widget
+
+        # BOOLEAN
+        if isinstance(col_type, Boolean):
             widget = QComboBox()
             widget.addItem("")
             widget.addItem("Да", True)
             widget.addItem("Нет", False)
-        elif isinstance(column.type, Date):
+            return widget
+
+        # DATE
+        if isinstance(col_type, Date):
             widget = QDateEdit()
             widget.setCalendarPopup(True)
             widget.setSpecialValueText("Не задано")
             widget.setDate(QDate(2000, 1, 1))
-        elif isinstance(column.type, (Integer, Numeric)):
+            return widget
+
+        # ARRAY — используем кастомный ArrayLineEdit
+        if isinstance(col_type, ARRAY):
+            widget = ArrayLineEdit()
+            widget.setArray([], delimiter=":")
+            widget.setItemConstraints({"type": str(col_type.item_type)})
+            return widget
+
+        # NUMERIC / INTEGER / STRING
+        if isinstance(col_type, (Integer, Numeric)):
             widget = QLineEdit()
             widget.setPlaceholderText("Число или оставьте пустым")
-        elif isinstance(column.type, String):
+            return widget
+
+        if isinstance(col_type, String):
             widget = QLineEdit()
             widget.setPlaceholderText("Текст или оставьте пустым")
-        else:
-            widget = QLineEdit()
-            widget.setPlaceholderText("Значение или оставьте пустым")
+            return widget
+
+        # По умолчанию — обычный текстовый ввод
+        widget = QLineEdit()
+        widget.setPlaceholderText("Значение или оставьте пустым")
         return widget
 
     def create_update_widget(self, column):
-        """Создает виджет для ввода нового значения на основе типа столбца."""
-        if isinstance(column.type, SQLEnum):
+        """Создает виджет для ввода нового значения (включая ArrayLineEdit для ARRAY)."""
+        col_type = column.type
+
+        # ENUM
+        if hasattr(col_type, "enums"):
             widget = QComboBox()
-            widget.addItems(column.type.enums)
+            widget.addItems(col_type.enums)
             widget.setEditable(False)
-        elif isinstance(column.type, ARRAY) and isinstance(column.type.item_type, String):
-            widget = QLineEdit()
-            widget.setPlaceholderText("Введите значения через двоеточие: знач1:знач2")
-        elif isinstance(column.type, Boolean):
-            widget = QCheckBox("Да")
-        elif isinstance(column.type, Date):
+            return widget
+
+        # BOOLEAN
+        if isinstance(col_type, Boolean):
+            return QCheckBox("Да / Нет")
+
+        # DATE
+        if isinstance(col_type, Date):
             widget = QDateEdit()
             widget.setCalendarPopup(True)
             widget.setDate(QDate.currentDate())
-        elif isinstance(column.type, (Integer, Numeric)):
-            widget = QLineEdit()
-            widget.setPlaceholderText("Число")
-        elif isinstance(column.type, String):
-            widget = QLineEdit()
-        else:
-            widget = QLineEdit()
-            widget.setPlaceholderText("Новое значение")
+            return widget
+
+        # TEXT (длинные поля)
+        if isinstance(col_type, String) and getattr(col_type, "length", 0) and col_type.length > 255:
+            return QTextEdit()
+
+        # ARRAY — используем кастомный ArrayLineEdit
+        if isinstance(col_type, ARRAY):
+            widget = ArrayLineEdit()
+            widget.setArray([], delimiter=":")
+            widget.setItemConstraints({"type": str(col_type.item_type)})
+            widget.arrayChanged.connect(
+                lambda val, dn=self.COLUMN_HEADERS_MAP.get(column.name, column.name): self.validate_real_time(dn)
+            )
+            return widget
+
+        # Числовые и короткие строковые поля
+        widget = QLineEdit()
+        widget.setPlaceholderText("Введите значение")
         return widget
 
     def on_search_clicked(self):
@@ -1079,32 +1029,38 @@ class EditRecordDialog(QDialog):
             column = getattr(table.c, col_name)
 
             try:
+                # ENUM
                 if isinstance(widget, QComboBox) and isinstance(column.type, SQLEnum):
                     index = widget.findText(str(value))
                     widget.setCurrentIndex(index if index >= 0 else 0)
 
-                elif isinstance(widget, QLineEdit) and isinstance(column.type, ARRAY):
+                # ✅ ARRAY (ArrayLineEdit)
+                elif isinstance(widget, ArrayLineEdit):
                     if isinstance(value, list):
-                        widget.setText(':'.join(map(str, value)))
+                        widget.setArray(value, delimiter=":")
                     elif isinstance(value, str):
-                        cleaned = value.strip('[]').replace("'", "").replace('"', "")
-                        parts = [v.strip() for v in cleaned.split(':') if v.strip()]
-                        widget.setText(':'.join(parts))
+                        # Приводим строку к списку (удаляем скобки, кавычки и пробелы)
+                        cleaned = value.strip("[]").replace("'", "").replace('"', "")
+                        parts = [v.strip() for v in cleaned.split(":") if v.strip()]
+                        widget.setArray(parts, delimiter=":")
                     else:
-                        widget.setText('')
+                        widget.setArray([], delimiter=":")
 
+                # BOOLEAN
                 elif isinstance(widget, QCheckBox):
                     widget.setChecked(bool(value))
 
+                # DATE
                 elif isinstance(widget, QDateEdit):
                     if isinstance(value, str):
                         qdate = QDate.fromString(value, "yyyy-MM-dd")
                         if qdate.isValid():
                             widget.setDate(qdate)
 
+                # LINEEDIT (обычные поля)
                 elif isinstance(widget, QLineEdit):
                     if value is None:
-                        widget.setText('')
+                        widget.setText("")
                     elif isinstance(value, Decimal):
                         widget.setText(str(value))
                     elif isinstance(value, (int, float)):
@@ -1112,6 +1068,7 @@ class EditRecordDialog(QDialog):
                     else:
                         widget.setText(str(value))
 
+                # TEXTEDIT
                 elif isinstance(widget, QTextEdit):
                     if value is None:
                         widget.clear()
@@ -1123,7 +1080,8 @@ class EditRecordDialog(QDialog):
 
             except Exception as e:
                 print(f"Ошибка при заполнении поля {display_name}: {e}")
-                widget.setText('')
+                if isinstance(widget, QLineEdit):
+                    widget.setText("")
 
     def on_update_clicked(self):
         """Обрабатывает нажатие кнопки 'Сохранить изменения'."""

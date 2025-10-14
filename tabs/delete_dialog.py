@@ -7,7 +7,7 @@ from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, 
 from plyer import notification
 from PySide6.QtGui import QFont, QPalette, QColor
 from PySide6.QtCore import Qt
-
+from custom.array_line_edit import ArrayLineEdit
 
 class DeleteRecordDialog(QDialog):
     """Модальное окно для удаления записей из выбранной таблицы."""
@@ -327,6 +327,7 @@ class DeleteRecordDialog(QDialog):
         self.clear_fields()
 
         if table_name not in self.db_instance.tables:
+            from plyer import notification
             notification.notify(
                 title="Ошибка",
                 message=f"Метаданные для таблицы '{table_name}' не загружены.",
@@ -340,35 +341,52 @@ class DeleteRecordDialog(QDialog):
             display_name = self.COLUMN_HEADERS_MAP.get(column.name, column.name)
             widget = None
 
+            # ENUM
             if isinstance(column.type, SQLEnum):
                 widget = QComboBox()
                 widget.addItem("")  # пустой элемент = не задано
                 widget.addItems(column.type.enums)
 
-            elif isinstance(column.type, ARRAY) and isinstance(column.type.item_type, String):
-                widget = QLineEdit()
-                widget.setPlaceholderText("Введите через запятую или оставьте пустым")
+            # ARRAY — теперь используем кастомный ArrayLineEdit
+            elif isinstance(column.type, ARRAY):
+                widget = ArrayLineEdit()
+                widget.setToolTip("Нажмите, чтобы открыть редактор массива")
 
+                # Определяем тип элементов массива для валидации
+                if isinstance(column.type.item_type, String):
+                    widget.setItemConstraints({"type": "string"})
+                elif isinstance(column.type.item_type, Integer):
+                    widget.setItemConstraints({"type": "int"})
+                elif isinstance(column.type.item_type, Numeric):
+                    widget.setItemConstraints({"type": "float"})
+                else:
+                    widget.setItemConstraints({"type": "string"})
+
+            # BOOLEAN
             elif isinstance(column.type, Boolean):
                 widget = QComboBox()
                 widget.addItem("")  # не задано
                 widget.addItem("Да", True)
                 widget.addItem("Нет", False)
 
+            # DATE
             elif isinstance(column.type, Date):
                 widget = QDateEdit()
                 widget.setCalendarPopup(True)
                 widget.setSpecialValueText("Не задано")
                 widget.setDate(QDate(2000, 1, 1))  # маркер "не задано"
 
+            # INTEGER / NUMERIC
             elif isinstance(column.type, (Integer, Numeric)):
                 widget = QLineEdit()
                 widget.setPlaceholderText("Число или оставьте пустым")
 
+            # STRING
             elif isinstance(column.type, String):
                 widget = QLineEdit()
                 widget.setPlaceholderText("Текст или оставьте пустым")
 
+            # Другие типы
             else:
                 widget = QLineEdit()
                 widget.setPlaceholderText("Значение или оставьте пустым")
@@ -382,6 +400,7 @@ class DeleteRecordDialog(QDialog):
         self.fields_layout.addStretch()
 
     def on_delete_clicked(self):
+        """Обработка нажатия на кнопку удаления записей."""
         table_name = self.table_combo.currentText()
         if not table_name:
             notification.notify(title="Ошибка", message="Выберите таблицу!", timeout=3)
@@ -393,26 +412,30 @@ class DeleteRecordDialog(QDialog):
         for col_name, widget in self.condition_widgets.items():
             column = getattr(table.c, col_name)
 
+            # ENUM
             if isinstance(widget, QComboBox) and isinstance(column.type, SQLEnum):
                 value = widget.currentText()
                 if value:
                     condition[col_name] = value
 
-            elif isinstance(widget, QLineEdit) and isinstance(column.type, ARRAY):
-                text = widget.text().strip()
-                if text:
-                    items = [item.strip() for item in text.split(",") if item.strip()]
-                    condition[col_name] = items
+            # ARRAY — используем кастомный виджет
+            elif isinstance(widget, ArrayLineEdit) and isinstance(column.type, ARRAY):
+                values = widget.getArray()
+                if values:
+                    condition[col_name] = values
 
+            # BOOLEAN
             elif isinstance(widget, QComboBox) and isinstance(column.type, Boolean):
                 index = widget.currentIndex()
                 if index > 0:  # пропускаем "не задано"
                     condition[col_name] = widget.currentData()
 
+            # DATE
             elif isinstance(widget, QDateEdit):
                 if widget.date().isValid() and widget.date().year() != 2000:
                     condition[col_name] = widget.date().toString("yyyy-MM-dd")
 
+            # NUMERIC / STRING / INT
             elif isinstance(widget, QLineEdit):
                 text = widget.text().strip()
                 if text:
