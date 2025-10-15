@@ -697,12 +697,11 @@ class DB:
             self.logger.error(f"⚠️ Ошибка получения внешних ключей '{table_name}': {self.format_db_error(e)}")
             return []
 
-
     def get_joined_summary(
             self,
             left_table: str,
             right_table: str,
-            join_on: tuple,
+            join_on: List[Tuple[str, str]],  # Теперь ожидаем список кортежей
             columns: List[str] = None,
             condition: Dict[str, Any] = None,
             sort_columns: List[tuple] = None,
@@ -720,6 +719,19 @@ class DB:
 
             left, right = self.tables[left_table], self.tables[right_table]
 
+            # --- НАДЕЖНАЯ ОБРАБОТКА ПАРАМЕТРА join_on ---
+            # Поддерживаем как старый формат (один кортеж), так и новый (список кортежей)
+            if isinstance(join_on, tuple) and join_on and not isinstance(join_on[0], tuple):
+                # Это старый формат: ('col1', 'col2')
+                join_on_list = [join_on]
+            elif isinstance(join_on, list):
+                # Это новый формат: [('col1', 'col2'), ...]
+                join_on_list = join_on
+            else:
+                self.logger.error(
+                    f"❌ Неверный формат параметра join_on: {join_on}. Ожидался кортеж или список кортежей.")
+                return []
+
             # ✅ ИСПРАВЛЕНО: Правильно обрабатываем список столбцов с префиксами
             if columns:
                 selected_cols = []
@@ -733,7 +745,7 @@ class DB:
                         else:
                             self.logger.error(f"❌ Не удалось разобрать столбец для SELECT: {col_str}")
                             return []  # Прерываем, если столбец невалидный
-                    else: # Если префикса нет (на всякий случай)
+                    else:  # Если префикса нет (на всякий случай)
                         if hasattr(left.c, col_str):
                             selected_cols.append(getattr(left.c, col_str))
                         elif hasattr(right.c, col_str):
@@ -746,7 +758,7 @@ class DB:
 
             stmt = select(*selected_cols)
 
-            # JOIN
+            # --- ЛОГИКА ДЛЯ JOIN ---
             if join_type.upper() == "CROSS":
                 stmt = stmt.select_from(left.join(right, isouter=False, full=False))
             else:
@@ -758,8 +770,21 @@ class DB:
                 }
                 join_func = join_map.get(join_type.upper(), left.join)
 
-                on_clause = getattr(left.c, join_on[0]) == getattr(right.c, join_on[1])
-                stmt = stmt.select_from(join_func(right, on_clause))
+                # Создаем список условий для JOIN
+                on_clauses = []
+                for left_col_name, right_col_name in join_on_list:
+                    on_clauses.append(getattr(left.c, left_col_name) == getattr(right.c, right_col_name))
+
+                # Объединяем условия через AND
+                if not on_clauses:
+                    self.logger.error("❌ Не предоставлено ни одного условия для JOIN.")
+                    return []
+
+                # Используем sqlalchemy.and_ для объединения нескольких условий
+                from sqlalchemy import and_
+                final_on_clause = and_(*on_clauses) if len(on_clauses) > 1 else on_clauses[0]
+
+                stmt = stmt.select_from(join_func(right, final_on_clause))
 
             # WHERE
             if condition:
@@ -771,7 +796,7 @@ class DB:
                     else:
                         self.logger.warning(f"⚠️ Колонка '{col}' не найдена в '{left_table}' или '{right_table}'")
 
-            # ORDER BY (эта часть уже была написана правильно)
+            # ORDER BY
             if sort_columns:
                 order_exprs = []
                 for col, asc_order in sort_columns:

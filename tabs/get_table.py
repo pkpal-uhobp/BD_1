@@ -277,6 +277,28 @@ class ShowTableDialog(QDialog):
         row2_layout.addWidget(self.join_type_combo, 1)
         layout.addLayout(row2_layout)
 
+        # --- НОВЫЙ БЛОК: Выбор из предопределенных связей ---
+        join_selection_group = QWidget()
+        join_selection_layout = QVBoxLayout(join_selection_group)
+        join_selection_layout.addWidget(QLabel("Доступные связи для соединения:"))
+
+        self.available_joins_list = QListWidget()
+        self.available_joins_list.setMaximumHeight(120)
+        self.available_joins_list.setSelectionMode(QListWidget.MultiSelection)
+        join_selection_layout.addWidget(self.available_joins_list)
+
+        # Кнопки управления выбором
+        btn_join_keys_layout = QHBoxLayout()
+        btn_select_all_joins = QPushButton("Выбрать все")
+        btn_deselect_all_joins = QPushButton("Снять выбор")
+        btn_select_all_joins.clicked.connect(self.select_all_available_joins)
+        btn_deselect_all_joins.clicked.connect(self.deselect_all_available_joins)
+        btn_join_keys_layout.addWidget(btn_select_all_joins)
+        btn_join_keys_layout.addWidget(btn_deselect_all_joins)
+        join_selection_layout.addLayout(btn_join_keys_layout)
+
+        layout.addWidget(join_selection_group)
+
         # Строка 3: Поля для отображения
         row3_layout = QHBoxLayout()
         self.display_columns_list = QListWidget()
@@ -286,7 +308,7 @@ class ShowTableDialog(QDialog):
         row3_layout.addWidget(self.display_columns_list, 1)
         layout.addLayout(row3_layout)
 
-        # Кнопки управления выбором
+        # Кнопки управления выбором полей
         btn_layout = QHBoxLayout()
         btn_select_all = QPushButton("Выбрать все")
         btn_deselect_all = QPushButton("Снять выбор")
@@ -297,37 +319,81 @@ class ShowTableDialog(QDialog):
         layout.addLayout(btn_layout)
 
         return container
-
     def toggle_mode(self):
         is_join = self.radio_join.isChecked()
         self.single_container.setVisible(not is_join)
         self.join_container.setVisible(is_join)
 
     def update_join_fields(self):
-        """Обновляет список полей для отображения при смене таблиц."""
+        """Обновляет список доступных связей и полей для отображения."""
         left_table = self.join_combo_left.currentText()
         right_table = self.join_combo_right.currentText()
-        if not left_table or not right_table:
+
+        # Обновляем список доступных связей
+        self.available_joins_list.clear()
+        self.display_columns_list.clear()
+
+        if not left_table or not right_table or left_table == right_table:
             return
 
-        self.display_columns_list.clear()
+        # --- Логика заполнения списка связей ---
+        predefined_joins = self.db_instance.get_predefined_joins()
+
+        # Ищем связь в прямом и обратном порядке
+        join_on = predefined_joins.get((left_table, right_table))
+        if not join_on:
+            join_on = predefined_joins.get((right_table, left_table))
+            if join_on:
+                # Если нашли обратную связь, меняем поля местами для корректного отображения
+                join_on = (join_on[1], join_on[0])
+
+        if join_on:
+            left_col, right_col = join_on
+            item_text = f"{left_table}.{left_col}  ->  {right_table}.{right_col}"
+            item = QListWidgetItem(item_text)
+            item.setData(Qt.UserRole, (left_col, right_col))
+            self.available_joins_list.addItem(item)
+            item.setSelected(True)  # Выбираем по умолчанию
+        else:
+            # Если связь не найдена, сообщаем об этом
+            item = QListWidgetItem("Для этих таблиц не найдено предопределенных связей.")
+            item.setFlags(item.flags() & ~Qt.ItemIsSelectable & ~Qt.ItemIsEnabled)  # Делаем неактивным
+            self.available_joins_list.addItem(item)
+
+        # --- Обновляем поля для отображения ---
         left_columns = self.db_instance.get_column_names(left_table) or []
         right_columns = self.db_instance.get_column_names(right_table) or []
 
-        # Добавляем столбцы левой таблицы
         for col in left_columns:
             item = QListWidgetItem(f"{left_table}.{col}")
-            # Сохраняем кортеж (имя_таблицы, имя_столбца) для последующего извлечения
             item.setData(Qt.UserRole, (left_table, col))
             self.display_columns_list.addItem(item)
-            item.setSelected(True)  # По умолчанию все выбраны
+            item.setSelected(True)
 
-        # Добавляем столбцы правой таблицы
         for col in right_columns:
             item = QListWidgetItem(f"{right_table}.{col}")
             item.setData(Qt.UserRole, (right_table, col))
             self.display_columns_list.addItem(item)
-            item.setSelected(True)  # По умолчанию все выбраны
+            item.setSelected(True)
+
+        # --- НОВЫЕ МЕТОДЫ ---
+
+    def select_all_available_joins(self):
+        for i in range(self.available_joins_list.count()):
+            item = self.available_joins_list.item(i)
+            if item.flags() & Qt.ItemIsSelectable:
+                item.setSelected(True)
+
+    def deselect_all_available_joins(self):
+        for i in range(self.available_joins_list.count()):
+            item = self.available_joins_list.item(i)
+            if item.flags() & Qt.ItemIsSelectable:
+                item.setSelected(False)
+
+    def get_selected_join_keys(self) -> List[Tuple[str, str]]:
+        """Возвращает список выбранных связей для JOIN."""
+        selected_items = self.available_joins_list.selectedItems()
+        return [item.data(Qt.UserRole) for item in selected_items if item.flags() & Qt.ItemIsSelectable]
 
     def select_all_columns(self):
         for i in range(self.display_columns_list.count()):
@@ -374,26 +440,17 @@ class ShowTableDialog(QDialog):
                     notification.notify(title="Ошибка", message="Выберите две разные таблицы!", timeout=3)
                     return
 
-                # 1. Определяем условие для JOIN с помощью метода из класса DB
+                # 1. Получаем список выбранных связей
                 # --- ИЗМЕНЕНИЕ ЗДЕСЬ ---
-                predefined_joins = self.db_instance.get_predefined_joins()
-                join_on = predefined_joins.get((left_table, right_table))
+                join_on_list = self.get_selected_join_keys()
+                if not join_on_list:
+                    notification.notify(title="Ошибка", message="Выберите хотя бы одну доступную связь для соединения.", timeout=3)
+                    return
 
-                if not join_on:
-                    # Если связь не найдена, пробуем найти общие поля как запасной вариант
-                    left_cols = set(self.db_instance.get_column_names(left_table) or [])
-                    right_cols = set(self.db_instance.get_column_names(right_table) or [])
-                    common_cols = list(left_cols & right_cols)
-                    if not common_cols:
-                        notification.notify(title="Ошибка", message="Не найдено предопределенных связей или общих полей для JOIN.", timeout=3)
-                        return
-                    join_on = (common_cols[0], common_cols[0])
-
-                # 2. Получаем выбранные пользователем столбцы
+                # 2. Получаем выбранные пользователем столбцы для отображения
                 selected_tuples = self.get_selected_display_columns()
                 if not selected_tuples:
-                    notification.notify(title="Ошибка", message="Выберите хотя бы одно поле для отображения.",
-                                        timeout=3)
+                    notification.notify(title="Ошибка", message="Выберите хотя бы одно поле для отображения.", timeout=3)
                     return
 
                 # 3. Формируем список столбцов в формате ['t1.col', 't2.col']
@@ -407,7 +464,7 @@ class ShowTableDialog(QDialog):
                     "mode": "join",
                     "left_table": left_table,
                     "right_table": right_table,
-                    "join_on": join_on,
+                    "join_on": join_on_list,
                     "columns": columns_for_db,
                     "sort_columns": [self.get_default_sort_column()],
                     "join_type": self.join_type_combo.currentText(),
@@ -416,3 +473,4 @@ class ShowTableDialog(QDialog):
 
         except Exception as e:
             notification.notify(title="❌ Ошибка", message=f"Не удалось собрать параметры: {str(e)}", timeout=5)
+
