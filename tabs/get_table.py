@@ -19,7 +19,7 @@ class ShowTableDialog(QDialog):
 
         self.setWindowTitle("Параметры запроса")
         self.setModal(True)
-        self.resize(600, 700)  # Увеличил размер для удобства
+        self.resize(700, 850)  # Увеличил размер для удобства
 
         self.set_dark_palette()
 
@@ -35,6 +35,7 @@ class ShowTableDialog(QDialog):
         self.init_ui()
         self.apply_styles()
 
+    # ... (остальные методы класса без изменений: set_dark_palette, apply_styles, init_ui и т.д.) ...
     def set_dark_palette(self):
         """Устанавливает тёмную цветовую палитру"""
         dark_palette = QPalette()
@@ -373,23 +374,18 @@ class ShowTableDialog(QDialog):
                     notification.notify(title="Ошибка", message="Выберите две разные таблицы!", timeout=3)
                     return
 
-                # 1. Определяем условие для JOIN (ваша логика)
-                predefined_joins = {
-                    ("Issued_Books", "Books"): ("book_id", "id_book"),
-                    ("Issued_Books", "Readers"): ("reader_id", "reader_id"),
-                    ("Books", "Issued_Books"): ("id_book", "book_id"),
-                    ("Readers", "Issued_Books"): ("reader_id", "reader_id"),
-                }
+                # 1. Определяем условие для JOIN с помощью метода из класса DB
+                # --- ИЗМЕНЕНИЕ ЗДЕСЬ ---
+                predefined_joins = self.db_instance.get_predefined_joins()
                 join_on = predefined_joins.get((left_table, right_table))
+
                 if not join_on:
-                    join_on = predefined_joins.get((right_table, left_table))
-                    if join_on: join_on = (join_on[1], join_on[0])
-                if not join_on:
+                    # Если связь не найдена, пробуем найти общие поля как запасной вариант
                     left_cols = set(self.db_instance.get_column_names(left_table) or [])
                     right_cols = set(self.db_instance.get_column_names(right_table) or [])
                     common_cols = list(left_cols & right_cols)
                     if not common_cols:
-                        notification.notify(title="Ошибка", message="Не найдено общих полей для JOIN.", timeout=3)
+                        notification.notify(title="Ошибка", message="Не найдено предопределенных связей или общих полей для JOIN.", timeout=3)
                         return
                     join_on = (common_cols[0], common_cols[0])
 

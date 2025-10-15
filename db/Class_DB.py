@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, MetaData, inspect, UniqueConstraint, Check
 from sqlalchemy import Table, Column, Integer, String, Numeric, Date, ForeignKey, text
 import logging
 from datetime import date
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
 from sqlalchemy import func, select, asc, desc, text
 from sqlalchemy import DDL
 from sqlalchemy.exc import SQLAlchemyError
@@ -2052,3 +2052,40 @@ class DB:
             self.logger.error(f"Ошибка получения ограничений для '{table_name}.{column_name}': {user_friendly_msg}")
             return constraints
 
+    def get_predefined_joins(self) -> Dict[Tuple[str, str], Tuple[str, str]]:
+        """
+        Анализирует внешние ключи в метаданных и возвращает словарь
+        для предопределенных соединений JOIN.
+
+        Для каждой связи создаются две записи, чтобы соединение можно было
+        выполнить в любом направлении (A,B и B,A).
+
+        Returns:
+            Dict[Tuple[str, str], Tuple[str, str]]: Словарь, где ключ -
+            это кортеж из имен таблиц, а значение - кортеж из имен колонок для JOIN.
+        """
+        predefined_joins = {}
+        if not self.tables:
+            self.logger.warning("⚠️ Метаданные таблиц не загружены. Невозможно сгенерировать соединения.")
+            return predefined_joins
+
+        for table in self.tables.values():
+            for fk in table.foreign_keys:
+                # Таблица, в которой находится внешний ключ
+                local_table_name = table.name
+                # Колонка с внешним ключом
+                local_column_name = fk.parent.name
+
+                # Таблица, на которую ссылается внешний ключ
+                referenced_table_name = fk.column.table.name
+                # Колонка, на которую ссылается внешний ключ
+                referenced_column_name = fk.column.name
+
+                # Создаем запись для прямого соединения (local, referenced)
+                predefined_joins[(local_table_name, referenced_table_name)] = (local_column_name, referenced_column_name)
+
+                # И для обратного соединения (referenced, local)
+                predefined_joins[(referenced_table_name, local_table_name)] = (referenced_column_name, local_column_name)
+
+        self.logger.info(f"🔗 Сгенерирован словарь соединений: {predefined_joins}")
+        return predefined_joins

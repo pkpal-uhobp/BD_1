@@ -846,7 +846,6 @@ class AddRecordDialog(QDialog):
         # === Если есть ошибки — подсветим и покажем уведомление ===
         if error_fields:
             for field, message in error_fields.items():
-                print(f" - {field}: {message}")
                 self.set_field_error(field, message)
             notification.notify(
                 title="❌ Ошибки валидации",
