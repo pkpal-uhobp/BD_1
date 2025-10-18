@@ -29,6 +29,13 @@ class StringFunctionsDialog(QDialog):
         main_layout.setSpacing(15)
         self.setLayout(main_layout)
         
+        # Переменные для хранения результатов
+        self.current_results = []
+        self.current_function_name = ""
+        self.current_table_name = ""
+        self.current_column_name = ""
+        self.current_function_params = ""
+        
         # Создаем интерфейс
         self.setup_ui()
         self.apply_styles()
@@ -294,6 +301,15 @@ class StringFunctionsDialog(QDialog):
         self.execute_button.setMinimumHeight(45)
         self.execute_button.clicked.connect(self.execute_function)
         button_layout.addWidget(self.execute_button)
+        
+        # Кнопка применения изменений
+        self.apply_button = QPushButton("✅ Применить изменения")
+        self.apply_button.setObjectName("applyButton")
+        self.apply_button.setMinimumHeight(45)
+        self.apply_button.clicked.connect(self.apply_changes)
+        self.apply_button.setEnabled(False)  # Включается только при наличии результатов
+        button_layout.addWidget(self.apply_button)
+        
         
         # Кнопка очистки
         self.clear_button = QPushButton("🗑️ Очистить")
@@ -578,6 +594,7 @@ class StringFunctionsDialog(QDialog):
         try:
             function_name = function_text.split(' - ')[0]
             results = []
+            function_params = ""
             
             if function_name == "UPPER":
                 results = self.db_instance.string_functions_demo(table_name, column_name, "UPPER")
@@ -589,25 +606,37 @@ class StringFunctionsDialog(QDialog):
                 if start and length:
                     length_val = length.value() if length.value() > 0 else None
                     results = self.db_instance.substring_function(table_name, column_name, start.value(), length_val)
+                    function_params = f"start={start.value()}, length={length_val}"
             elif function_name == "TRIM":
                 trim_type = getattr(self, 'trim_type_combo', None)
                 chars = getattr(self, 'trim_chars_input', None)
                 if trim_type and chars:
                     chars_val = chars.text().strip() if chars.text().strip() else None
                     results = self.db_instance.trim_functions(table_name, column_name, trim_type.currentText(), chars_val)
+                    function_params = f"trim_type={trim_type.currentText()}, chars={chars_val}"
             elif function_name in ["LPAD", "RPAD"]:
                 length = getattr(self, 'pad_length_spin', None)
                 char = getattr(self, 'pad_char_input', None)
                 if length and char:
                     pad_type = "LPAD" if function_name == "LPAD" else "RPAD"
                     results = self.db_instance.pad_functions(table_name, column_name, length.value(), char.text(), pad_type)
+                    function_params = f"length={length.value()}, char='{char.text()}', pad_type={pad_type}"
             elif function_name == "CONCAT":
                 concat_str = getattr(self, 'concat_input', None)
                 if concat_str:
                     results = self.db_instance.string_functions_demo(table_name, column_name, "CONCAT", concat_string=concat_str.text())
+                    function_params = f"concat_string='{concat_str.text()}'"
+                    
+            # Сохраняем текущие результаты для возможного сохранения
+            self.current_results = results
+            self.current_function_name = function_name
+            self.current_table_name = table_name
+            self.current_column_name = column_name
+            self.current_function_params = function_params
                     
             if results:
                 self.display_results(results)
+                self.apply_button.setEnabled(True)   # Включаем кнопку применения
                 notification.notify(
                     title="✅ Успех",
                     message=f"Функция {function_name} выполнена успешно. Найдено {len(results)} записей.",
@@ -619,6 +648,7 @@ class StringFunctionsDialog(QDialog):
                 self.results_table.setColumnCount(1)
                 self.results_table.setHorizontalHeaderLabels(["Нет данных"])
                 self.results_info.setText("Результаты не найдены")
+                self.apply_button.setEnabled(False)  # Отключаем кнопку
                 
         except Exception as e:
             notification.notify(
@@ -664,13 +694,107 @@ class StringFunctionsDialog(QDialog):
         # Обновляем информацию
         self.results_info.setText(f"Найдено {len(results)} записей")
         
+
+    def apply_changes(self):
+        """Применяет изменения к исходной таблице"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="❌ Ошибка",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+            
+        # Показываем диалог подтверждения
+        from PySide6.QtWidgets import QMessageBox
+        
+        reply = QMessageBox.question(
+            self,
+            "⚠️ Подтверждение изменений",
+            f"Вы уверены, что хотите применить функцию {self.current_function_name} "
+            f"к столбцу {self.current_column_name} в таблице {self.current_table_name}?\n\n"
+            f"Это изменит данные в исходной таблице!",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply != QMessageBox.Yes:
+            return
+            
+        try:
+            # Получаем параметры функции
+            params = self._get_function_params()
+            
+            # Применяем изменения
+            success = self.db_instance.update_string_values_in_table(
+                table_name=self.current_table_name,
+                column_name=self.current_column_name,
+                function_name=self.current_function_name,
+                **params
+            )
+            
+            if success:
+                notification.notify(
+                    title="✅ Успех",
+                    message=f"Функция {self.current_function_name} успешно применена к таблице {self.current_table_name}!",
+                    timeout=3
+                )
+                # Обновляем отображение результатов
+                self.execute_function()
+            else:
+                notification.notify(
+                    title="❌ Ошибка",
+                    message="Не удалось применить изменения к таблице!",
+                    timeout=3
+                )
+                
+        except Exception as e:
+            notification.notify(
+                title="❌ Ошибка",
+                message=f"Ошибка применения изменений: {str(e)}",
+                timeout=5
+            )
+
     def clear_results(self):
         """Очищает результаты"""
         self.results_table.clear()
         self.results_table.setRowCount(0)
         self.results_table.setColumnCount(0)
         self.results_info.setText("Результаты очищены")
+        self.current_results = []
+        self.apply_button.setEnabled(False)
+
+    def _get_function_params(self):
+        """Получает параметры функции из UI"""
+        params = {}
         
+        if self.current_function_name == "SUBSTRING":
+            start = getattr(self, 'start_spin', None)
+            length = getattr(self, 'length_spin', None)
+            if start and length:
+                params['start'] = start.value()
+                params['length'] = length.value() if length.value() > 0 else None
+        elif self.current_function_name == "TRIM":
+            trim_type = getattr(self, 'trim_type_combo', None)
+            chars = getattr(self, 'trim_chars_input', None)
+            if trim_type and chars:
+                params['trim_type'] = trim_type.currentText()
+                params['chars'] = chars.text().strip() if chars.text().strip() else None
+        elif self.current_function_name in ["LPAD", "RPAD"]:
+            length = getattr(self, 'pad_length_spin', None)
+            char = getattr(self, 'pad_char_input', None)
+            if length and char:
+                params['length'] = length.value()
+                params['pad_string'] = char.text()
+        elif self.current_function_name == "CONCAT":
+            concat_str = getattr(self, 'concat_input', None)
+            if concat_str:
+                params['concat_string'] = concat_str.text()
+        
+        return params
+
+
+
     def apply_styles(self):
         """Применяет стили к диалогу"""
         self.setStyleSheet("""
@@ -977,6 +1101,68 @@ class StringFunctionsDialog(QDialog):
                                           stop: 1 #5a5a7a);
                 border: 2px solid #6272a4;
             }
+            
+            #saveButton {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #4caf50, 
+                                          stop: 1 #45a049);
+                border: none;
+                border-radius: 8px;
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 12px 20px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+            }
+            
+            #saveButton:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #45a049, 
+                                          stop: 1 #3d8b40);
+                border: 2px solid #4caf50;
+            }
+            
+            #saveButton:pressed {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #3d8b40, 
+                                          stop: 1 #2e7d32);
+            }
+            
+            
+            #applyButton {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #4caf50, 
+                                          stop: 1 #45a049);
+                border: none;
+                border-radius: 8px;
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 12px 20px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+            }
+            
+            #applyButton:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #45a049, 
+                                          stop: 1 #3d8b40);
+                border: 2px solid #4caf50;
+            }
+            
+            #applyButton:pressed {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #3d8b40, 
+                                          stop: 1 #2e7d32);
+            }
+            
+            #applyButton:disabled {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #666666, 
+                                          stop: 1 #555555);
+                color: #999999;
+                border: none;
+            }
+            
             
             /* Метки параметров */
             #paramLabel {

@@ -4,6 +4,8 @@
 
 import logging
 from typing import List, Dict, Any
+from sqlalchemy import text, Table, Column, Integer, String, DateTime, Text
+from datetime import datetime
 
 
 class StringOperationsMixin:
@@ -414,4 +416,501 @@ class StringOperationsMixin:
 
         except Exception as e:
             self.logger.error(f"Ошибка выполнения STRING_TO_ARRAY: {self.format_db_error(e)}")
+            return []
+
+    def create_string_results_table(self, table_name: str = "string_function_results") -> bool:
+        """
+        Создает таблицу для сохранения результатов строковых функций.
+        
+        Args:
+            table_name: Имя таблицы для результатов
+            
+        Returns:
+            bool: True если таблица создана успешно
+        """
+        if not self.is_connected():
+            self.logger.error("Нет подключения к БД")
+            return False
+
+        try:
+            # Проверяем, существует ли таблица
+            if self.record_exists_ex_table(table_name):
+                self.logger.info(f"Таблица '{table_name}' уже существует")
+                return True
+
+            # Создаем таблицу для результатов строковых функций
+            create_sql = f"""
+            CREATE TABLE "{table_name}" (
+                id SERIAL PRIMARY KEY,
+                source_table VARCHAR(100) NOT NULL,
+                source_column VARCHAR(100) NOT NULL,
+                function_name VARCHAR(50) NOT NULL,
+                function_params TEXT,
+                original_value TEXT,
+                result_value TEXT,
+                execution_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """
+            
+            self.logger.info(f"Создание таблицы результатов строковых функций: {table_name}")
+            
+            with self.engine.begin() as conn:
+                conn.execute(text(create_sql))
+            
+            # Обновляем метаданные
+            self._refresh_metadata()
+            
+            self.logger.info(f"✅ Таблица '{table_name}' успешно создана")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Ошибка создания таблицы результатов: {self.format_db_error(e)}")
+            return False
+
+    def save_string_function_result(self, 
+                                  source_table: str,
+                                  source_column: str, 
+                                  function_name: str,
+                                  original_value: str,
+                                  result_value: str,
+                                  function_params: str = None,
+                                  results_table: str = "string_function_results") -> bool:
+        """
+        Сохраняет результат выполнения строковой функции в таблицу результатов.
+        
+        Args:
+            source_table: Исходная таблица
+            source_column: Исходный столбец
+            function_name: Название функции
+            original_value: Исходное значение
+            result_value: Результат функции
+            function_params: Параметры функции (JSON строка)
+            results_table: Таблица для сохранения результатов
+            
+        Returns:
+            bool: True если результат сохранен успешно
+        """
+        if not self.is_connected():
+            self.logger.error("Нет подключения к БД")
+            return False
+
+        try:
+            # Убеждаемся, что таблица результатов существует
+            if not self.record_exists_ex_table(results_table):
+                if not self.create_string_results_table(results_table):
+                    return False
+
+            # Подготавливаем данные для вставки
+            insert_sql = f"""
+            INSERT INTO "{results_table}" 
+            (source_table, source_column, function_name, function_params, original_value, result_value)
+            VALUES (:source_table, :source_column, :function_name, :function_params, :original_value, :result_value)
+            """
+            
+            params = {
+                'source_table': source_table,
+                'source_column': source_column,
+                'function_name': function_name,
+                'function_params': function_params or '',
+                'original_value': str(original_value) if original_value is not None else '',
+                'result_value': str(result_value) if result_value is not None else ''
+            }
+            
+            with self.engine.begin() as conn:
+                conn.execute(text(insert_sql), params)
+            
+            self.logger.info(f"Результат функции {function_name} сохранен в {results_table}")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Ошибка сохранения результата: {self.format_db_error(e)}")
+            return False
+
+    def save_string_function_results_batch(self,
+                                         source_table: str,
+                                         source_column: str,
+                                         function_name: str,
+                                         results: List[Dict[str, Any]],
+                                         function_params: str = None,
+                                         results_table: str = "string_function_results") -> bool:
+        """
+        Сохраняет результаты выполнения строковой функции пакетом.
+        
+        Args:
+            source_table: Исходная таблица
+            source_column: Исходный столбец
+            function_name: Название функции
+            results: Список результатов с исходными и результирующими значениями
+            function_params: Параметры функции (JSON строка)
+            results_table: Таблица для сохранения результатов
+            
+        Returns:
+            bool: True если результаты сохранены успешно
+        """
+        if not self.is_connected():
+            self.logger.error("Нет подключения к БД")
+            return False
+
+        if not results:
+            self.logger.warning("Нет результатов для сохранения")
+            return True
+
+        try:
+            # Убеждаемся, что таблица результатов существует
+            if not self.record_exists_ex_table(results_table):
+                if not self.create_string_results_table(results_table):
+                    return False
+
+            # Подготавливаем данные для пакетной вставки
+            insert_sql = f"""
+            INSERT INTO "{results_table}" 
+            (source_table, source_column, function_name, function_params, original_value, result_value)
+            VALUES (:source_table, :source_column, :function_name, :function_params, :original_value, :result_value)
+            """
+            
+            batch_data = []
+            for result in results:
+                # Определяем исходное и результирующее значение
+                original_value = result.get(source_column, '')
+                result_value = ''
+                
+                # Ищем результирующее значение по различным возможным ключам
+                for key in result.keys():
+                    if key != source_column and ('result' in key.lower() or 'output' in key.lower()):
+                        result_value = result[key]
+                        break
+                
+                # Если не нашли по ключу, берем последнее значение (обычно это результат)
+                if not result_value and len(result) > 1:
+                    values = list(result.values())
+                    if len(values) >= 2:
+                        result_value = values[1]  # Второе значение обычно результат
+                
+                batch_data.append({
+                    'source_table': source_table,
+                    'source_column': source_column,
+                    'function_name': function_name,
+                    'function_params': function_params or '',
+                    'original_value': str(original_value) if original_value is not None else '',
+                    'result_value': str(result_value) if result_value is not None else ''
+                })
+            
+            # Выполняем пакетную вставку
+            with self.engine.begin() as conn:
+                conn.execute(text(insert_sql), batch_data)
+            
+            self.logger.info(f"Сохранено {len(batch_data)} результатов функции {function_name} в {results_table}")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Ошибка пакетного сохранения результатов: {self.format_db_error(e)}")
+            return False
+
+    def get_string_function_results(self, 
+                                  results_table: str = "string_function_results",
+                                  function_name: str = None,
+                                  source_table: str = None,
+                                  limit: int = 100) -> List[Dict[str, Any]]:
+        """
+        Получает сохраненные результаты строковых функций.
+        
+        Args:
+            results_table: Таблица с результатами
+            function_name: Фильтр по названию функции
+            source_table: Фильтр по исходной таблице
+            limit: Максимальное количество записей
+            
+        Returns:
+            List[Dict]: Список результатов
+        """
+        if not self.is_connected():
+            self.logger.error("Нет подключения к БД")
+            return []
+
+        try:
+            # Проверяем существование таблицы
+            if not self.record_exists_ex_table(results_table):
+                self.logger.warning(f"Таблица '{results_table}' не существует")
+                return []
+
+            # Формируем запрос с фильтрами
+            where_conditions = []
+            params = {}
+            
+            if function_name:
+                where_conditions.append("function_name = :function_name")
+                params['function_name'] = function_name
+                
+            if source_table:
+                where_conditions.append("source_table = :source_table")
+                params['source_table'] = source_table
+            
+            where_clause = ""
+            if where_conditions:
+                where_clause = "WHERE " + " AND ".join(where_conditions)
+            
+            query = f"""
+            SELECT id, source_table, source_column, function_name, function_params,
+                   original_value, result_value, execution_time, created_at
+            FROM "{results_table}"
+            {where_clause}
+            ORDER BY created_at DESC
+            LIMIT :limit
+            """
+            
+            params['limit'] = limit
+            
+            result = self.execute_query(query, fetch="dict", params=params)
+            self.logger.info(f"Получено {len(result) if result else 0} записей из {results_table}")
+            
+            return result or []
+
+        except Exception as e:
+            self.logger.error(f"Ошибка получения результатов: {self.format_db_error(e)}")
+            return []
+
+    def clear_string_function_results(self, 
+                                    results_table: str = "string_function_results",
+                                    function_name: str = None,
+                                    source_table: str = None) -> bool:
+        """
+        Очищает сохраненные результаты строковых функций.
+        
+        Args:
+            results_table: Таблица с результатами
+            function_name: Фильтр по названию функции
+            source_table: Фильтр по исходной таблице
+            
+        Returns:
+            bool: True если очистка выполнена успешно
+        """
+        if not self.is_connected():
+            self.logger.error("Нет подключения к БД")
+            return False
+
+        try:
+            # Проверяем существование таблицы
+            if not self.record_exists_ex_table(results_table):
+                self.logger.warning(f"Таблица '{results_table}' не существует")
+                return True
+
+            # Формируем запрос с фильтрами
+            where_conditions = []
+            params = {}
+            
+            if function_name:
+                where_conditions.append("function_name = :function_name")
+                params['function_name'] = function_name
+                
+            if source_table:
+                where_conditions.append("source_table = :source_table")
+                params['source_table'] = source_table
+            
+            where_clause = ""
+            if where_conditions:
+                where_clause = "WHERE " + " AND ".join(where_conditions)
+            
+            delete_sql = f'DELETE FROM "{results_table}" {where_clause}'
+            
+            with self.engine.begin() as conn:
+                result = conn.execute(text(delete_sql), params)
+                deleted_count = result.rowcount
+            
+            self.logger.info(f"Удалено {deleted_count} записей из {results_table}")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Ошибка очистки результатов: {self.format_db_error(e)}")
+            return False
+
+    def update_string_values_in_table(self, 
+                                    table_name: str,
+                                    column_name: str,
+                                    function_name: str,
+                                    **params) -> bool:
+        """
+        Обновляет значения в исходной таблице, применяя строковую функцию.
+        
+        Args:
+            table_name: Имя таблицы
+            column_name: Имя столбца
+            function_name: Название функции
+            **params: Параметры функции
+            
+        Returns:
+            bool: True если обновление выполнено успешно
+        """
+        if not self.is_connected():
+            self.logger.error("Нет подключения к БД")
+            return False
+
+        try:
+            # Формируем SQL для обновления
+            update_sql = self._build_update_sql(table_name, column_name, function_name, **params)
+            
+            if not update_sql:
+                self.logger.error(f"Не удалось сформировать SQL для функции {function_name}")
+                return False
+            
+            self.logger.info(f"Обновление значений в {table_name}.{column_name} функцией {function_name}")
+            self.logger.debug(f"SQL: {update_sql}")
+            
+            with self.engine.begin() as conn:
+                result = conn.execute(text(update_sql))
+                updated_count = result.rowcount
+            
+            self.logger.info(f"✅ Обновлено {updated_count} записей в {table_name}.{column_name}")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Ошибка обновления значений: {self.format_db_error(e)}")
+            return False
+
+    def _build_update_sql(self, table_name: str, column_name: str, function_name: str, **params) -> str:
+        """
+        Строит SQL запрос для обновления значений в таблице.
+        
+        Args:
+            table_name: Имя таблицы
+            column_name: Имя столбца
+            function_name: Название функции
+            **params: Параметры функции
+            
+        Returns:
+            str: SQL запрос для обновления
+        """
+        col = f'"{column_name}"'
+        table = f'"{table_name}"'
+        func = function_name.upper()
+        
+        # Формируем выражение функции
+        function_expr = None
+        
+        if func == "UPPER":
+            function_expr = f"UPPER({col})"
+        elif func == "LOWER":
+            function_expr = f"LOWER({col})"
+        elif func == "TRIM":
+            trim_type = params.get("trim_type", "BOTH")
+            chars = params.get("chars")
+            if chars:
+                function_expr = f"TRIM({trim_type} '{chars}' FROM {col})"
+            else:
+                function_expr = f"TRIM({trim_type} FROM {col})"
+        elif func == "SUBSTRING":
+            start = params.get("start", 1)
+            length = params.get("length")
+            if length:
+                function_expr = f"SUBSTRING({col} FROM {start} FOR {length})"
+            else:
+                function_expr = f"SUBSTRING({col} FROM {start})"
+        elif func in ["LPAD", "RPAD"]:
+            length = params.get("length", 10)
+            pad_string = params.get("pad_string", " ")
+            function_expr = f"{func}({col}, {length}, '{pad_string}')"
+        elif func == "REPLACE":
+            old_string = params.get("old_string", "")
+            new_string = params.get("new_string", "")
+            # Экранируем специальные символы
+            old_escaped = old_string.replace("'", "''")
+            new_escaped = new_string.replace("'", "''")
+            function_expr = f"REPLACE({col}, '{old_escaped}', '{new_escaped}')"
+        elif func == "CONCAT":
+            concat_string = params.get("concat_string", "")
+            concat_escaped = concat_string.replace("'", "''")
+            function_expr = f"CONCAT({col}, '{concat_escaped}')"
+        else:
+            self.logger.error(f"Неподдерживаемая функция: {func}")
+            return ""
+        
+        # Формируем полный UPDATE запрос
+        update_sql = f'UPDATE {table} SET {col} = {function_expr} WHERE {col} IS NOT NULL'
+        
+        return update_sql
+
+    def preview_string_function_update(self, 
+                                     table_name: str,
+                                     column_name: str,
+                                     function_name: str,
+                                     limit: int = 10,
+                                     **params) -> List[Dict[str, Any]]:
+        """
+        Показывает предварительный просмотр изменений перед обновлением.
+        
+        Args:
+            table_name: Имя таблицы
+            column_name: Имя столбца
+            function_name: Название функции
+            limit: Количество записей для предварительного просмотра
+            **params: Параметры функции
+            
+        Returns:
+            List[Dict]: Список записей с исходными и новыми значениями
+        """
+        if not self.is_connected():
+            self.logger.error("Нет подключения к БД")
+            return []
+
+        try:
+            col = f'"{column_name}"'
+            table = f'"{table_name}"'
+            func = function_name.upper()
+            
+            # Формируем выражение функции
+            function_expr = None
+            
+            if func == "UPPER":
+                function_expr = f"UPPER({col})"
+            elif func == "LOWER":
+                function_expr = f"LOWER({col})"
+            elif func == "TRIM":
+                trim_type = params.get("trim_type", "BOTH")
+                chars = params.get("chars")
+                if chars:
+                    function_expr = f"TRIM({trim_type} '{chars}' FROM {col})"
+                else:
+                    function_expr = f"TRIM({trim_type} FROM {col})"
+            elif func == "SUBSTRING":
+                start = params.get("start", 1)
+                length = params.get("length")
+                if length:
+                    function_expr = f"SUBSTRING({col} FROM {start} FOR {length})"
+                else:
+                    function_expr = f"SUBSTRING({col} FROM {start})"
+            elif func in ["LPAD", "RPAD"]:
+                length = params.get("length", 10)
+                pad_string = params.get("pad_string", " ")
+                function_expr = f"{func}({col}, {length}, '{pad_string}')"
+            elif func == "REPLACE":
+                old_string = params.get("old_string", "")
+                new_string = params.get("new_string", "")
+                old_escaped = old_string.replace("'", "''")
+                new_escaped = new_string.replace("'", "''")
+                function_expr = f"REPLACE({col}, '{old_escaped}', '{new_escaped}')"
+            elif func == "CONCAT":
+                concat_string = params.get("concat_string", "")
+                concat_escaped = concat_string.replace("'", "''")
+                function_expr = f"CONCAT({col}, '{concat_escaped}')"
+            else:
+                self.logger.error(f"Неподдерживаемая функция: {func}")
+                return []
+            
+            # Формируем запрос для предварительного просмотра
+            preview_sql = f"""
+            SELECT 
+                {col} as original_value,
+                {function_expr} as new_value
+            FROM {table}
+            WHERE {col} IS NOT NULL
+            LIMIT {limit}
+            """
+            
+            self.logger.info(f"Предварительный просмотр {func} для {table_name}.{column_name}")
+            
+            result = self.execute_query(preview_sql, fetch="dict")
+            return result or []
+
+        except Exception as e:
+            self.logger.error(f"Ошибка предварительного просмотра: {self.format_db_error(e)}")
             return []
