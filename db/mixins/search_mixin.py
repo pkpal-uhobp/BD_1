@@ -419,12 +419,17 @@ class SearchMixin:
 
     def get_joined_summary(
             self,
-            table1: str,
-            table2: str,
+            left_table: str = None,
+            right_table: str = None,
+            table1: str = None,
+            table2: str = None,
+            join_on: str = None,
             join_condition: str = None,
+            join_type: str = "INNER",
             columns: List[str] = None,
-            where_conditions: Dict[str, Any] = None,
+            sort_columns: List[tuple] = None,
             order_by: List[tuple] = None,
+            where_conditions: Dict[str, Any] = None,
             limit: int = None
     ) -> List[Dict[str, Any]]:
         """
@@ -434,31 +439,65 @@ class SearchMixin:
             return []
 
         try:
-            if not self.record_exists_ex_table(table1) or not self.record_exists_ex_table(table2):
+            # Определяем имена таблиц (поддержка старых и новых параметров)
+            table1_name = left_table or table1
+            table2_name = right_table or table2
+            
+            if not table1_name or not table2_name:
+                self.logger.error("Не указаны имена таблиц для соединения")
+                return []
+                
+            if not self.record_exists_ex_table(table1_name) or not self.record_exists_ex_table(table2_name):
                 self.logger.error("Одна или обе таблицы не существуют")
                 return []
 
             # Используем предопределенные соединения или пользовательское условие
-            if join_condition:
+            if join_on:
+                # Обрабатываем join_on как список кортежей или строку
+                if isinstance(join_on, list):
+                    # Если это список кортежей, формируем условие JOIN
+                    join_conditions = []
+                    for col1, col2 in join_on:
+                        join_conditions.append(f'"{table1_name}"."{col1}" = "{table2_name}"."{col2}"')
+                    join_clause = " AND ".join(join_conditions)
+                else:
+                    # Если это строка, используем как есть
+                    join_clause = join_on
+            elif join_condition:
                 join_clause = join_condition
             else:
                 predefined_joins = self.get_predefined_joins()
-                join_key = (table1, table2)
+                join_key = (table1_name, table2_name)
                 if join_key not in predefined_joins:
-                    self.logger.error(f"Не найдено предопределенное соединение между '{table1}' и '{table2}'")
+                    self.logger.error(f"Не найдено предопределенное соединение между '{table1_name}' и '{table2_name}'")
                     return []
                 
                 col1, col2 = predefined_joins[join_key]
-                join_clause = f'"{table1}"."{col1}" = "{table2}"."{col2}"'
+                join_clause = f'"{table1_name}"."{col1}" = "{table2_name}"."{col2}"'
 
             # Формируем SELECT
             if columns:
-                select_clause = ", ".join(f'"{col}"' for col in columns)
+                # Обрабатываем колонки с префиксами t1/t2
+                processed_columns = []
+                for col in columns:
+                    if col.startswith("t1."):
+                        # Заменяем t1 на реальное имя левой таблицы
+                        col_name = col[3:]  # убираем "t1."
+                        processed_columns.append(f'"{table1_name}"."{col_name}"')
+                    elif col.startswith("t2."):
+                        # Заменяем t2 на реальное имя правой таблицы
+                        col_name = col[3:]  # убираем "t2."
+                        processed_columns.append(f'"{table2_name}"."{col_name}"')
+                    else:
+                        # Если колонка уже содержит имя таблицы, используем как есть
+                        processed_columns.append(f'"{col}"')
+                select_clause = ", ".join(processed_columns)
             else:
-                select_clause = f'"{table1}".*, "{table2}".*'
+                select_clause = f'"{table1_name}".*, "{table2_name}".*'
 
-            # Базовый запрос
-            sql = f'SELECT {select_clause} FROM "{table1}" JOIN "{table2}" ON {join_clause}'
+            # Базовый запрос с поддержкой типа соединения
+            join_keyword = join_type.upper() if join_type else "INNER"
+            sql = f'SELECT {select_clause} FROM "{table1_name}" {join_keyword} JOIN "{table2_name}" ON {join_clause}'
 
             # WHERE условия
             if where_conditions:
@@ -467,18 +506,51 @@ class SearchMixin:
                     if "." in col:
                         where_clauses.append(f'"{col}" = :{col.replace(".", "_")}')
                     else:
-                        where_clauses.append(f'"{table1}"."{col}" = :{col}')
+                        where_clauses.append(f'"{table1_name}"."{col}" = :{col}')
                 if where_clauses:
                     sql += " WHERE " + " AND ".join(where_clauses)
 
-            # ORDER BY
-            if order_by:
+            # ORDER BY (поддержка sort_columns и order_by)
+            order_columns = sort_columns or order_by
+            if order_columns:
                 order_clauses = []
-                for col, asc in order_by:
-                    if "." in col:
+                for col, asc in order_columns:
+                    # Обрабатываем колонки с префиксами t1/t2
+                    if col.startswith("t1."):
+                        col_name = col[3:]  # убираем "t1."
+                        order_clauses.append(f'"{table1_name}"."{col_name}" {"ASC" if asc else "DESC"}')
+                    elif col.startswith("t2."):
+                        col_name = col[3:]  # убираем "t2."
+                        order_clauses.append(f'"{table2_name}"."{col_name}" {"ASC" if asc else "DESC"}')
+                    elif "." in col:
                         order_clauses.append(f'"{col}" {"ASC" if asc else "DESC"}')
                     else:
-                        order_clauses.append(f'"{table1}"."{col}" {"ASC" if asc else "DESC"}')
+                        # Если колонка без префикса, пытаемся определить к какой таблице она принадлежит
+                        # Сначала проверяем левую таблицу, потом правую
+                        if self.record_exists_ex_table(table1_name):
+                            table1_cols = self.get_table_columns(table1_name)
+                            if isinstance(table1_cols, list) and len(table1_cols) > 0:
+                                if isinstance(table1_cols[0], dict):
+                                    table1_col_names = [col['name'] for col in table1_cols]
+                                else:
+                                    table1_col_names = table1_cols
+                                if col in table1_col_names:
+                                    order_clauses.append(f'"{table1_name}"."{col}" {"ASC" if asc else "DESC"}')
+                                    continue
+                        
+                        if self.record_exists_ex_table(table2_name):
+                            table2_cols = self.get_table_columns(table2_name)
+                            if isinstance(table2_cols, list) and len(table2_cols) > 0:
+                                if isinstance(table2_cols[0], dict):
+                                    table2_col_names = [col['name'] for col in table2_cols]
+                                else:
+                                    table2_col_names = table2_cols
+                                if col in table2_col_names:
+                                    order_clauses.append(f'"{table2_name}"."{col}" {"ASC" if asc else "DESC"}')
+                                    continue
+                        
+                        # Если не найдена ни в одной таблице, используем левую по умолчанию
+                        order_clauses.append(f'"{table1_name}"."{col}" {"ASC" if asc else "DESC"}')
                 if order_clauses:
                     sql += " ORDER BY " + ", ".join(order_clauses)
 
