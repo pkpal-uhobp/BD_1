@@ -8,10 +8,8 @@ from PySide6.QtGui import QStandardItem, QStandardItemModel, QPalette, QColor
 from decimal import Decimal
 from datetime import date
 from plyer import notification
-from tabs.add_dialog import AddRecordDialog
-from tabs.delete_dialog import DeleteRecordDialog
-from tabs.update_dialog import EditRecordDialog
-from tabs.get_table import ShowTableDialog
+from tabs.modules.data_operations import AddRecordDialog, DeleteRecordDialog, EditRecordDialog, ShowTableDialog
+from tabs.modules.table_operations import AddColumnDialog
 
 
 class MainWindow(QMainWindow):
@@ -74,7 +72,7 @@ class MainWindow(QMainWindow):
             "discount_percent": "Процент скидки (%)",
             # === Выдачи ===
             "id_book": "ID Книги",
-            "reader_id=": "ID Читателя (в выдаче)",
+            "reader_id": "ID Читателя (в выдаче)",
             "issue_date": "Дата выдачи",
             "expected_return_date": "Ожидаемая дата возврата",
             "actual_return_date": "Фактическая дата возврата",
@@ -152,6 +150,21 @@ class MainWindow(QMainWindow):
         actions_button.setMenu(actions_menu)
         center_layout.addWidget(actions_button)
 
+        # === 🔍 Выпадающая кнопка "Поиск" ===
+        search_button = QPushButton("🔍 Поиск ▼")
+        search_menu = QMenu(search_button)
+
+        # Добавляем пункты меню поиска
+        search_menu.addAction("🔍 Поиск по тексту", lambda: self.open_text_search())
+        search_menu.addAction("🚀 Расширенный SELECT", lambda: self.open_advanced_select())
+        search_menu.addAction("🔤 Строковые функции", lambda: self.open_string_functions())
+
+        # Применяем стиль
+        self.style_dropdown_button(search_button, search_menu)
+
+        # Назначаем меню кнопке
+        search_button.setMenu(search_menu)
+        center_layout.addWidget(search_button)
 
         alter_menu_button = QPushButton("Структура ▼")
         alter_menu_button.setMinimumHeight(45)
@@ -210,7 +223,7 @@ class MainWindow(QMainWindow):
 
         alter_menu.addAction("➕ Добавить столбец", lambda: self.alter_table_action("add"))
         alter_menu.addAction("➖ Удалить столбец", lambda: self.alter_table_action("drop"))
-        alter_menu.addAction("✏️ Переименовать столбец", lambda: self.alter_table_action("rename"))
+        alter_menu.addAction("✏️ Переименовать", lambda: self.alter_table_action("rename"))
         alter_menu.addAction("🔁 Изменить тип столбца", lambda: self.alter_table_action("type"))
 
         alter_menu_button.setMenu(alter_menu)
@@ -712,6 +725,113 @@ class MainWindow(QMainWindow):
         if dialog.exec() == QDialog.Accepted and dialog.result:
             self.sort = dialog.result
             self._display_data_in_table()
+            
+    def open_text_search(self):
+        """Открывает диалоговое окно поиска по тексту"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="❌ Ошибка подключения",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+            
+        from tabs.modules.search_operations import TextSearchDialog
+        dialog = TextSearchDialog(self.db_instance, parent=self)
+        dialog.exec()
+        
+    def open_advanced_select(self):
+        """Открывает диалоговое окно расширенного SELECT"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="❌ Ошибка подключения",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+            
+        from tabs.modules.search_operations import AdvancedSelectDialog
+        dialog = AdvancedSelectDialog(self.db_instance, parent=self)
+        dialog.results_to_main_table.connect(self.display_advanced_select_results)
+        dialog.exec()
+        
+    def open_string_functions(self):
+        """Открывает диалоговое окно строковых функций"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="❌ Ошибка подключения",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+            
+        from tabs.modules.string_operations import StringFunctionsDialog
+        dialog = StringFunctionsDialog(self.db_instance, parent=self)
+        dialog.exec()
+        
+    def display_advanced_select_results(self, results):
+        """Отображает результаты расширенного SELECT в основной таблице"""
+        if not results:
+            self.table_model.clear()
+            self.table_model.setHorizontalHeaderLabels(["Нет данных"])
+            self.data_table.setVisible(True)
+            return
+            
+        # Получаем заголовки столбцов
+        if results and isinstance(results[0], dict):
+            original_headers = list(results[0].keys())
+        else:
+            self.table_model.clear()
+            self.table_model.setHorizontalHeaderLabels(["Неверный формат результатов"])
+            self.data_table.setVisible(True)
+            return
+            
+        # Преобразуем заголовки
+        column_headers = [
+            self.COLUMN_HEADERS_MAP.get(col, col)
+            for col in original_headers
+        ]
+        
+        # Очищаем и настраиваем таблицу
+        self.table_model.clear()
+        self.table_model.setHorizontalHeaderLabels(column_headers)
+        
+        # Заполняем данные
+        for row_dict in results:
+            row_items = []
+            for col_name in original_headers:
+                value = row_dict.get(col_name, "")
+                if isinstance(value, list):
+                    value = ", ".join(map(str, value))
+                elif isinstance(value, (int, float, Decimal)):
+                    value = f"{value:.2f}" if isinstance(value, (float, Decimal)) else str(value)
+                elif isinstance(value, date):
+                    value = value.strftime("%Y-%m-%d")
+                elif hasattr(value, 'isoformat'):  # datetime/date
+                    value = value.isoformat()
+                elif value is None:
+                    value = ""
+                else:
+                    value = str(value)
+                item = QStandardItem(value)
+                item.setEditable(False)
+                row_items.append(item)
+            self.table_model.appendRow(row_items)
+            
+        # Настраиваем таблицу
+        self.data_table.setVisible(True)
+        self.data_table.resizeColumnsToContents()
+        self.data_table.horizontalHeader().setStretchLastSection(True)
+        
+        # Сохраняем данные для возможного использования
+        self.current_table_data = results
+        
+        # Показываем уведомление
+        notification.notify(
+            title="✅ Результаты загружены",
+            message=f"Найдено {len(results)} записей",
+            timeout=3
+        )
 
     def _display_data_in_table(self):
         """
@@ -736,9 +856,12 @@ class MainWindow(QMainWindow):
                 self.data_table.setVisible(True)
                 return
 
+            # Получаем выбранные пользователем столбцы (если ShowTableDialog их вернул)
+            selected_columns = self.sort.get('columns')
             data = self.db_instance.get_sorted_data(
                 table_name=table_name,
-                sort_columns=sort_columns
+                sort_columns=sort_columns,
+                columns=selected_columns
             )
             self.current_table_data = data
         elif mode == 'join':
@@ -851,10 +974,42 @@ class MainWindow(QMainWindow):
             )
             return
 
+        if action_type == "add":
+            dialog = AddColumnDialog(self.db_instance, parent=self)
+            if dialog.exec() == QDialog.Accepted:
+                # Если столбец успешно добавлен, обновляем данные таблицы, если она открыта
+                if hasattr(self, 'sort') and self.sort:
+                    self._display_data_in_table()
+            return
+        
+        elif action_type == "rename":
+            from tabs.modules.table_operations import RenameDialog
+            dialog = RenameDialog(self.db_instance, parent=self)
+            if dialog.exec() == QDialog.Accepted:
+                # Если столбец или таблица успешно переименованы, обновляем данные таблицы, если она открыта
+                if hasattr(self, 'sort') and self.sort:
+                    self._display_data_in_table()
+            return
+
+        # Реализация для удаления столбца
+        if action_type == "drop":
+            from tabs.modules.table_operations import DropColumnDialog
+            dialog = DropColumnDialog(self.db_instance, parent=self)
+            if dialog.exec() == QDialog.Accepted:
+                if hasattr(self, 'sort') and self.sort:
+                    self._display_data_in_table()
+            return
+
+        # Здесь реализуем изменение типа столбца
+        if action_type == "type":
+            from tabs.modules.table_operations import ChangeTypeDialog
+            dialog = ChangeTypeDialog(self.db_instance, parent=self)
+            if dialog.exec() == QDialog.Accepted:
+                if hasattr(self, 'sort') and self.sort:
+                    self._display_data_in_table()
+            return
+        # Здесь можно будет добавить реализацию для других действий
         action_texts = {
-            "add": "Добавление нового столбца",
-            "drop": "Удаление существующего столбца",
-            "rename": "Переименование столбца",
             "type": "Изменение типа столбца"
         }
 
@@ -868,13 +1023,16 @@ class MainWindow(QMainWindow):
         label.setAlignment(Qt.AlignCenter)
         layout.addWidget(label)
 
-        info = QLabel("🔧 Здесь можно реализовать логику изменения структуры таблицы (ALTER TABLE).")
+        info = QLabel("🔧 Эта функция пока не реализована.")
         info.setWordWrap(True)
         layout.addWidget(info)
 
         close_btn = QPushButton("Закрыть")
         close_btn.clicked.connect(dialog.close)
         layout.addWidget(close_btn)
+
+        # Применяем стили для соответствия главному окну
+        dialog.setStyleSheet(self.styleSheet())
 
         dialog.exec()
 

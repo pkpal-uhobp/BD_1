@@ -27,7 +27,7 @@ class ArrayLineEdit(QLineEdit):
         # Стили такие же, как в AddRecordDialog
         self.setStyleSheet("""
             QLineEdit {
-                background: rgba(25, 25, 35, 0.8);
+                background: rgba(15, 15, 25, 0.8);
                 border: 2px solid #44475a;
                 border-radius: 8px;
                 padding: 12px;
@@ -373,7 +373,7 @@ class ArrayEditDialog(QDialog):
 
             # только само поле делаем красным
             widget.setStyleSheet("""
-                background: rgba(25, 25, 35, 0.8);
+                background: rgba(15, 15, 25, 0.8);
                 border: 2px solid #ff5555;
                 border-radius: 8px;
                 padding: 12px;
@@ -405,7 +405,7 @@ class ArrayEditDialog(QDialog):
 
             # вернуть обычную серую рамку
             widget.setStyleSheet("""
-                background: rgba(25, 25, 35, 0.8);
+                background: rgba(15, 15, 25, 0.8);
                 border: 2px solid #44475a;
                 border-radius: 8px;
                 padding: 12px;
@@ -456,7 +456,7 @@ class ArrayEditDialog(QDialog):
             }
 
             QLineEdit {
-                background: rgba(25, 25, 35, 0.8);
+                background: rgba(15, 15, 25, 0.8);
                 border: 2px solid #44475a;
                 border-radius: 8px;
                 padding: 12px;
