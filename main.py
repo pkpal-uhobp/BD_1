@@ -1,14 +1,49 @@
 import sys
 import logging
+import os
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QLineEdit, QFormLayout
 )
 from tabs.menu import MainWindow
-from db.Class_DB import DB
+from db.Class_DB_refactored import DB
 from PySide6.QtCore import Qt, QTimer, QEvent
 from PySide6.QtGui import QFont, QColor, QPalette
 from plyer import notification
+
+
+def setup_logging():
+    """Настройка централизованного логирования в файл db/db_app.log"""
+    # Создаем папку db если её нет
+    os.makedirs('db', exist_ok=True)
+    
+    # Настраиваем корневой логгер
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+    
+    # Очищаем все существующие обработчики
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+    
+    # Создаем обработчик для записи в файл
+    file_handler = logging.FileHandler('db/db_app.log', encoding='utf-8', mode='a')
+    file_handler.setLevel(logging.INFO)
+    
+    # Формат сообщений
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    file_handler.setFormatter(formatter)
+    
+    # Добавляем обработчик к корневому логгеру
+    root_logger.addHandler(file_handler)
+    
+    # Также добавляем консольный вывод для отладки
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
+    root_logger.addHandler(console_handler)
+    
+    logging.info("=== Запуск приложения ===")
+    logging.info("Логирование настроено в db/db_app.log")
 
 
 class DBConnectionWindow(QMainWindow):
@@ -67,7 +102,7 @@ class DBConnectionWindow(QMainWindow):
         self.dbname_input.installEventFilter(self)
         """Настройка стиля"""
         self.dbname_input.setStyleSheet("""
-                   background: rgba(25, 25, 35, 0.8);
+                   background: rgba(15, 15, 25, 0.8);
                    border: 2px solid #44475a;
                    border-radius: 8px;
                    padding: 14px;
@@ -193,7 +228,7 @@ class DBConnectionWindow(QMainWindow):
 
             /* Поля ввода */
             #inputField {
-                background: rgba(25, 25, 35, 0.8);
+                background: rgba(15, 15, 25, 0.8);
                 border: 2px solid #44475a;
                 border-radius: 8px;
                 padding: 14px;
@@ -284,7 +319,7 @@ class DBConnectionWindow(QMainWindow):
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                 height: 0px;
             }
-            
+
             #errorLabel {
                 color: #ff5555;
                 font-size: 11px;
@@ -336,8 +371,8 @@ class DBConnectionWindow(QMainWindow):
             file_handler = logging.FileHandler("db/db_app.log", encoding='utf-8')
             log_file_path = "db/db_app.log"
         except FileNotFoundError:
-            file_handler = logging.FileHandler("db_app.log", encoding='utf-8')
-            log_file_path = "db_app.log"
+            file_handler = logging.FileHandler("db/db_app.log", encoding='utf-8')
+            log_file_path = "db/db_app.log"
 
         file_handler.setFormatter(
             logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -431,7 +466,7 @@ class DBConnectionWindow(QMainWindow):
     def set_field_error_style(self, field, has_error):
         if has_error:
             field.setStyleSheet("""
-                background: rgba(25, 25, 35, 0.8);
+                background: rgba(15, 15, 25, 0.8);
                 border: 2px solid #ff5555;
                 border-radius: 8px;
                 padding: 14px;
@@ -443,7 +478,7 @@ class DBConnectionWindow(QMainWindow):
             """)
         else:
             field.setStyleSheet("""
-                background: rgba(25, 25, 35, 0.8);
+                background: rgba(15, 15, 25, 0.8);
                 border: 2px solid #44475a;
                 border-radius: 8px;
                 padding: 14px;
@@ -529,6 +564,9 @@ class DBConnectionWindow(QMainWindow):
 
 
 if __name__ == "__main__":
+    # Настраиваем логирование перед запуском приложения
+    setup_logging()
+    
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     window = DBConnectionWindow()

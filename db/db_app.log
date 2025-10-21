@@ -1,0 +1,110 @@
+2025-10-18 20:28:19 - INFO - === Запуск приложения ===
+2025-10-18 20:28:19 - INFO - Логирование настроено в db/db_app.log
+2025-10-18 20:28:21,150 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-18 20:28:21 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-18 20:28:21,150 - DB - INFO - Попытка подключения к БД...
+2025-10-18 20:28:21 - INFO - Попытка подключения к БД...
+2025-10-18 20:28:21,266 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-18 20:28:21 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-18 20:28:24,379 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:28:24 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:28:24,434 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:24 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:24,438 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:28:24 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:28:27,584 - DB - INFO - Сгенерировано 4 предопределенных соединений
+2025-10-18 20:28:27 - INFO - Сгенерировано 4 предопределенных соединений
+2025-10-18 20:28:27,599 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:27 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:27,610 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (11): ['recording_id', 'book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-18 20:28:27 - INFO - 📄 Колонки таблицы 'Issued_Books' (11): ['recording_id', 'book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-18 20:28:29,083 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:29 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:29,092 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-18 20:28:29 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-18 20:28:29,101 - DB - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-18 20:28:29 - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-18 20:28:29,104 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-18 20:28:29 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-18 20:28:29,112 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:29 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:29,112 - DB - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."recording_id", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" INNER JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-18 20:28:29 - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."recording_id", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" INNER JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-18 20:28:29,123 - DB - INFO - Получено 8 строк из JOIN
+2025-10-18 20:28:29 - INFO - Получено 8 строк из JOIN
+2025-10-18 20:28:34,283 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-18 20:28:34 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-18 20:28:34,286 - DB - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-18 20:28:34 - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-18 20:28:34,288 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-18 20:28:34 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-18 20:28:34,298 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:34 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:28:34,302 - DB - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-18 20:28:34 - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-18 20:28:34,310 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (11): ['recording_id', 'book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-18 20:28:34 - INFO - 📄 Колонки таблицы 'Issued_Books' (11): ['recording_id', 'book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-18 20:28:34,310 - DB - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."recording_id", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" INNER JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Issued_Books"."final_rental_cost" ASC
+2025-10-18 20:28:34 - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."recording_id", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" INNER JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Issued_Books"."final_rental_cost" ASC
+2025-10-18 20:28:34,313 - DB - INFO - Получено 8 строк из JOIN
+2025-10-18 20:28:34 - INFO - Получено 8 строк из JOIN
+2025-10-18 20:28:35,918 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-18 20:28:35 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-18 20:32:36 - INFO - === Запуск приложения ===
+2025-10-18 20:32:36 - INFO - Логирование настроено в db/db_app.log
+2025-10-18 20:32:43,522 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-18 20:32:43 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-18 20:32:43,522 - DB - INFO - Попытка подключения к БД...
+2025-10-18 20:32:43 - INFO - Попытка подключения к БД...
+2025-10-18 20:32:43,662 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-18 20:32:43 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-18 20:32:45,564 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:32:45 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:32:45,615 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:32:45 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:32:45,619 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:32:45 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:32:46,824 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:32:46 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:32:46,830 - DB - INFO - 📊 Выполнение запроса сортировки для 'Books'
+2025-10-18 20:32:46 - INFO - 📊 Выполнение запроса сортировки для 'Books'
+2025-10-18 20:32:46,840 - DB - INFO - ✅ Получено 10 строк из 'Books'
+2025-10-18 20:32:46 - INFO - ✅ Получено 10 строк из 'Books'
+2025-10-18 20:32:49,456 - DB - INFO - 📊 Выполнение запроса сортировки для 'Books'
+2025-10-18 20:32:49 - INFO - 📊 Выполнение запроса сортировки для 'Books'
+2025-10-18 20:32:49,460 - DB - INFO - ✅ Получено 10 строк из 'Books'
+2025-10-18 20:32:49 - INFO - ✅ Получено 10 строк из 'Books'
+2025-10-18 20:33:07,340 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:33:07 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:33:07,351 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:33:07 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:33:07,362 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:33:07 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:33:13,348 - DB - INFO - 🔍 Поиск в 'Books.id_book' (ILIKE) с запросом '1'
+2025-10-18 20:33:13 - INFO - 🔍 Поиск в 'Books.id_book' (ILIKE) с запросом '1'
+2025-10-18 20:33:13,348 - DB - INFO - 📝 SQL: SELECT * FROM "Books" WHERE "id_book"::text ILIKE '1'
+2025-10-18 20:33:13 - INFO - 📝 SQL: SELECT * FROM "Books" WHERE "id_book"::text ILIKE '1'
+2025-10-18 20:33:13,398 - DB - INFO - ✅ Найдено 1 строк по '1' (ILIKE)
+2025-10-18 20:33:13 - INFO - ✅ Найдено 1 строк по '1' (ILIKE)
+2025-10-18 20:33:34,030 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:33:34 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-18 20:33:34,040 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:33:34 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:33:34,050 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:33:34 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-18 20:33:57,138 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-18 20:33:57 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-21 16:18:39 - INFO - === Запуск приложения ===
+2025-10-21 16:18:39 - INFO - Логирование настроено в db/db_app.log
+2025-10-21 16:18:52,102 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-21 16:18:52 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-21 16:18:52,103 - DB - INFO - Попытка подключения к БД...
+2025-10-21 16:18:52 - INFO - Попытка подключения к БД...
+2025-10-21 16:18:52,501 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-21 16:18:52 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-21 16:19:09,184 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-21 16:19:09 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-21 16:19:09,270 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-21 16:19:09 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-21 16:19:09,281 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-21 16:19:09 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
