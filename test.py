@@ -18,22 +18,10 @@ logging.basicConfig(
     ]
 )
 
-def drop_and_recreate_schema():
+def drop_and_recreate_schema(db):
     """Удаляет существующую схему и создает новую"""
     
-    db = DB(
-        host="localhost",
-        port=5432,
-        dbname="library_db",
-        user="postgres",
-        password="root"
-    )
-    
     try:
-        if not db.connect():
-            print("❌ Не удалось подключиться к базе данных")
-            return False
-        
         print("🗑️ Удаление существующей схемы...")
         
         # Удаляем все таблицы в правильном порядке (с учетом внешних ключей)
@@ -65,9 +53,6 @@ def drop_and_recreate_schema():
     except Exception as e:
         print(f"❌ Ошибка при удалении схемы: {e}")
         return False
-    
-    finally:
-        db.disconnect()
 
 def create_test_data():
     """Создает тестовые данные для библиотеки"""
@@ -78,7 +63,7 @@ def create_test_data():
         port=5432,
         dbname="library_db",
         user="postgres",
-        password="root"
+        password="DhhkKLNM"
     )
     
     try:
@@ -91,7 +76,7 @@ def create_test_data():
         
         # Сначала удаляем старую схему
         print("🗑️ Удаление старой схемы...")
-        if not drop_and_recreate_schema():
+        if not drop_and_recreate_schema(db):
             print("❌ Не удалось удалить старую схему")
             return False
         

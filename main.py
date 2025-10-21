@@ -119,7 +119,7 @@ class DBConnectionWindow(QMainWindow):
         self.user_error = QLabel("")
         self.user_error.setObjectName("errorLabel")
         self.user_error.setVisible(False)
-        self.password_input = QLineEdit("root")
+        self.password_input = QLineEdit("DhhkKLNM")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_error = QLabel("")
         self.password_error.setObjectName("errorLabel")

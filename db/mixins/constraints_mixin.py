@@ -38,42 +38,41 @@ class ConstraintsMixin:
             sql = f'ALTER TABLE "{table_name}" ADD CONSTRAINT "{constraint_name}" '
 
             # ✅ Универсальные шаблоны для трёх типов ограничений
-            match constraint_type:
-                case "CHECK":
-                    cond = kwargs.get("check_condition")
-                    if not cond:
-                        self.logger.error("❌ Для CHECK-ограничения необходимо указать параметр 'check_condition'")
-                        return False
-                    sql += f"CHECK ({cond})"
-
-                case "UNIQUE":
-                    cols = kwargs.get("columns")
-                    if not cols:
-                        self.logger.error("❌ Для UNIQUE необходимо указать 'columns'")
-                        return False
-                    cols_str = ", ".join(f'"{c}"' for c in (cols if isinstance(cols, list) else [cols]))
-                    sql += f"UNIQUE ({cols_str})"
-
-                case "FOREIGN_KEY":
-                    cols = kwargs.get("columns")
-                    ref_table = kwargs.get("foreign_table")
-                    ref_cols = kwargs.get("foreign_columns")
-
-                    if not all([cols, ref_table, ref_cols]):
-                        self.logger.error("❌ Для FOREIGN KEY нужны 'columns', 'foreign_table' и 'foreign_columns'")
-                        return False
-
-                    if not self.record_exists_ex_table(ref_table):
-                        self.logger.error(f"Ссылочная таблица '{ref_table}' не существует")
-                        return False
-
-                    cols_str = ", ".join(f'"{c}"' for c in (cols if isinstance(cols, list) else [cols]))
-                    ref_cols_str = ", ".join(f'"{c}"' for c in (ref_cols if isinstance(ref_cols, list) else [ref_cols]))
-                    sql += f"FOREIGN KEY ({cols_str}) REFERENCES \"{ref_table}\" ({ref_cols_str})"
-
-                case _:
-                    self.logger.error(f"Неизвестный тип ограничения: {constraint_type}")
+            if constraint_type == "CHECK":
+                cond = kwargs.get("check_condition")
+                if not cond:
+                    self.logger.error("❌ Для CHECK-ограничения необходимо указать параметр 'check_condition'")
                     return False
+                sql += f"CHECK ({cond})"
+
+            elif constraint_type == "UNIQUE":
+                cols = kwargs.get("columns")
+                if not cols:
+                    self.logger.error("❌ Для UNIQUE необходимо указать 'columns'")
+                    return False
+                cols_str = ", ".join(f'"{c}"' for c in (cols if isinstance(cols, list) else [cols]))
+                sql += f"UNIQUE ({cols_str})"
+
+            elif constraint_type == "FOREIGN_KEY":
+                cols = kwargs.get("columns")
+                ref_table = kwargs.get("foreign_table")
+                ref_cols = kwargs.get("foreign_columns")
+
+                if not all([cols, ref_table, ref_cols]):
+                    self.logger.error("❌ Для FOREIGN KEY нужны 'columns', 'foreign_table' и 'foreign_columns'")
+                    return False
+
+                if not self.record_exists_ex_table(ref_table):
+                    self.logger.error(f"Ссылочная таблица '{ref_table}' не существует")
+                    return False
+
+                cols_str = ", ".join(f'"{c}"' for c in (cols if isinstance(cols, list) else [cols]))
+                ref_cols_str = ", ".join(f'"{c}"' for c in (ref_cols if isinstance(ref_cols, list) else [ref_cols]))
+                sql += f"FOREIGN KEY ({cols_str}) REFERENCES \"{ref_table}\" ({ref_cols_str})"
+
+            else:
+                self.logger.error(f"Неизвестный тип ограничения: {constraint_type}")
+                return False
 
             sql += ";"
             self.logger.debug(f"SQL → {sql}")

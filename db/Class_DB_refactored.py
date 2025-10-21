@@ -47,7 +47,7 @@ class DB(
                  port: int = 5432,
                  dbname: str = "library_db",
                  user: str = "postgres",
-                 password: str = "root",
+                 password: str = "DhhkKLNM",
                  sslmode: str = "prefer",
                  connect_timeout: int = 5,
                  log_file: str = "db_app.log"):
