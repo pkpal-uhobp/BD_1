@@ -22,6 +22,11 @@ class TextSearchDialog(QDialog):
         # Устанавливаем темную палитру
         self.set_dark_palette()
         
+        # Словари для валидации
+        self.input_widgets = {}
+        self.error_labels = {}
+        self.field_validity = {}
+        
         # Основной layout
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(20, 20, 20, 20)
@@ -90,11 +95,34 @@ class TextSearchDialog(QDialog):
         ])
         search_layout.addRow("Тип поиска:", self.search_type_combo)
         
-        # Поле поиска
+        # Поле поиска с валидацией
+        search_container = QWidget()
+        search_container.setMinimumHeight(50)  # Устанавливаем минимальную высоту
+        search_input_layout = QVBoxLayout(search_container)
+        search_input_layout.setContentsMargins(0, 0, 0, 0)
+        search_input_layout.setSpacing(5)
+        
         self.search_input = QLineEdit()
         self.search_input.setObjectName("searchInput")
         self.search_input.setPlaceholderText("Введите текст для поиска...")
-        search_layout.addRow("Поисковый запрос:", self.search_input)
+        self.search_input.setMinimumHeight(35)  # Устанавливаем минимальную высоту для поля
+        search_input_layout.addWidget(self.search_input)
+        
+        # Метка ошибок для поискового запроса
+        self.search_error = QLabel()
+        self.search_error.setProperty("class", "error-label")
+        self.search_error.hide()
+        search_input_layout.addWidget(self.search_error)
+        
+        search_layout.addRow("Поисковый запрос:", search_container)
+        
+        # Регистрируем виджеты для валидации
+        self.input_widgets['search'] = self.search_input
+        self.error_labels['search'] = self.search_error
+        self.field_validity['search'] = True
+        
+        # Валидация в реальном времени
+        self.search_input.textChanged.connect(self._validate_search_query)
         
         # Чекбокс для учета регистра (только для LIKE)
         self.case_sensitive_check = QCheckBox("Учитывать регистр")
@@ -274,6 +302,103 @@ class TextSearchDialog(QDialog):
         else:
             self.case_sensitive_check.setVisible(False)
             
+    def _validate_search_query(self):
+        """Валидация поискового запроса в реальном времени"""
+        search_query = self.search_input.text().strip()
+        
+        # Если поле пустое, не показываем ошибку, просто очищаем
+        if not search_query:
+            self.clear_field_error('search')
+            return False
+        
+        # Проверяем длину запроса
+        if len(search_query) < 1:
+            self.set_field_error('search', "Поисковый запрос должен содержать хотя бы 1 символ")
+            return False
+        
+        if len(search_query) > 1000:
+            self.set_field_error('search', "Поисковый запрос не должен превышать 1000 символов")
+            return False
+        
+        # Проверяем на специальные символы для регулярных выражений
+        search_type = self.search_type_combo.currentText()
+        if "LIKE" not in search_type:
+            # Для регулярных выражений проверяем корректность
+            try:
+                import re
+                re.compile(search_query)
+            except re.error as e:
+                self.set_field_error('search', f"Некорректное регулярное выражение: {str(e)}")
+                return False
+        
+        # Если все проверки пройдены
+        self.set_field_success('search', "✅ Поисковый запрос корректен")
+        return True
+    
+    def set_field_error(self, field_name, error_message):
+        """Устанавливает ошибку для поля"""
+        if field_name in self.error_labels:
+            if error_message:
+                self.error_labels[field_name].setText(error_message)
+                self.error_labels[field_name].setProperty("class", "error-label")
+                self.error_labels[field_name].setStyleSheet("""
+                    QLabel {
+                        color: #ff6b6b;
+                        font-size: 12px;
+                        font-weight: bold;
+                        font-family: 'Consolas', 'Fira Code', monospace;
+                        margin-top: 5px;
+                        padding: 5px 8px;
+                        background: rgba(255, 107, 107, 0.1);
+                        border-radius: 4px;
+                        border-left: 3px solid #ff6b6b;
+                    }
+                """)
+                self.error_labels[field_name].show()
+                self.field_validity[field_name] = False
+                widget = self.input_widgets[field_name]
+                widget.setProperty("class", "error")
+                widget.setStyleSheet(self.styleSheet())
+            else:
+                self.clear_field_error(field_name)
+    
+    def set_field_success(self, field_name, success_message):
+        """Устанавливает успешное состояние для поля"""
+        if field_name in self.error_labels:
+            if success_message:
+                self.error_labels[field_name].setText(success_message)
+                self.error_labels[field_name].setProperty("class", "success-label")
+                self.error_labels[field_name].setStyleSheet("""
+                    QLabel {
+                        color: #50fa7b;
+                        font-size: 12px;
+                        font-weight: bold;
+                        font-family: 'Consolas', 'Fira Code', monospace;
+                        margin-top: 5px;
+                        padding: 5px 8px;
+                        background: rgba(80, 250, 123, 0.1);
+                        border-radius: 4px;
+                        border-left: 3px solid #50fa7b;
+                    }
+                """)
+                self.error_labels[field_name].show()
+                self.field_validity[field_name] = True
+                widget = self.input_widgets[field_name]
+                widget.setProperty("class", "success")
+                widget.setStyleSheet(self.styleSheet())
+            else:
+                self.clear_field_error(field_name)
+    
+    def clear_field_error(self, field_name):
+        """Очищает ошибку для поля"""
+        if field_name in self.error_labels:
+            self.error_labels[field_name].hide()
+            self.error_labels[field_name].setStyleSheet("")  # Очищаем стили метки
+            self.field_validity[field_name] = True
+            widget = self.input_widgets[field_name]
+            widget.setProperty("class", "")
+            widget.setStyleSheet(self.styleSheet())
+
     def perform_search(self):
         """Выполняет поиск"""
         try:
@@ -302,6 +427,10 @@ class TextSearchDialog(QDialog):
                 
             if not column_name:
                 self.show_error("Выберите столбец")
+                return
+            
+            # Проверяем валидность поискового запроса
+            if not self._validate_search_query():
                 return
                 
             if not search_query:
@@ -406,6 +535,8 @@ class TextSearchDialog(QDialog):
         """Очищает результаты поиска"""
         self.results_text.clear()
         self.search_input.clear()
+        # Очищаем валидацию
+        self.clear_field_error('search')
     
     def show_error(self, message):
         """Показывает сообщение об ошибке"""
@@ -480,12 +611,13 @@ class TextSearchDialog(QDialog):
                 background: rgba(15, 15, 25, 0.8);
                 border: 2px solid #44475a;
                 border-radius: 6px;
-                padding: 8px;
-                font-size: 13px;
+                padding: 10px 12px;
+                font-size: 14px;
                 font-family: 'Consolas', 'Fira Code', monospace;
                 color: #f8f8f2;
                 selection-background-color: #64ffda;
                 selection-color: #0a0a0f;
+                min-height: 20px;
             }
             
             #searchInput:focus {
@@ -496,6 +628,75 @@ class TextSearchDialog(QDialog):
             #searchInput::placeholder {
                 color: #6272a4;
                 font-style: italic;
+            }
+            
+            /* Стили валидации */
+            .error-label {
+                color: #ff6b6b !important;
+                font-size: 12px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                margin-top: 5px;
+                padding: 5px 8px;
+                background: rgba(255, 107, 107, 0.1);
+                border-radius: 4px;
+                border-left: 3px solid #ff6b6b;
+            }
+            
+            .success-label {
+                color: #50fa7b !important;
+                font-size: 12px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                margin-top: 5px;
+                padding: 5px 8px;
+                background: rgba(80, 250, 123, 0.1);
+                border-radius: 4px;
+                border-left: 3px solid #50fa7b;
+            }
+            
+            QLabel[class="error-label"] {
+                color: #ff6b6b !important;
+                font-size: 12px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                margin-top: 5px;
+                padding: 5px 8px;
+                background: rgba(255, 107, 107, 0.1);
+                border-radius: 4px;
+                border-left: 3px solid #ff6b6b;
+            }
+            
+            QLabel[class="success-label"] {
+                color: #50fa7b !important;
+                font-size: 12px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                margin-top: 5px;
+                padding: 5px 8px;
+                background: rgba(80, 250, 123, 0.1);
+                border-radius: 4px;
+                border-left: 3px solid #50fa7b;
+            }
+            
+            QLineEdit.error {
+                border: 2px solid #ff6b6b !important;
+                background: rgba(255, 107, 107, 0.15) !important;
+            }
+            
+            QLineEdit.success {
+                border: 2px solid #50fa7b !important;
+                background: rgba(80, 250, 123, 0.15) !important;
+            }
+            
+            #searchInput.error {
+                border: 2px solid #ff6b6b !important;
+                background: rgba(255, 107, 107, 0.15) !important;
+            }
+            
+            #searchInput.success {
+                border: 2px solid #50fa7b !important;
+                background: rgba(80, 250, 123, 0.15) !important;
             }
             
             /* Выпадающие списки */
