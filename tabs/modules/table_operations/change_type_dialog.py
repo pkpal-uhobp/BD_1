@@ -190,30 +190,38 @@ class ChangeTypeDialog(QDialog):
                 QMessageBox.critical(self, "Ошибка", "Не удалось изменить тип столбца. См. логи.")
 
     def _open_constraints_window(self):
-        from tabs.modules.constraints import ConstraintsBasicDialog
         table_name = self.table_combo.currentText().strip()
         column_name = self.column_combo.currentText().strip()
-        dlg = ConstraintsBasicDialog(self.db_instance, self, table_name, column_name)
-        if dlg.exec() == QMessageBox.Accepted:
-            cons = dlg.get_constraints()
-            # Применим изменения к столбцу: NOT NULL, DEFAULT, UNIQUE, CHECK
-            set_nn = None if cons.get('nullable') is None else (not cons['nullable'])
-            default_value = ...
-            if cons.get('default') is not None:
-                default_value = cons['default']
-            unique = cons.get('unique') if 'unique' in cons else None
-            check_expr = cons.get('check') if 'check' in cons else None
-            ok = self.db_instance.alter_column_constraints(
-                self.table_combo.currentText().strip(),
-                self.column_combo.currentText().strip(),
-                nullable=set_nn,
-                default=default_value,
-                check_condition=check_expr
-            )
-            if ok:
-                QMessageBox.information(self, "Успех", "Ограничения применены")
-            else:
-                QMessageBox.critical(self, "Ошибка", "Не удалось применить ограничения")
+        
+        if not table_name or not column_name:
+            QMessageBox.warning(self, "Ошибка", "Выберите таблицу и столбец")
+            return
+            
+        try:
+            dlg = ConstraintsDialog(self.db_instance, self)
+            dlg.show()  # Показываем диалог
+            if dlg.exec() == QDialog.Accepted:
+                cons = dlg.get_constraints()
+                # Применим изменения к столбцу: NOT NULL, DEFAULT, UNIQUE, CHECK
+                set_nn = None if cons.get('nullable') is None else (not cons['nullable'])
+                default_value = ...
+                if cons.get('default') is not None:
+                    default_value = cons['default']
+                unique = cons.get('unique') if 'unique' in cons else None
+                check_expr = cons.get('check') if 'check' in cons else None
+                ok = self.db_instance.alter_column_constraints(
+                    self.table_combo.currentText().strip(),
+                    self.column_combo.currentText().strip(),
+                    nullable=set_nn,
+                    default=default_value,
+                    check_condition=check_expr
+                )
+                if ok:
+                    QMessageBox.information(self, "Успех", "Ограничения применены")
+                else:
+                    QMessageBox.critical(self, "Ошибка", "Не удалось применить ограничения")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось открыть диалог ограничений: {str(e)}")
 
 
 
