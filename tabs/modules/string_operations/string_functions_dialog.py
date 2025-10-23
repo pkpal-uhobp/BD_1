@@ -40,6 +40,9 @@ class StringFunctionsDialog(QDialog):
         self.setup_ui()
         self.apply_styles()
         
+        # Контейнеры подсказок/ошибок для полей параметров
+        self._error_labels = {}
+        
     def set_dark_palette(self):
         """Устанавливает тёмную цветовую палитру"""
         dark_palette = QPalette()
@@ -423,6 +426,8 @@ class StringFunctionsDialog(QDialog):
         self.params_layout.addWidget(length_label)
         self.params_layout.addWidget(self.length_spin)
         
+        # SUBSTRING не требует текстовой валидации, т.к. используются QSpinBox
+        
     def create_trim_params(self):
         """Создает параметры для TRIM"""
         # Тип TRIM
@@ -476,6 +481,17 @@ class StringFunctionsDialog(QDialog):
         self.params_layout.addWidget(chars_label)
         self.params_layout.addWidget(self.trim_chars_input)
         
+        # Метка ошибок для trim chars
+        self.trim_chars_error = QLabel()
+        self.trim_chars_error.setObjectName("trimCharsError")
+        self.trim_chars_error.setProperty("class", "error-label")
+        self.trim_chars_error.hide()
+        self.params_layout.addWidget(self.trim_chars_error)
+        self._error_labels['trim_chars'] = self.trim_chars_error
+        
+        # Валидация в реальном времени
+        self.trim_chars_input.textChanged.connect(self.validate_trim_chars)
+        
     def create_pad_params(self):
         """Создает параметры для LPAD/RPAD"""
         # Длина
@@ -503,6 +519,17 @@ class StringFunctionsDialog(QDialog):
         self.params_layout.addWidget(pad_char_label)
         self.params_layout.addWidget(self.pad_char_input)
         
+        # Метка ошибок для pad char
+        self.pad_char_error = QLabel()
+        self.pad_char_error.setObjectName("padCharError")
+        self.pad_char_error.setProperty("class", "error-label")
+        self.pad_char_error.hide()
+        self.params_layout.addWidget(self.pad_char_error)
+        self._error_labels['pad_char'] = self.pad_char_error
+        
+        # Валидация в реальном времени
+        self.pad_char_input.textChanged.connect(self.validate_pad_char)
+        
     def create_concat_params(self):
         """Создает параметры для CONCAT"""
         # Строка для объединения
@@ -515,6 +542,17 @@ class StringFunctionsDialog(QDialog):
         
         self.params_layout.addWidget(concat_label)
         self.params_layout.addWidget(self.concat_input)
+        
+        # Метка ошибок для concat
+        self.concat_error = QLabel()
+        self.concat_error.setObjectName("concatError")
+        self.concat_error.setProperty("class", "error-label")
+        self.concat_error.hide()
+        self.params_layout.addWidget(self.concat_error)
+        self._error_labels['concat'] = self.concat_error
+        
+        # Валидация в реальном времени
+        self.concat_input.textChanged.connect(self.validate_concat_string)
         
     def update_preview(self):
         """Обновляет предварительный просмотр SQL-запроса"""
@@ -561,13 +599,85 @@ class StringFunctionsDialog(QDialog):
             length = getattr(self, 'pad_length_spin', None)
             char = getattr(self, 'pad_char_input', None)
             if length and char:
-                return f"SELECT {col}, {function_name}({col}, {length.value()}, '{char.text()}') AS {function_name.lower()}_result FROM {table_name};"
+                # Экранируем одиночные кавычки для корректного превью
+                pad_ch = (char.text() or " ").replace("'", "''")
+                return f"SELECT {col}, {function_name}({col}, {length.value()}, '{pad_ch}') AS {function_name.lower()}_result FROM {table_name};"
         elif function_name == "CONCAT":
             concat_str = getattr(self, 'concat_input', None)
             if concat_str:
-                return f"SELECT {col}, CONCAT({col}, '{concat_str.text()}') AS concat_result FROM {table_name};"
+                concat_escaped = (concat_str.text() or "").replace("'", "''")
+                return f"SELECT {col}, CONCAT({col}, '{concat_escaped}') AS concat_result FROM {table_name};"
                 
         return f"SELECT {col}, {function_name}({col}) AS {function_name.lower()}_result FROM {table_name};"
+
+    # ===== ВАЛИДАЦИЯ ПАРАМЕТРОВ СТРОКОВЫХ ФУНКЦИЙ =====
+    def _set_input_state(self, widget: QWidget, error_label: QLabel, is_ok: bool, message: str):
+        if is_ok:
+            error_label.setText(message or "")
+            if message:
+                error_label.setProperty("class", "success-label")
+                error_label.setStyleSheet(self.styleSheet())
+                error_label.show()
+            else:
+                error_label.hide()
+            widget.setProperty("class", "success" if message else "")
+            widget.setStyleSheet(self.styleSheet())
+        else:
+            error_label.setText(message)
+            error_label.setProperty("class", "error-label")
+            error_label.setStyleSheet(self.styleSheet())
+            error_label.show()
+            widget.setProperty("class", "error")
+            widget.setStyleSheet(self.styleSheet())
+
+    @staticmethod
+    def _has_dangerous_sql(text: str) -> bool:
+        if not text:
+            return False
+        dangerous = [r"--", r"/\*", r"\*/", r";\s*$"]
+        return any(re.search(p, text, re.IGNORECASE) for p in dangerous)
+
+    def validate_trim_chars(self):
+        text = self.trim_chars_input.text()
+        # Поле опциональное: пусто — валидно
+        if not text.strip():
+            self._set_input_state(self.trim_chars_input, self.trim_chars_error, True, "")
+            return
+        if self._has_dangerous_sql(text):
+            self._set_input_state(self.trim_chars_input, self.trim_chars_error, False, "✕ Запрещены комментарии и точка с запятой")
+            return
+        # Разрешаем любую последовательность, но ограничим длину до 32 символов
+        if len(text) > 32:
+            self._set_input_state(self.trim_chars_input, self.trim_chars_error, False, "✕ Слишком длинная строка (до 32 символов)")
+            return
+        self._set_input_state(self.trim_chars_input, self.trim_chars_error, True, f"✓ {len(text)} симв.")
+
+    def validate_pad_char(self):
+        text = self.pad_char_input.text()
+        if not text:
+            self._set_input_state(self.pad_char_input, self.pad_char_error, False, "✕ Укажите символ дополнения")
+            return
+        if len(text) != 1:
+            self._set_input_state(self.pad_char_input, self.pad_char_error, False, "✕ Должен быть ровно один символ")
+            return
+        if self._has_dangerous_sql(text):
+            self._set_input_state(self.pad_char_input, self.pad_char_error, False, "✕ Недопустимый символ")
+            return
+        self._set_input_state(self.pad_char_input, self.pad_char_error, True, "✓ Ок")
+
+    def validate_concat_string(self):
+        text = self.concat_input.text()
+        if text is None:
+            text = ""
+        if self._has_dangerous_sql(text):
+            self._set_input_state(self.concat_input, self.concat_error, False, "✕ Запрещены комментарии и точка с запятой")
+            return
+        if len(text) > 255:
+            self._set_input_state(self.concat_input, self.concat_error, False, "✕ Слишком длинная строка (до 255 символов)")
+            return
+        # Пустая строка допустима для CONCAT
+        msg = f"✓ {len(text)} симв." if text else ""
+        self._set_input_state(self.concat_input, self.concat_error, True, msg)
         
     def execute_function(self):
         """Выполняет выбранную строковую функцию"""
@@ -956,6 +1066,16 @@ class StringFunctionsDialog(QDialog):
                 background: rgba(35, 35, 45, 0.9);
             }
             
+            /* Состояния валидации для полей ввода */
+            QLineEdit.error, QComboBox.error, QTextEdit.error, QSpinBox.error, QDoubleSpinBox.error {
+                border: 2px solid #ff5555 !important;
+                background: rgba(75, 25, 35, 0.8) !important;
+            }
+            QLineEdit.success, QComboBox.success, QTextEdit.success, QSpinBox.success, QDoubleSpinBox.success {
+                border: 2px solid #50fa7b !important;
+                background: rgba(25, 75, 35, 0.3) !important;
+            }
+            
             /* Спинбоксы */
             #spinBox {
                 background: rgba(15, 15, 25, 0.8);
@@ -1206,5 +1326,28 @@ class StringFunctionsDialog(QDialog):
             
             QSplitter::handle:hover {
                 background: #64ffda;
+            }
+            
+            /* Метки состояний */
+            .error-label {
+                color: #ff5555;
+                font-size: 11px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 2px 5px;
+                background: rgba(255, 85, 85, 0.1);
+                border-radius: 4px;
+                margin-top: 4px;
+                border-left: 3px solid #ff5555;
+            }
+            
+            .success-label {
+                color: #50fa7b;
+                font-size: 11px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 2px 5px;
+                background: rgba(80, 250, 123, 0.1);
+                border-radius: 4px;
+                margin-top: 4px;
+                border-left: 3px solid #50fa7b;
             }
         """)
