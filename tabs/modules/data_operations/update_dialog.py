@@ -31,6 +31,8 @@ class EditRecordDialog(QDialog):
         self.update_widgets = {}
         self.update_error_labels = {}  # Метки ошибок для обновления
         self.field_validity = {}  # Словарь для отслеживания валидности полей
+        self.search_error_labels = {}  # Метки ошибок для поиска
+        self.search_field_validity = {}  # Словарь для отслеживания валидности полей поиска
 
         # ID найденной записи (для возможного использования в будущем)
         self.found_record_id = None
@@ -521,6 +523,48 @@ class EditRecordDialog(QDialog):
             widget.setProperty("class", "")
             widget.setStyleSheet(self.styleSheet())
 
+    def set_search_field_error(self, field_name, error_message):
+        """Устанавливает сообщение об ошибке для поля поиска"""
+        if field_name in self.search_error_labels:
+            if error_message:
+                self.search_error_labels[field_name].setText(error_message)
+                self.search_error_labels[field_name].show()
+                self.search_field_validity[field_name] = False
+                # Подсветка ошибки
+                widget = self.search_widgets[field_name]
+                widget.setProperty("class", "error")
+                widget.setStyleSheet(self.styleSheet())
+            else:
+                self.clear_search_field_error(field_name)
+
+    def set_search_field_success(self, field_name, success_message):
+        """Устанавливает сообщение об успехе для поля поиска"""
+        if field_name in self.search_error_labels:
+            if success_message:
+                self.search_error_labels[field_name].setText(success_message)
+                self.search_error_labels[field_name].show()
+                self.search_error_labels[field_name].setProperty("class", "success-label")
+                self.search_error_labels[field_name].setStyleSheet(self.styleSheet())
+                # Подсветка успеха
+                widget = self.search_widgets[field_name]
+                widget.setProperty("class", "success")
+                widget.setStyleSheet(self.styleSheet())
+            else:
+                self.clear_search_field_error(field_name)
+
+    def clear_search_field_error(self, field_name):
+        """Очищает ошибку для поля поиска"""
+        if field_name in self.search_error_labels:
+            self.search_error_labels[field_name].hide()
+            self.search_error_labels[field_name].setText("")
+            self.search_error_labels[field_name].setProperty("class", "error-label")
+            self.search_error_labels[field_name].setStyleSheet(self.styleSheet())
+            self.search_field_validity[field_name] = True
+            # Убираем подсветку
+            widget = self.search_widgets[field_name]
+            widget.setProperty("class", "")
+            widget.setStyleSheet(self.styleSheet())
+
     def validate_field(self, display_name, widget, column, table_name):
         """Валидирует поле, включая ArrayLineEdit."""
         import re
@@ -691,6 +735,37 @@ class EditRecordDialog(QDialog):
         # Обновляем состояние кнопки "СОХРАНИТЬ ИЗМЕНЕНИЯ"
         self.check_update_button_state()
 
+    def validate_search_real_time(self, field_name):
+        """Валидация в реальном времени при изменении поля поиска"""
+        if field_name not in self.search_widgets:
+            return
+        widget = self.search_widgets[field_name]
+        table_name = self.table_combo.currentText()
+        if table_name not in self.db_instance.tables:
+            return
+
+        table = self.db_instance.tables[table_name]
+        col_name = self.REVERSE_COLUMN_HEADERS_MAP.get(field_name, field_name)
+
+        try:
+            column = getattr(table.c, col_name)
+        except AttributeError:
+            self.set_search_field_error(field_name, "❌ Колонка не найдена в таблице")
+            self.search_field_validity[field_name] = False
+            return
+
+        is_valid, value, error_message, success_message = self.validate_field(field_name, widget, column, table_name)
+
+        if not is_valid:
+            self.set_search_field_error(field_name, error_message)
+            self.search_field_validity[field_name] = False
+        else:
+            if success_message:
+                self.set_search_field_success(field_name, success_message)
+            else:
+                self.clear_search_field_error(field_name)
+            self.search_field_validity[field_name] = True
+
     def clear_fields(self):
         """Полностью очищает все поля ввода в обоих контейнерах."""
         # Очистка условий поиска
@@ -699,6 +774,8 @@ class EditRecordDialog(QDialog):
             if item.widget():
                 item.widget().deleteLater()
         self.search_widgets.clear()
+        self.search_error_labels.clear()
+        self.search_field_validity.clear()
 
         # Очистка полей для новых значений
         while self.update_layout.count():
@@ -723,15 +800,29 @@ class EditRecordDialog(QDialog):
 
         table = self.db_instance.tables[table_name]
 
-        # Поля для условий поиска (без валидации)
+        # Поля для условий поиска (с валидацией)
         for column in table.columns:
             display_name = self.COLUMN_HEADERS_MAP.get(column.name, column.name)
             widget = self.create_search_widget(column)
 
-            # Используем обычный метод, без метки ошибки
-            field_row = self.create_simple_field_row(f"{display_name}:", widget)
+            # Используем метод с меткой ошибки для поиска
+            field_row, error_label = self.create_field_row(f"{display_name}:", widget)
             self.search_layout.addWidget(field_row)
-            self.search_widgets[column.name] = widget
+            self.search_widgets[display_name] = widget
+            self.search_error_labels[display_name] = error_label
+            self.search_field_validity[display_name] = True  # Изначально валидно
+
+            # Подключаем валидацию в реальном времени для поиска
+            if isinstance(widget, QLineEdit):
+                widget.textChanged.connect(lambda text, dn=display_name: self.validate_search_real_time(dn))
+            elif isinstance(widget, QComboBox):
+                widget.currentTextChanged.connect(lambda text, dn=display_name: self.validate_search_real_time(dn))
+            elif isinstance(widget, QDateEdit):
+                widget.dateChanged.connect(lambda date, dn=display_name: self.validate_search_real_time(dn))
+            elif isinstance(widget, QCheckBox):
+                widget.stateChanged.connect(lambda state, dn=display_name: self.validate_search_real_time(dn))
+            elif isinstance(widget, QTextEdit):
+                widget.textChanged.connect(lambda: self.validate_search_real_time(display_name))
 
         # Поля для новых значений (пропускаем автоинкрементные PK)
         for column in table.columns:
@@ -966,7 +1057,18 @@ class EditRecordDialog(QDialog):
         condition = {}
         table = self.db_instance.tables[table_name]
 
-        for col_name, widget in self.search_widgets.items():
+        # Проверяем валидность всех полей поиска перед формированием условий
+        for display_name in self.search_field_validity:
+            if not self.search_field_validity[display_name]:
+                notification.notify(
+                    title="❌ Ошибки валидации",
+                    message="Исправьте ошибки в полях поиска перед выполнением поиска",
+                    timeout=3
+                )
+                return None
+
+        for display_name, widget in self.search_widgets.items():
+            col_name = self.REVERSE_COLUMN_HEADERS_MAP.get(display_name, display_name)
             column = getattr(table.c, col_name)
 
             if isinstance(widget, QComboBox) and isinstance(column.type, SQLEnum):
@@ -993,10 +1095,10 @@ class EditRecordDialog(QDialog):
                 text = widget.text().strip()
                 if text:
                     if isinstance(column.type, Integer):
-                        if not text.isdigit():
+                        if not text.isdigit() and not (text.startswith('-') and text[1:].isdigit()):
                             notification.notify(
                                 title="Ошибка",
-                                message=f"Поле '{col_name}' должно быть целым числом.",
+                                message=f"Поле '{display_name}' должно быть целым числом.",
                                 timeout=3
                             )
                             return None
@@ -1007,7 +1109,7 @@ class EditRecordDialog(QDialog):
                         except ValueError:
                             notification.notify(
                                 title="Ошибка",
-                                message=f"Поле '{col_name}' должно быть числом.",
+                                message=f"Поле '{display_name}' должно быть числом.",
                                 timeout=3
                             )
                             return None
