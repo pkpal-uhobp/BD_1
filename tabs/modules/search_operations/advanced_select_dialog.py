@@ -193,6 +193,10 @@ class AdvancedSelectDialog(QDialog):
         # Переменная для хранения результатов запроса
         self.last_query_results = []
         
+        # Подключаем валидацию в реальном времени для WHERE и HAVING
+        self.where_input.textChanged.connect(self.validate_where_condition)
+        self.having_input.textChanged.connect(self.validate_having_condition)
+        
         # Заполняем начальные данные
         self.populate_tables()
         
@@ -309,6 +313,13 @@ class AdvancedSelectDialog(QDialog):
         self.where_input.setObjectName("whereInput")
         self.where_input.setPlaceholderText("Например: age > 18 AND name LIKE '%John%'")
         where_layout.addWidget(self.where_input)
+        
+        # Метка для отображения ошибок/успеха валидации WHERE
+        self.where_error_label = QLabel()
+        self.where_error_label.setObjectName("whereErrorLabel")
+        self.where_error_label.setWordWrap(True)
+        self.where_error_label.hide()
+        where_layout.addWidget(self.where_error_label)
         
         filter_layout.addWidget(where_group)
         
@@ -465,6 +476,13 @@ class AdvancedSelectDialog(QDialog):
         self.having_input.setObjectName("havingInput")
         self.having_input.setPlaceholderText("Например: COUNT(*) > 5")
         having_layout.addWidget(self.having_input)
+        
+        # Метка для отображения ошибок/успеха валидации HAVING
+        self.having_error_label = QLabel()
+        self.having_error_label.setObjectName("havingErrorLabel")
+        self.having_error_label.setWordWrap(True)
+        self.having_error_label.hide()
+        having_layout.addWidget(self.having_error_label)
         
         group_tab_layout.addWidget(having_group)
         
@@ -995,6 +1013,10 @@ class AdvancedSelectDialog(QDialog):
         self.where_input.clear()
         self.having_input.clear()
         
+        # Очищаем ошибки валидации
+        self.clear_where_error()
+        self.clear_having_error()
+        
         # Очищаем новые списки
         self.available_order_columns.clear()
         self.available_group_columns.clear()
@@ -1008,6 +1030,157 @@ class AdvancedSelectDialog(QDialog):
     def show_error(self, message):
         """Показывает сообщение об ошибке"""
         QMessageBox.warning(self, "Ошибка", message)
+        
+    def validate_where_condition(self, text):
+        """Валидирует SQL условие WHERE в реальном времени"""
+        text = text.strip()
+        
+        if not text:
+            self.clear_where_error()
+            return
+            
+        # Проверяем базовую структуру SQL
+        is_valid, error_message, success_message = self.validate_sql_condition(text)
+        
+        if not is_valid:
+            self.set_where_error(error_message)
+        else:
+            if success_message:
+                self.set_where_success(success_message)
+            else:
+                self.clear_where_error()
+                
+    def validate_sql_condition(self, condition):
+        """Валидирует SQL условие и возвращает (is_valid, error_message, success_message)"""
+        import re
+        
+        # Удаляем лишние пробелы
+        condition = re.sub(r'\s+', ' ', condition.strip())
+        
+        if not condition:
+            return True, "", ""
+            
+        # Проверяем на опасные SQL конструкции
+        dangerous_patterns = [
+            r'\b(DROP|DELETE|INSERT|UPDATE|CREATE|ALTER|TRUNCATE)\b',
+            r'\b(EXEC|EXECUTE|sp_|xp_)\b',
+            r'--',  # SQL комментарии
+            r'/\*.*?\*/',  # Блочные комментарии
+            r';\s*$',  # Точка с запятой в конце
+        ]
+        
+        for pattern in dangerous_patterns:
+            if re.search(pattern, condition, re.IGNORECASE):
+                return False, "✕ Запрещенные SQL конструкции", ""
+        
+        # Проверяем на базовые SQL операторы
+        allowed_operators = ['=', '!=', '<>', '<', '>', '<=', '>=', 'LIKE', 'ILIKE', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL']
+        logical_operators = ['AND', 'OR', 'NOT']
+        
+        # Простая проверка на корректность скобок
+        if condition.count('(') != condition.count(')'):
+            return False, "✕ Несбалансированные скобки", ""
+            
+        # Проверяем на пустые условия
+        if condition in ['AND', 'OR', 'NOT']:
+            return False, "✕ Неполное условие", ""
+            
+        # Проверяем на корректность строковых литералов
+        if condition.count("'") % 2 != 0:
+            return False, "✕ Незакрытые кавычки", ""
+            
+        # Проверяем на корректность LIKE с экранированием
+        if 'LIKE' in condition.upper() or 'ILIKE' in condition.upper():
+            if not re.search(r"LIKE\s+['\"].*['\"]", condition, re.IGNORECASE):
+                return False, "✕ LIKE должен содержать строковый литерал", ""
+        
+        # Если все проверки пройдены
+        return True, "", "✓ Валидное SQL условие"
+        
+    def set_where_error(self, message):
+        """Устанавливает ошибку для поля WHERE"""
+        self.where_error_label.setText(message)
+        self.where_error_label.setProperty("class", "error-label")
+        self.where_error_label.setStyleSheet(self.styleSheet())
+        self.where_error_label.show()
+        
+        # Подсветка поля ввода
+        self.where_input.setProperty("class", "error")
+        self.where_input.setStyleSheet(self.styleSheet())
+        
+    def set_where_success(self, message):
+        """Устанавливает успех для поля WHERE"""
+        self.where_error_label.setText(message)
+        self.where_error_label.setProperty("class", "success-label")
+        self.where_error_label.setStyleSheet(self.styleSheet())
+        self.where_error_label.show()
+        
+        # Подсветка поля ввода
+        self.where_input.setProperty("class", "success")
+        self.where_input.setStyleSheet(self.styleSheet())
+        
+    def clear_where_error(self):
+        """Очищает ошибку для поля WHERE"""
+        self.where_error_label.hide()
+        self.where_error_label.setText("")
+        self.where_error_label.setProperty("class", "error-label")
+        self.where_error_label.setStyleSheet(self.styleSheet())
+        
+        # Убираем подсветку поля ввода
+        self.where_input.setProperty("class", "")
+        self.where_input.setStyleSheet(self.styleSheet())
+        
+    def validate_having_condition(self, text):
+        """Валидирует SQL условие HAVING в реальном времени"""
+        text = text.strip()
+        
+        if not text:
+            self.clear_having_error()
+            return
+            
+        # Проверяем базовую структуру SQL
+        is_valid, error_message, success_message = self.validate_sql_condition(text)
+        
+        if not is_valid:
+            self.set_having_error(error_message)
+        else:
+            if success_message:
+                self.set_having_success(success_message)
+            else:
+                self.clear_having_error()
+                
+    def set_having_error(self, message):
+        """Устанавливает ошибку для поля HAVING"""
+        self.having_error_label.setText(message)
+        self.having_error_label.setProperty("class", "error-label")
+        self.having_error_label.setStyleSheet(self.styleSheet())
+        self.having_error_label.show()
+        
+        # Подсветка поля ввода
+        self.having_input.setProperty("class", "error")
+        self.having_input.setStyleSheet(self.styleSheet())
+        
+    def set_having_success(self, message):
+        """Устанавливает успех для поля HAVING"""
+        self.having_error_label.setText(message)
+        self.having_error_label.setProperty("class", "success-label")
+        self.having_error_label.setStyleSheet(self.styleSheet())
+        self.having_error_label.show()
+        
+        # Подсветка поля ввода
+        self.having_input.setProperty("class", "success")
+        self.having_input.setStyleSheet(self.styleSheet())
+        
+    def clear_having_error(self):
+        """Очищает ошибку для поля HAVING"""
+        self.having_error_label.hide()
+        self.having_error_label.setText("")
+        self.having_error_label.setProperty("class", "error-label")
+        self.having_error_label.setStyleSheet(self.styleSheet())
+        
+        # Убираем подсветку поля ввода
+        self.having_input.setProperty("class", "")
+        self.having_input.setStyleSheet(self.styleSheet())
         
     def apply_styles(self):
         """Применяет стили"""
@@ -1606,6 +1779,39 @@ class AdvancedSelectDialog(QDialog):
             /* Контент-виджет */
             #contentWidget {
                 background: transparent;
+            }
+            
+            /* Стили для валидации WHERE */
+            QLineEdit.error, QComboBox.error, QTextEdit.error, QSpinBox.error, QDoubleSpinBox.error {
+                border: 2px solid #ff5555 !important;
+                background: rgba(75, 25, 35, 0.8) !important;
+            }
+            
+            QLineEdit.success, QComboBox.success, QTextEdit.success, QSpinBox.success, QDoubleSpinBox.success {
+                border: 2px solid #50fa7b !important;
+                background: rgba(25, 75, 35, 0.3) !important;
+            }
+            
+            .error-label {
+                color: #ff5555;
+                font-size: 11px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 2px 5px;
+                background: rgba(255, 85, 85, 0.1);
+                border-radius: 4px;
+                margin-top: 2px;
+                border-left: 3px solid #ff5555;
+            }
+            
+            .success-label {
+                color: #50fa7b;
+                font-size: 11px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 2px 5px;
+                background: rgba(80, 250, 123, 0.1);
+                border-radius: 4px;
+                margin-top: 2px;
+                border-left: 3px solid #50fa7b;
             }
         """)
 
