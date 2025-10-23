@@ -108,3 +108,1481 @@
 2025-10-21 16:19:09 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
 2025-10-21 16:19:09,281 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
 2025-10-21 16:19:09 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:46:45 - INFO - === Запуск приложения ===
+2025-10-23 09:46:45 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 09:46:50,289 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:46:50 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:46:50,289 - DB - INFO - Попытка подключения к БД...
+2025-10-23 09:46:50 - INFO - Попытка подключения к БД...
+2025-10-23 09:46:50,402 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:46:50 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:46:58,609 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:46:58 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:46:58,609 - DB - INFO - Попытка подключения к БД...
+2025-10-23 09:46:58 - INFO - Попытка подключения к БД...
+2025-10-23 09:46:58,710 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 09:46:58 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 09:47:02,063 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:47:02 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:47:22,538 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:47:22 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:47:38,505 - DB - INFO - Схема уже существует — все таблицы присутствуют.
+2025-10-23 09:47:38 - INFO - Схема уже существует — все таблицы присутствуют.
+2025-10-23 09:47:45,984 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:47:45 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:47:46,100 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:47:46 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:47:46,103 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:47:46 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:48:03,940 - DB - INFO - Сгенерировано 4 предопределенных соединений
+2025-10-23 09:48:03 - INFO - Сгенерировано 4 предопределенных соединений
+2025-10-23 09:48:03,946 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:03 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:03,952 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 09:48:03 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 09:48:31,215 - DB - INFO - Сгенерировано 4 предопределенных соединений
+2025-10-23 09:48:31 - INFO - Сгенерировано 4 предопределенных соединений
+2025-10-23 09:48:31,222 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:31 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:31,227 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:48:31 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:48:35,953 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:35 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:35,962 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:48:35 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:48:35,964 - DB - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 09:48:35 - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 09:48:35,965 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:48:35 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:48:35,970 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:35 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:35,970 - DB - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" LEFT JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-23 09:48:35 - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" LEFT JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-23 09:48:35,990 - DB - INFO - Получено 11 строк из JOIN
+2025-10-23 09:48:35 - INFO - Получено 11 строк из JOIN
+2025-10-23 09:48:41,276 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:48:41 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:48:44,067 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:48:44 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:48:44,068 - DB - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 09:48:44 - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 09:48:44,070 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:48:44 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:48:44,075 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:44 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:44,075 - DB - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" LEFT JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-23 09:48:44 - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" LEFT JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-23 09:48:44,076 - DB - INFO - Получено 11 строк из JOIN
+2025-10-23 09:48:44 - INFO - Получено 11 строк из JOIN
+2025-10-23 09:48:47,019 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:48:47 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:48:47,024 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:47 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:47,029 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:48:47 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:16,958 - DB - INFO - 🔍 Выполняется SQL запрос: SELECT "id_book", "title", "authors", "genre", "daily_rental_rate" FROM "Books"
+2025-10-23 09:49:16 - INFO - 🔍 Выполняется SQL запрос: SELECT "id_book", "title", "authors", "genre", "daily_rental_rate" FROM "Books"
+2025-10-23 09:49:16,959 - DB - INFO - ✅ Запрос выполнен успешно. Найдено 10 записей
+2025-10-23 09:49:16 - INFO - ✅ Запрос выполнен успешно. Найдено 10 записей
+2025-10-23 09:49:25,594 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:25 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:25,599 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:25 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:25,670 - DB - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 0 найдено (FK=0, CHECK=0, IDX=0)
+2025-10-23 09:49:25 - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 0 найдено (FK=0, CHECK=0, IDX=0)
+2025-10-23 09:49:30,670 - DB - INFO - 🔎 Зависимости столбца 'title' в 'Books': 1 найдено (FK=0, CHECK=0, IDX=1)
+2025-10-23 09:49:30 - INFO - 🔎 Зависимости столбца 'title' в 'Books': 1 найдено (FK=0, CHECK=0, IDX=1)
+2025-10-23 09:49:31,704 - DB - INFO - 🔎 Зависимости столбца 'title' в 'Books': 1 найдено (FK=0, CHECK=0, IDX=1)
+2025-10-23 09:49:31 - INFO - 🔎 Зависимости столбца 'title' в 'Books': 1 найдено (FK=0, CHECK=0, IDX=1)
+2025-10-23 09:49:33,417 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:49:33 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:49:33,422 - DB - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:33 - INFO - 📄 Колонки таблицы 'Books' (6): ['id_book', 'title', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:33,427 - DB - INFO - 🔎 Зависимости столбца 'title' в 'Books': 1 найдено (FK=0, CHECK=0, IDX=1)
+2025-10-23 09:49:33 - INFO - 🔎 Зависимости столбца 'title' в 'Books': 1 найдено (FK=0, CHECK=0, IDX=1)
+2025-10-23 09:49:33,427 - DB - INFO - 🧩 ALTER TABLE: удаление столбца 'title' из 'Books' (force=True)
+2025-10-23 09:49:33 - INFO - 🧩 ALTER TABLE: удаление столбца 'title' из 'Books' (force=True)
+2025-10-23 09:49:33,504 - DB - INFO - 🔄 Метаданные обновлены: 3 таблиц загружено.
+2025-10-23 09:49:33 - INFO - 🔄 Метаданные обновлены: 3 таблиц загружено.
+2025-10-23 09:49:33,504 - DB - INFO - ✅ Столбец 'title' успешно удалён из таблицы 'Books'.
+2025-10-23 09:49:33 - INFO - ✅ Столбец 'title' успешно удалён из таблицы 'Books'.
+2025-10-23 09:49:34,653 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:49:34 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:49:34,655 - DB - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 09:49:34 - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 09:49:34,656 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:49:34 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:49:34,660 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:34 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:34,660 - DB - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" LEFT JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-23 09:49:34 - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."title", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" LEFT JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-23 09:49:34,664 - DB - ERROR - Ошибка выполнения JOIN: Ошибка подключения: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец Books.title не существует
+LINE 1: SELECT "Books"."id_book", "Books"."title", "Books"."authors"...
+                                  ^
+
+[SQL: SELECT "...
+2025-10-23 09:49:34 - ERROR - Ошибка выполнения JOIN: Ошибка подключения: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец Books.title не существует
+LINE 1: SELECT "Books"."id_book", "Books"."title", "Books"."authors"...
+                                  ^
+
+[SQL: SELECT "...
+2025-10-23 09:49:38,265 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:38 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:38,271 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:38 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:38,273 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:38 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:41,486 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:41 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:41,492 - DB - INFO - 📊 Выполнение запроса сортировки для 'Books'
+2025-10-23 09:49:41 - INFO - 📊 Выполнение запроса сортировки для 'Books'
+2025-10-23 09:49:41,495 - DB - INFO - ✅ Получено 10 строк из 'Books'
+2025-10-23 09:49:41 - INFO - ✅ Получено 10 строк из 'Books'
+2025-10-23 09:49:43,483 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:43 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:43,489 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:43 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:43,491 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:43 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:45,486 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 09:49:45 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 09:49:48,525 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:49:48 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:49:50,959 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:49:50 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:49:50,965 - DB - INFO - 📊 Выполнение запроса сортировки для 'Issued_Books'
+2025-10-23 09:49:50 - INFO - 📊 Выполнение запроса сортировки для 'Issued_Books'
+2025-10-23 09:49:50,968 - DB - INFO - ✅ Получено 7 строк из 'Issued_Books'
+2025-10-23 09:49:50 - INFO - ✅ Получено 7 строк из 'Issued_Books'
+2025-10-23 09:49:55,398 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:55 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:55,404 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:55 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:49:55,406 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:49:55 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:50:01,191 - DB - INFO - Сгенерировано 4 предопределенных соединений
+2025-10-23 09:50:01 - INFO - Сгенерировано 4 предопределенных соединений
+2025-10-23 09:50:01,198 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:01 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:01,202 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:50:01 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:50:02,928 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:02 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:02,935 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:02 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:02,937 - DB - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 09:50:02 - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 09:50:02,938 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:02 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:02,942 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:02 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:02,943 - DB - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" INNER JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-23 09:50:02 - INFO - Выполнение JOIN: SELECT "Books"."id_book", "Books"."authors", "Books"."genre", "Books"."deposit_amount", "Books"."daily_rental_rate", "Issued_Books"."book_id", "Issued_Books"."reader_id", "Issued_Books"."issue_date", "Issued_Books"."expected_return_date", "Issued_Books"."actual_return_date", "Issued_Books"."damage_type", "Issued_Books"."damage_fine", "Issued_Books"."final_rental_cost", "Issued_Books"."paid", "Issued_Books"."actual_rental_days" FROM "Books" INNER JOIN "Issued_Books" ON "Books"."id_book" = "Issued_Books"."book_id" ORDER BY "Books"."id_book" ASC
+2025-10-23 09:50:02,943 - DB - INFO - Получено 7 строк из JOIN
+2025-10-23 09:50:02 - INFO - Получено 7 строк из JOIN
+2025-10-23 09:50:07,383 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:50:07 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:50:07,389 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:07 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:25,495 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:25 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:25,499 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:25 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:25,502 - DB - INFO - 🔧 SET NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:50:25 - INFO - 🔧 SET NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:50:25,503 - DB - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:50:25 - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:50:25,511 - DB - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:50:25 - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:50:25,539 - DB - INFO - 🔄 Метаданные обновлены: 3 таблиц загружено.
+2025-10-23 09:50:25 - INFO - 🔄 Метаданные обновлены: 3 таблиц загружено.
+2025-10-23 09:50:25,539 - DB - INFO - ✅ Ограничения столбца 'id_book' успешно изменены в 'Books'.
+2025-10-23 09:50:25 - INFO - ✅ Ограничения столбца 'id_book' успешно изменены в 'Books'.
+2025-10-23 09:50:43,742 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:43 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:43,747 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:43 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:43,748 - DB - INFO - 🔧 SET NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:50:43 - INFO - 🔧 SET NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:50:43,748 - DB - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:50:43 - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:50:43,749 - DB - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:50:43 - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:50:43,752 - DB - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:50:43 - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:50:54,427 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:54 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:50:54,432 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:54 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:50:54,433 - DB - INFO - 🔧 SET NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:50:54 - INFO - 🔧 SET NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:50:54,433 - DB - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:50:54 - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:50:54,434 - DB - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:50:54 - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:50:54,435 - DB - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:50:54 - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:51:12,240 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:51:12 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:51:12,246 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:51:12 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:51:12,247 - DB - INFO - 🔧 DROP NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:51:12 - INFO - 🔧 DROP NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:51:12,248 - DB - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.InvalidTableDefinition) ОШИБКА:  столбец "id_book" входит в первичный ключ
+
+[SQL: ALTER TABLE "Books" ALTER COLUMN "id_book" DROP NOT NULL;]
+(Background on this error at: https://sqla...
+2025-10-23 09:51:12 - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.InvalidTableDefinition) ОШИБКА:  столбец "id_book" входит в первичный ключ
+
+[SQL: ALTER TABLE "Books" ALTER COLUMN "id_book" DROP NOT NULL;]
+(Background on this error at: https://sqla...
+2025-10-23 09:51:36,122 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:51:36 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:51:36,127 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:51:36 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:51:36,128 - DB - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:51:36 - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:51:36,128 - DB - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:51:36 - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:51:36,129 - DB - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:51:36 - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:51:42,167 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 09:51:42 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 09:51:43,449 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:43 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:43,450 - DB - INFO - Попытка подключения к БД...
+2025-10-23 09:51:43 - INFO - Попытка подключения к БД...
+2025-10-23 09:51:43,493 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:43 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:44,817 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:44 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:44,817 - DB - INFO - Попытка подключения к БД...
+2025-10-23 09:51:44 - INFO - Попытка подключения к БД...
+2025-10-23 09:51:44,866 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:44 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:47,283 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:47 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:47,284 - DB - INFO - Попытка подключения к БД...
+2025-10-23 09:51:47 - INFO - Попытка подключения к БД...
+2025-10-23 09:51:47,600 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:47 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:47,611 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:47 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:47,611 - DB - INFO - Попытка подключения к БД...
+2025-10-23 09:51:47 - INFO - Попытка подключения к БД...
+2025-10-23 09:51:47,666 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:47 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:53,037 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:53 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:51:53,037 - DB - INFO - Попытка подключения к БД...
+2025-10-23 09:51:53 - INFO - Попытка подключения к БД...
+2025-10-23 09:51:53,082 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:51:53 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 09:52:00,457 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:52:00 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 09:52:00,458 - DB - INFO - Попытка подключения к БД...
+2025-10-23 09:52:00 - INFO - Попытка подключения к БД...
+2025-10-23 09:52:00,507 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 09:52:00 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 09:52:03,434 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:52:03 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:52:03,450 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:52:03 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:52:08,619 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:52:08 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:52:08,623 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:52:08 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:52:08,623 - DB - INFO - 🔧 SET NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:52:08 - INFO - 🔧 SET NOT NULL для столбца 'Books.id_book'
+2025-10-23 09:52:08,624 - DB - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:52:08 - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:52:08,625 - DB - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:52:08 - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:52:08,627 - DB - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:52:08 - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:52:15,557 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:52:15 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:52:15,563 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:52:15 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:52:15,563 - DB - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:52:15 - INFO - 🔧 Изменение DEFAULT для столбца 'Books.id_book'
+2025-10-23 09:52:15,564 - DB - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:52:15 - INFO - 🔧 Добавление CHECK ограничения для столбца 'Books.id_book'
+2025-10-23 09:52:15,565 - DB - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:52:15 - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.id_book': Ошибка подключения: (psycopg2.errors.DuplicateObject) ОШИБКА:  ограничение "chk_Books_id_book" для отношения "Books" уже существует
+
+[SQL: ALTER TABLE "Books" ADD CONSTRAINT "chk_Books_id_book" CHECK ((id_book IS NOT NUL...
+2025-10-23 09:57:34,535 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:57:34 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:57:34,539 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:57:34 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:57:34,546 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:57:34 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:57:41,167 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 09:57:41 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 09:57:48,097 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:57:48 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 09:58:10,295 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:58:10 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:58:10,301 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:58:10 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:58:10,306 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:58:10 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:58:27,068 - DB - INFO - 🔍 Поиск в 'Books.id_book' (LIKE) с запросом '34242342532424'
+2025-10-23 09:58:27 - INFO - 🔍 Поиск в 'Books.id_book' (LIKE) с запросом '34242342532424'
+2025-10-23 09:58:27,069 - DB - INFO - 📝 SQL: SELECT * FROM "Books" WHERE "id_book"::text LIKE '34242342532424'
+2025-10-23 09:58:27 - INFO - 📝 SQL: SELECT * FROM "Books" WHERE "id_book"::text LIKE '34242342532424'
+2025-10-23 09:58:27,070 - DB - INFO - ✅ Найдено 0 строк по '34242342532424' (LIKE)
+2025-10-23 09:58:27 - INFO - ✅ Найдено 0 строк по '34242342532424' (LIKE)
+2025-10-23 09:59:09,148 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:59:09 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:59:22,316 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:59:22 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:59:22,320 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:59:22 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:59:22,329 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:59:22 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:59:39,433 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:59:39 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 09:59:39,438 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:59:39 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:59:51,022 - DB - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:59:51 - INFO - 🔍 Таблица 'Books' существует в БД
+2025-10-23 09:59:51,027 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:59:51 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 09:59:51,028 - DB - INFO - 🔧 SET NOT NULL для столбца 'Books.genre'
+2025-10-23 09:59:51 - INFO - 🔧 SET NOT NULL для столбца 'Books.genre'
+2025-10-23 09:59:51,028 - DB - INFO - 🔧 Изменение DEFAULT для столбца 'Books.genre'
+2025-10-23 09:59:51 - INFO - 🔧 Изменение DEFAULT для столбца 'Books.genre'
+2025-10-23 09:59:51,031 - DB - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.genre': Ошибка подключения: (psycopg2.errors.InvalidTextRepresentation) ОШИБКА:  неверное значение для перечисления book_genre: "hhhhhhhhhhhhhhhtg"
+
+[SQL: ALTER TABLE "Books" ALTER COLUMN "genre" SET DEFAULT 'hhhhhhhhhhhhhhhtg';...
+2025-10-23 09:59:51 - ERROR - ❌ Ошибка изменения ограничений столбца 'Books.genre': Ошибка подключения: (psycopg2.errors.InvalidTextRepresentation) ОШИБКА:  неверное значение для перечисления book_genre: "hhhhhhhhhhhhhhhtg"
+
+[SQL: ALTER TABLE "Books" ALTER COLUMN "genre" SET DEFAULT 'hhhhhhhhhhhhhhhtg';...
+2025-10-23 10:00:08,468 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:00:08 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:00:08,473 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:00:08 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:00:08,480 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:00:08 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:00:32,809 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:00:32 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:00:32,814 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:00:32 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:01:09,620 - DB - INFO - Выполнение SUBSTRING для Books.authors (start=1, length=10)
+2025-10-23 10:01:09 - INFO - Выполнение SUBSTRING для Books.authors (start=1, length=10)
+2025-10-23 10:01:09,621 - DB - INFO - 🔧 Выполнение SQL: SELECT "authors", SUBSTRING("authors" FROM 1 FOR 10) AS substring_result FROM "Books"...
+2025-10-23 10:01:09 - INFO - 🔧 Выполнение SQL: SELECT "authors", SUBSTRING("authors" FROM 1 FOR 10) AS substring_result FROM "Books"...
+2025-10-23 10:01:09,626 - DB - ERROR - ❌ Ошибка выполнения SQL: Ошибка подключения: (psycopg2.errors.UndefinedFunction) ОШИБКА:  функция pg_catalog.substring(character varying[], integer, integer) не существует
+LINE 1: SELECT "authors", SUBSTRING("authors" FROM 1 FOR 10) AS subs...
+ ...
+2025-10-23 10:01:09 - ERROR - ❌ Ошибка выполнения SQL: Ошибка подключения: (psycopg2.errors.UndefinedFunction) ОШИБКА:  функция pg_catalog.substring(character varying[], integer, integer) не существует
+LINE 1: SELECT "authors", SUBSTRING("authors" FROM 1 FOR 10) AS subs...
+ ...
+2025-10-23 10:01:09,626 - DB - INFO - Результатов: 0
+2025-10-23 10:01:09 - INFO - Результатов: 0
+2025-10-23 10:01:37,347 - DB - INFO - Выполнение SUBSTRING для Books.genre (start=1, length=10)
+2025-10-23 10:01:37 - INFO - Выполнение SUBSTRING для Books.genre (start=1, length=10)
+2025-10-23 10:01:37,347 - DB - INFO - 🔧 Выполнение SQL: SELECT "genre", SUBSTRING("genre" FROM 1 FOR 10) AS substring_result FROM "Books"...
+2025-10-23 10:01:37 - INFO - 🔧 Выполнение SQL: SELECT "genre", SUBSTRING("genre" FROM 1 FOR 10) AS substring_result FROM "Books"...
+2025-10-23 10:01:37,349 - DB - ERROR - ❌ Ошибка выполнения SQL: Ошибка подключения: (psycopg2.errors.UndefinedFunction) ОШИБКА:  функция pg_catalog.substring(book_genre, integer, integer) не существует
+LINE 1: SELECT "genre", SUBSTRING("genre" FROM 1 FOR 10) AS substrin...
+          ...
+2025-10-23 10:01:37 - ERROR - ❌ Ошибка выполнения SQL: Ошибка подключения: (psycopg2.errors.UndefinedFunction) ОШИБКА:  функция pg_catalog.substring(book_genre, integer, integer) не существует
+LINE 1: SELECT "genre", SUBSTRING("genre" FROM 1 FOR 10) AS substrin...
+          ...
+2025-10-23 10:01:37,349 - DB - INFO - Результатов: 0
+2025-10-23 10:01:37 - INFO - Результатов: 0
+2025-10-23 10:01:39,861 - DB - INFO - Выполнение SUBSTRING для Books.genre (start=1, length=10)
+2025-10-23 10:01:39 - INFO - Выполнение SUBSTRING для Books.genre (start=1, length=10)
+2025-10-23 10:01:39,861 - DB - INFO - 🔧 Выполнение SQL: SELECT "genre", SUBSTRING("genre" FROM 1 FOR 10) AS substring_result FROM "Books"...
+2025-10-23 10:01:39 - INFO - 🔧 Выполнение SQL: SELECT "genre", SUBSTRING("genre" FROM 1 FOR 10) AS substring_result FROM "Books"...
+2025-10-23 10:01:39,863 - DB - ERROR - ❌ Ошибка выполнения SQL: Ошибка подключения: (psycopg2.errors.UndefinedFunction) ОШИБКА:  функция pg_catalog.substring(book_genre, integer, integer) не существует
+LINE 1: SELECT "genre", SUBSTRING("genre" FROM 1 FOR 10) AS substrin...
+          ...
+2025-10-23 10:01:39 - ERROR - ❌ Ошибка выполнения SQL: Ошибка подключения: (psycopg2.errors.UndefinedFunction) ОШИБКА:  функция pg_catalog.substring(book_genre, integer, integer) не существует
+LINE 1: SELECT "genre", SUBSTRING("genre" FROM 1 FOR 10) AS substrin...
+          ...
+2025-10-23 10:01:39,863 - DB - INFO - Результатов: 0
+2025-10-23 10:01:39 - INFO - Результатов: 0
+2025-10-23 10:01:43,591 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:01:43 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:01:54,982 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 10:01:54 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 10:01:58,907 - DB - INFO - Выполнение SUBSTRING для Readers.first_name (start=1, length=10)
+2025-10-23 10:01:58 - INFO - Выполнение SUBSTRING для Readers.first_name (start=1, length=10)
+2025-10-23 10:01:58,907 - DB - INFO - 🔧 Выполнение SQL: SELECT "first_name", SUBSTRING("first_name" FROM 1 FOR 10) AS substring_result FROM "Readers"...
+2025-10-23 10:01:58 - INFO - 🔧 Выполнение SQL: SELECT "first_name", SUBSTRING("first_name" FROM 1 FOR 10) AS substring_result FROM "Readers"...
+2025-10-23 10:01:58,923 - DB - INFO - Результатов: 6
+2025-10-23 10:01:58 - INFO - Результатов: 6
+2025-10-23 10:02:07,538 - DB - INFO - Выполнение строковой функции: LOWER на 'Readers.first_name'
+2025-10-23 10:02:07 - INFO - Выполнение строковой функции: LOWER на 'Readers.first_name'
+2025-10-23 10:02:07,538 - DB - INFO - 🔧 Выполнение SQL: SELECT "first_name", LOWER("first_name") AS lower_result FROM "Readers" WHERE "first_name" IS NOT NU...
+2025-10-23 10:02:07 - INFO - 🔧 Выполнение SQL: SELECT "first_name", LOWER("first_name") AS lower_result FROM "Readers" WHERE "first_name" IS NOT NU...
+2025-10-23 10:02:07,542 - DB - INFO - Результатов: 6
+2025-10-23 10:02:07 - INFO - Результатов: 6
+2025-10-23 10:02:56,525 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:02:56 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:02:56,531 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:02:56 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:02:56,538 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:02:56 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:02:58,560 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 10:02:58 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 10:03:44 - INFO - === Запуск приложения ===
+2025-10-23 10:03:44 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 10:03:52,665 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 10:03:52 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 10:03:52,665 - DB - INFO - Попытка подключения к БД...
+2025-10-23 10:03:52 - INFO - Попытка подключения к БД...
+2025-10-23 10:03:52,759 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 10:03:52 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 10:04:01,849 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 10:04:01 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 10:04:01,850 - DB - INFO - Попытка подключения к БД...
+2025-10-23 10:04:01 - INFO - Попытка подключения к БД...
+2025-10-23 10:04:01,906 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 10:04:01 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 10:08:16 - INFO - === Запуск приложения ===
+2025-10-23 10:08:16 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 10:08:23,416 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 10:08:23 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 10:08:23,416 - DB - INFO - Попытка подключения к БД...
+2025-10-23 10:08:23 - INFO - Попытка подключения к БД...
+2025-10-23 10:08:23,518 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 10:08:23 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 10:08:26,793 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:08:26 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:08:26,812 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:08:26 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:08:26,819 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:08:26 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:08:44,527 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:08:44 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:08:44,532 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:08:44 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:08:44,536 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:08:44 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:09:25,675 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:09:25 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:09:25,687 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 10:09:25 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 10:09:35,629 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:09:35 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:09:35,642 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:09:35 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:09:46,221 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:09:46 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:09:46,226 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:09:46 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:09:46,231 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:09:46 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:09:46,830 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:09:46 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:09:46,840 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 10:09:46 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 10:09:47,128 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:09:47 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 10:09:47,159 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 10:09:47 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 10:10:12,997 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:10:12 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:10:13,003 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:10:13 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:10:13,008 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:10:13 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:10:54,886 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:10:54 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:10:54,891 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:10:54 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:10:54,895 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:10:54 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:16:53 - INFO - === Запуск приложения ===
+2025-10-23 10:16:53 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 10:17:08,324 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 10:17:08 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 10:17:08,324 - DB - INFO - Попытка подключения к БД...
+2025-10-23 10:17:08 - INFO - Попытка подключения к БД...
+2025-10-23 10:17:09,122 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 10:17:09 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 10:17:14,500 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:17:14 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 10:17:14,517 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:17:14 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:17:14,527 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:17:14 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 10:18:59,339 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 10:18:59 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 10:23:48,330 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 10:23:48 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 11:03:28 - INFO - === Запуск приложения ===
+2025-10-23 11:03:28 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 11:03:35,927 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:03:35 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:03:35,927 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:03:35 - INFO - Попытка подключения к БД...
+2025-10-23 11:03:36,080 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:03:36 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:03:36,550 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:03:36 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:03:36,550 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:03:36 - INFO - Попытка подключения к БД...
+2025-10-23 11:03:36,695 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:03:36 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:03:43,279 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:03:43 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:03:43,279 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:03:43 - INFO - Попытка подключения к БД...
+2025-10-23 11:03:43,354 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:03:43 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:03:51,004 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:03:51 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:03:51,035 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:03:51 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:03:51,044 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:03:51 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:04:54,425 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:04:54 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:04:54,432 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:04:54 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:04:54,440 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:04:54 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:05:23,794 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:05:23 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:05:23,801 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:05:23 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:05:23,809 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:05:23 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:05:27,789 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 11:05:27 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 11:06:49 - INFO - === Запуск приложения ===
+2025-10-23 11:06:49 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 11:06:56,175 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:06:56 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:06:56,175 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:06:56 - INFO - Попытка подключения к БД...
+2025-10-23 11:06:56,275 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:06:56 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:07:04,432 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:07:04 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:07:04,433 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:07:04 - INFO - Попытка подключения к БД...
+2025-10-23 11:07:04,481 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:07:04 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:07:14,663 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:07:14 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:07:14,663 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:07:14 - INFO - Попытка подключения к БД...
+2025-10-23 11:07:14,715 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:07:14 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:07:17,002 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:07:17 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:07:17,024 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:07:17 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:07:17,033 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:07:17 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:35:16 - INFO - === Запуск приложения ===
+2025-10-23 11:35:16 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 11:35:23,204 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:35:23 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:35:23,205 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:35:23 - INFO - Попытка подключения к БД...
+2025-10-23 11:35:23,316 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:35:23 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:35:26,360 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:35:26 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:35:26,381 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:35:26 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:35:26,388 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:35:26 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:36:42,271 - DB - INFO - 🔍 Выполняется SQL запрос: SELECT * FROM "Books" WHERE k
+2025-10-23 11:36:42 - INFO - 🔍 Выполняется SQL запрос: SELECT * FROM "Books" WHERE k
+2025-10-23 11:36:42,277 - DB - ERROR - ❌ Ошибка выполнения SQL запроса: Ошибка подключения: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец "k" не существует
+LINE 1: SELECT * FROM "Books" WHERE k
+                                    ^
+
+[SQL: SELECT * FROM "Books" WHERE k]
+(Background on th...
+2025-10-23 11:36:42 - ERROR - ❌ Ошибка выполнения SQL запроса: Ошибка подключения: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец "k" не существует
+LINE 1: SELECT * FROM "Books" WHERE k
+                                    ^
+
+[SQL: SELECT * FROM "Books" WHERE k]
+(Background on th...
+2025-10-23 11:47:47,846 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 11:47:47 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 11:47:58 - INFO - === Запуск приложения ===
+2025-10-23 11:47:58 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 11:48:05,222 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:48:05 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:48:05,222 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:48:05 - INFO - Попытка подключения к БД...
+2025-10-23 11:48:05,411 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:48:05 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:48:10,094 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:48:10 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:48:10,113 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:48:10 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:48:10,121 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:48:10 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:50:19,410 - DB - INFO - 🔍 Выполняется SQL запрос: SELECT * FROM "Books" HAVING "
+2025-10-23 11:50:19 - INFO - 🔍 Выполняется SQL запрос: SELECT * FROM "Books" HAVING "
+2025-10-23 11:50:19,413 - DB - ERROR - ❌ Ошибка выполнения SQL запроса: Ошибка подключения: (psycopg2.errors.SyntaxError) ОШИБКА:  незавершённый идентификатор в кавычках (примерное положение: """)
+LINE 1: SELECT * FROM "Books" HAVING "
+                                     ^
+
+[SQL: SELECT * F...
+2025-10-23 11:50:19 - ERROR - ❌ Ошибка выполнения SQL запроса: Ошибка подключения: (psycopg2.errors.SyntaxError) ОШИБКА:  незавершённый идентификатор в кавычках (примерное положение: """)
+LINE 1: SELECT * FROM "Books" HAVING "
+                                     ^
+
+[SQL: SELECT * F...
+2025-10-23 11:51:06,562 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:51:06 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:51:06,569 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:51:06 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:51:06,576 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:51:06 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:51:07,372 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 11:51:07 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 11:51:07,383 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 11:51:07 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 11:51:07,932 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 11:51:07 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 11:51:07,959 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 11:51:07 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 11:51:24,538 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:51:24 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:51:24,544 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:51:24 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:56:53,829 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 11:56:53 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 11:57:06 - INFO - === Запуск приложения ===
+2025-10-23 11:57:06 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 11:57:08,862 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:57:08 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:57:08,862 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:57:08 - INFO - Попытка подключения к БД...
+2025-10-23 11:57:08,952 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:57:08 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 11:58:34,480 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:58:34 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 11:58:34,481 - DB - INFO - Попытка подключения к БД...
+2025-10-23 11:58:34 - INFO - Попытка подключения к БД...
+2025-10-23 11:58:34,537 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:58:34 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 11:58:45,907 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:58:45 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 11:58:45,930 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 11:58:45 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 12:00:10,115 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:00:10 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:00:18,099 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:00:18 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:00:19,660 - AddColumnDialog - WARNING - Ошибка валидации столбца: Имя столбца не может быть пустым
+2025-10-23 12:00:19 - WARNING - Ошибка валидации столбца: Имя столбца не может быть пустым
+2025-10-23 12:00:20,865 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:00:20 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:00:20,873 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 12:00:20 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 12:02:22,675 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:02:22 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:02:58,379 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:02:58 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:03:19,359 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 12:03:19 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 12:06:44 - INFO - === Запуск приложения ===
+2025-10-23 12:06:44 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 12:06:51,702 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 12:06:51 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 12:06:51,702 - DB - INFO - Попытка подключения к БД...
+2025-10-23 12:06:51 - INFO - Попытка подключения к БД...
+2025-10-23 12:06:51,810 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 12:06:51 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 12:06:57,140 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 12:06:57 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:23:20 - INFO - === Запуск приложения ===
+2025-10-23 15:23:20 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 15:23:27,481 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 15:23:27 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 15:23:27,482 - DB - INFO - Попытка подключения к БД...
+2025-10-23 15:23:27 - INFO - Попытка подключения к БД...
+2025-10-23 15:23:27,703 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 15:23:27 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 15:24:02,006 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:24:02 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:30:21 - INFO - === Запуск приложения ===
+2025-10-23 15:30:21 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 15:30:29,209 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 15:30:29 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 15:30:29,210 - DB - INFO - Попытка подключения к БД...
+2025-10-23 15:30:29 - INFO - Попытка подключения к БД...
+2025-10-23 15:30:29,393 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 15:30:29 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 15:30:33,119 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:30:33 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:32:25,038 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:32:25 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:33:09,487 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:33:09 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:33:09,543 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:33:09 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:33:09,558 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:33:09 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:33:39,053 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 15:33:39 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 15:33:48,685 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:33:48 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:33:48,695 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:33:48 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:33:48,707 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:33:48 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:46:17 - INFO - === Запуск приложения ===
+2025-10-23 15:46:17 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 15:46:23,922 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 15:46:23 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 15:46:23,923 - DB - INFO - Попытка подключения к БД...
+2025-10-23 15:46:23 - INFO - Попытка подключения к БД...
+2025-10-23 15:46:24,197 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 15:46:24 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 15:46:31,824 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 15:46:31 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 15:46:31,825 - DB - INFO - Попытка подключения к БД...
+2025-10-23 15:46:31 - INFO - Попытка подключения к БД...
+2025-10-23 15:46:31,917 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 15:46:31 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 15:46:38,729 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:46:38 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:46:38,770 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:46:38 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:46:38,784 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:46:38 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:46:50,732 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:46:50 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 15:46:50,742 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:46:50 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:46:50,752 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 15:46:50 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 16:14:34,624 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:14:34 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:14:34,635 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 16:14:34 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 16:14:34,648 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 16:14:34 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 16:14:37,326 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 16:14:37 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 16:21:05 - INFO - === Запуск приложения ===
+2025-10-23 16:21:05 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 16:21:12,313 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:21:12 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:21:12,314 - DB - INFO - Попытка подключения к БД...
+2025-10-23 16:21:12 - INFO - Попытка подключения к БД...
+2025-10-23 16:21:12,488 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 16:21:12 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 16:21:19,861 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:21:19 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:21:19,862 - DB - INFO - Попытка подключения к БД...
+2025-10-23 16:21:19 - INFO - Попытка подключения к БД...
+2025-10-23 16:21:19,968 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 16:21:19 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 16:36:46,555 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:36:46 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:42:45 - INFO - === Запуск приложения ===
+2025-10-23 16:42:45 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 16:42:52,539 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:42:52 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:42:52,539 - DB - INFO - Попытка подключения к БД...
+2025-10-23 16:42:52 - INFO - Попытка подключения к БД...
+2025-10-23 16:42:52,718 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 16:42:52 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 16:42:57,195 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:42:57 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:43:16,568 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 16:43:16 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 16:50:13 - INFO - === Запуск приложения ===
+2025-10-23 16:50:13 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 16:50:20,708 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:50:20 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:50:20,709 - DB - INFO - Попытка подключения к БД...
+2025-10-23 16:50:20 - INFO - Попытка подключения к БД...
+2025-10-23 16:50:20,900 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 16:50:20 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 16:50:50,309 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:50:50 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:52:08,659 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 16:52:08 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 16:55:37 - INFO - === Запуск приложения ===
+2025-10-23 16:55:37 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 16:55:44,934 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:55:44 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 16:55:44,934 - DB - INFO - Попытка подключения к БД...
+2025-10-23 16:55:44 - INFO - Попытка подключения к БД...
+2025-10-23 16:55:45,109 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 16:55:45 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 16:55:51,062 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:55:51 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:56:56,716 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:56:56 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:58:01,640 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:58:01 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:58:58,336 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:58:58 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 16:59:47,693 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 16:59:47 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:03:59 - INFO - === Запуск приложения ===
+2025-10-23 17:03:59 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:04:08,825 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:04:08 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:04:08,825 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:04:08 - INFO - Попытка подключения к БД...
+2025-10-23 17:04:09,328 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:04:09 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:04:26,229 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:04:26 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:04:53,811 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:04:53 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:07:24 - INFO - === Запуск приложения ===
+2025-10-23 17:07:24 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:07:32,621 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:07:32 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:07:32,621 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:07:32 - INFO - Попытка подключения к БД...
+2025-10-23 17:07:32,706 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:07:32 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:07:37,421 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:07:37 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:20,876 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:20 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:20,907 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:08:20 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:08:20,932 - DB - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 1 найдено (FK=0, CHECK=1, IDX=0)
+2025-10-23 17:08:20 - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 1 найдено (FK=0, CHECK=1, IDX=0)
+2025-10-23 17:08:31,172 - DB - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 1 найдено (FK=0, CHECK=1, IDX=0)
+2025-10-23 17:08:31 - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 1 найдено (FK=0, CHECK=1, IDX=0)
+2025-10-23 17:08:38,764 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:38 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:38,767 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:38 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:38,775 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:08:38 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:08:54,459 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:54 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:08:54,464 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:08:54 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:09:18,153 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:09:18 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:13:01 - INFO - === Запуск приложения ===
+2025-10-23 17:13:01 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:13:02,853 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:13:02 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:13:02,854 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:13:02 - INFO - Попытка подключения к БД...
+2025-10-23 17:13:02,937 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 17:13:02 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 17:13:11,509 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:13:11 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:13:11,509 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:13:11 - INFO - Попытка подключения к БД...
+2025-10-23 17:13:11,554 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:13:11 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:13:17,042 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:13:17 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:13:17,058 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:13:17 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:13:55,661 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:13:55 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:16:49 - INFO - === Запуск приложения ===
+2025-10-23 17:16:49 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:16:53,403 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:16:53 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:16:53,403 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:16:53 - INFO - Попытка подключения к БД...
+2025-10-23 17:16:53,483 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 17:16:53 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 17:17:06,118 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:17:06 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:17:06,119 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:17:06 - INFO - Попытка подключения к БД...
+2025-10-23 17:17:06,160 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:17:06 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:17:21,617 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:17:21 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:17:21,634 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:17:21 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:23:44 - INFO - === Запуск приложения ===
+2025-10-23 17:23:44 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:24:30,872 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:24:30 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:24:30,872 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:24:30 - INFO - Попытка подключения к БД...
+2025-10-23 17:24:30,962 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:24:30 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:24:34,932 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:24:34 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:24:34,951 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:24:34 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:24:56,335 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:24:56 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:26:43 - INFO - === Запуск приложения ===
+2025-10-23 17:26:43 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:26:50,583 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:26:50 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:26:50,583 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:26:50 - INFO - Попытка подключения к БД...
+2025-10-23 17:26:50,669 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:26:50 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:26:53,076 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:26:53 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:26:53,092 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:26:53 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:27:02,626 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:27:02 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:27:02,633 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:27:02 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:27:05,499 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:27:05 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:27:12,117 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:27:12 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:29:19 - INFO - === Запуск приложения ===
+2025-10-23 17:29:19 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:29:26,914 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:29:26 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:29:26,914 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:29:26 - INFO - Попытка подключения к БД...
+2025-10-23 17:29:27,103 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:29:27 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:29:30,991 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:29:30 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:29:31,009 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:29:31 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:29:50,278 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:29:50 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:32:07 - INFO - === Запуск приложения ===
+2025-10-23 17:32:07 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:32:18,313 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:32:18 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:32:18,313 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:32:18 - INFO - Попытка подключения к БД...
+2025-10-23 17:32:18,503 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:32:18 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:32:21,375 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:32:21 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:32:21,391 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:32:21 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:32:53,993 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:32:53 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:34:07 - INFO - === Запуск приложения ===
+2025-10-23 17:34:07 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:34:09,285 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:34:09 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:34:09,285 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:34:09 - INFO - Попытка подключения к БД...
+2025-10-23 17:34:09,368 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 17:34:09 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 17:34:14,555 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:34:14 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:34:14,555 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:34:14 - INFO - Попытка подключения к БД...
+2025-10-23 17:34:14,599 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:34:14 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:34:17,042 - DB - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:34:17 - INFO - 📋 Таблицы в БД (3): ['Books', 'Issued_Books', 'Readers']
+2025-10-23 17:34:17,060 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:34:17 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:34:21,549 - DB - INFO - 🔧 Изменение типа: 'Books.genre' → 'VARCHAR(255)'
+2025-10-23 17:34:21 - INFO - 🔧 Изменение типа: 'Books.genre' → 'VARCHAR(255)'
+2025-10-23 17:34:21,629 - DB - INFO - 🔄 Метаданные обновлены: 3 таблиц загружено.
+2025-10-23 17:34:21 - INFO - 🔄 Метаданные обновлены: 3 таблиц загружено.
+2025-10-23 17:34:21,629 - DB - INFO - ✅ Тип столбца 'genre' успешно изменён на 'VARCHAR(255)' в 'Books'.
+2025-10-23 17:34:21 - INFO - ✅ Тип столбца 'genre' успешно изменён на 'VARCHAR(255)' в 'Books'.
+2025-10-23 17:34:25,750 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:34:25 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:34:25,754 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:34:25 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:34:25,762 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:34:25 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:34:37,126 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:34:37 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:34:37,132 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:34:37 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:34:49,347 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:34:49 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:37:06 - INFO - === Запуск приложения ===
+2025-10-23 17:37:06 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:37:13,422 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:37:13 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:37:13,422 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:37:13 - INFO - Попытка подключения к БД...
+2025-10-23 17:37:13,508 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:37:13 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:37:15,641 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:37:15 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:37:15,658 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:37:15 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:37:25,786 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:37:25 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 17:37:41,704 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:37:41 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:38:32 - INFO - === Запуск приложения ===
+2025-10-23 17:38:32 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:38:39,153 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:38:39 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:38:39,154 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:38:39 - INFO - Попытка подключения к БД...
+2025-10-23 17:38:39,237 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 17:38:39 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 17:38:46,215 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:38:46 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:38:46,215 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:38:46 - INFO - Попытка подключения к БД...
+2025-10-23 17:38:46,259 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:38:46 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:38:48,113 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:38:48 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:38:48,131 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:38:48 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:38:49,986 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:38:49 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:38:49,991 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:38:49 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:39:27,404 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:39:27 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:40:08 - INFO - === Запуск приложения ===
+2025-10-23 17:40:08 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:40:14,278 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:40:14 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:40:14,278 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:40:14 - INFO - Попытка подключения к БД...
+2025-10-23 17:40:14,366 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:40:14 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:40:16,944 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:40:16 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:40:16,962 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:40:16 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:40:18,357 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:40:18 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:40:18,362 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:40:18 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:40:22,019 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:40:22 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:42:28 - INFO - === Запуск приложения ===
+2025-10-23 17:42:28 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:42:34,736 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:42:34 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:42:34,737 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:42:34 - INFO - Попытка подключения к БД...
+2025-10-23 17:42:34,926 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:42:34 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:42:36,747 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:42:36 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:42:36,764 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:42:36 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:42:38,060 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:42:38 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:42:38,065 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:42:38 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:42:49,159 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:42:49 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:44:44 - INFO - === Запуск приложения ===
+2025-10-23 17:44:44 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:44:50,874 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:44:50 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:44:50,874 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:44:50 - INFO - Попытка подключения к БД...
+2025-10-23 17:44:50,963 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:44:50 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:44:52,645 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:44:52 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:44:52,661 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:44:52 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:44:54,004 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:44:54 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:44:54,009 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:44:54 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:45:11,774 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:45:11 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:46:10 - INFO - === Запуск приложения ===
+2025-10-23 17:46:10 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:46:18,063 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:46:18 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:46:18,063 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:46:18 - INFO - Попытка подключения к БД...
+2025-10-23 17:46:18,149 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:46:18 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:46:19,940 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:46:19 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:46:19,958 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:46:19 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:46:21,193 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:46:21 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:46:21,198 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:46:21 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:46:32,113 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:46:32 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:50:31 - INFO - === Запуск приложения ===
+2025-10-23 17:50:31 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 17:50:43,853 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:50:43 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 17:50:43,853 - DB - INFO - Попытка подключения к БД...
+2025-10-23 17:50:43 - INFO - Попытка подключения к БД...
+2025-10-23 17:50:43,940 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:50:43 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 17:50:46,640 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:50:46 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:50:46,657 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:50:46 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:50:47,825 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:50:47 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:50:47,830 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:50:47 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 17:50:57,639 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:50:57 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 17:51:52,367 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 17:51:52 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:01:28 - INFO - === Запуск приложения ===
+2025-10-23 21:01:28 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:01:36,790 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:01:36 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:01:36,790 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:01:36 - INFO - Попытка подключения к БД...
+2025-10-23 21:01:36,960 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:01:36 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:01:39,160 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:01:39 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:02:26,227 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:02:26 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:03:04,993 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:03:04 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:06:28 - INFO - === Запуск приложения ===
+2025-10-23 21:06:28 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:06:43,032 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:06:43 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:06:43,032 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:06:43 - INFO - Попытка подключения к БД...
+2025-10-23 21:06:43,118 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:06:43 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:06:51,453 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:06:51 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:06:51,487 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:06:51 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:06:51,494 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:06:51 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:06:57,838 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:06:57 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:07:33,982 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:07:33 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:07:49,269 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:07:49 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:08:20 - INFO - === Запуск приложения ===
+2025-10-23 21:08:20 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:08:27,330 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:08:27 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:08:27,330 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:08:27 - INFO - Попытка подключения к БД...
+2025-10-23 21:08:27,416 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:08:27 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:08:31,337 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:08:31 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:09:07,787 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:09:07 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:09:17,610 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:09:17 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:09:29,024 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:09:29 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:09:44 - INFO - === Запуск приложения ===
+2025-10-23 21:09:44 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:09:51,877 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:09:51 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:09:51,878 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:09:51 - INFO - Попытка подключения к БД...
+2025-10-23 21:09:51,964 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:09:51 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:09:53,576 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:09:53 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:10:11,168 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:10:11 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:12:22 - INFO - === Запуск приложения ===
+2025-10-23 21:12:22 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:12:36 - INFO - === Запуск приложения ===
+2025-10-23 21:12:36 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:12:42,573 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:12:42 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:12:42,573 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:12:42 - INFO - Попытка подключения к БД...
+2025-10-23 21:12:42,658 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:12:42 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:12:45,855 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:12:45 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:13:39,205 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:13:39 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:13:39,223 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:13:39 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:13:39,246 - DB - INFO - 🔎 Зависимости столбца 'book_id' в 'Issued_Books': 2 найдено (FK=1, CHECK=0, IDX=1)
+2025-10-23 21:13:39 - INFO - 🔎 Зависимости столбца 'book_id' в 'Issued_Books': 2 найдено (FK=1, CHECK=0, IDX=1)
+2025-10-23 21:13:42,381 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 21:13:42 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 21:13:42,387 - DB - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 1 найдено (FK=0, CHECK=1, IDX=0)
+2025-10-23 21:13:42 - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 1 найдено (FK=0, CHECK=1, IDX=0)
+2025-10-23 21:13:42,394 - DB - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 1 найдено (FK=0, CHECK=1, IDX=0)
+2025-10-23 21:13:42 - INFO - 🔎 Зависимости столбца 'id_book' в 'Books': 1 найдено (FK=0, CHECK=1, IDX=0)
+2025-10-23 21:13:43,304 - DB - INFO - 🔎 Зависимости столбца 'genre' в 'Books': 0 найдено (FK=0, CHECK=0, IDX=0)
+2025-10-23 21:13:43 - INFO - 🔎 Зависимости столбца 'genre' в 'Books': 0 найдено (FK=0, CHECK=0, IDX=0)
+2025-10-23 21:13:47,593 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:13:47 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:13:47,596 - DB - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:13:47 - INFO - 📋 Таблицы в БД (3): ['Issued_Books', 'Readers', 'Books']
+2025-10-23 21:13:47,603 - DB - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:13:47 - INFO - 📄 Колонки таблицы 'Issued_Books' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:14:10,882 - DB - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 21:14:10 - INFO - 🔍 Таблица 'Issued_Books' существует в БД
+2025-10-23 21:14:10,883 - DB - INFO - 🔍 Таблица 'o' не найдена в БД
+2025-10-23 21:14:10 - INFO - 🔍 Таблица 'o' не найдена в БД
+2025-10-23 21:14:10,884 - DB - INFO - 🔧 Переименование таблицы: 'Issued_Books' → 'o'
+2025-10-23 21:14:10 - INFO - 🔧 Переименование таблицы: 'Issued_Books' → 'o'
+2025-10-23 21:14:10,921 - DB - INFO - 🔄 Метаданные обновлены: 3 таблиц загружено.
+2025-10-23 21:14:10 - INFO - 🔄 Метаданные обновлены: 3 таблиц загружено.
+2025-10-23 21:14:10,922 - DB - INFO - ✅ Таблица успешно переименована: 'Issued_Books' → 'o'
+2025-10-23 21:14:10 - INFO - ✅ Таблица успешно переименована: 'Issued_Books' → 'o'
+2025-10-23 21:14:13,635 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:14:13 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:14:13,641 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:14:13 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:14:17,153 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 21:14:17 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 21:14:18,814 - DB - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 21:14:18 - INFO - 📄 Колонки таблицы 'Books' (5): ['id_book', 'authors', 'genre', 'deposit_amount', 'daily_rental_rate']
+2025-10-23 21:14:20,701 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:14:20 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:14:23,749 - DB - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 21:14:23 - INFO - 📄 Колонки таблицы 'Readers' (8): ['reader_id', 'last_name', 'first_name', 'middle_name', 'address', 'phone', 'discount_category', 'discount_percent']
+2025-10-23 21:14:33,368 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:14:33 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:14:33,374 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:14:33 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:14:46,395 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:14:46 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:15:06 - INFO - === Запуск приложения ===
+2025-10-23 21:15:06 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:15:12,681 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:15:12 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:15:12,681 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:15:12 - INFO - Попытка подключения к БД...
+2025-10-23 21:15:12,765 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:15:12 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:15:16,140 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:15:16 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:15:58,471 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:15:58 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:16:11 - INFO - === Запуск приложения ===
+2025-10-23 21:16:11 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:16:17,958 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:16:17 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:16:17,959 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:16:17 - INFO - Попытка подключения к БД...
+2025-10-23 21:16:18,153 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:16:18 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:16:23,510 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:16:23 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:16:27,390 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:16:27 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:16:49 - INFO - === Запуск приложения ===
+2025-10-23 21:16:49 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:16:55,928 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:16:55 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:16:55,928 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:16:55 - INFO - Попытка подключения к БД...
+2025-10-23 21:16:56,076 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:16:56 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:16:59,696 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:16:59 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:17:05,300 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:17:05 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:18:22 - INFO - === Запуск приложения ===
+2025-10-23 21:18:22 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:18:29,459 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:18:29 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:18:29,459 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:18:29 - INFO - Попытка подключения к БД...
+2025-10-23 21:18:29,544 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:18:29 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:18:31,524 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:18:31 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:18:58,392 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:18:58 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:20:45 - INFO - === Запуск приложения ===
+2025-10-23 21:20:45 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:20:51,825 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:20:51 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:20:51,826 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:20:51 - INFO - Попытка подключения к БД...
+2025-10-23 21:20:51,910 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:20:51 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:20:54,401 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:20:54 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:20:58,464 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:20:58 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:23:28 - INFO - === Запуск приложения ===
+2025-10-23 21:23:28 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:23:47 - INFO - === Запуск приложения ===
+2025-10-23 21:23:47 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:23:54,841 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:23:54 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:23:54,841 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:23:54 - INFO - Попытка подключения к БД...
+2025-10-23 21:23:54,923 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:23:54 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:23:57,764 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:23:57 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:24:09,315 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:24:09 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:24:09,351 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:24:09 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:24:22,747 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:24:22 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:24:33,801 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:24:33 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:25:06,824 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:25:06 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:25:06,830 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:25:06 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:25:06,837 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:25:06 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:25:43,206 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:25:43 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:25:51 - INFO - === Запуск приложения ===
+2025-10-23 21:25:51 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:25:57,868 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:25:57 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:25:57,868 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:25:57 - INFO - Попытка подключения к БД...
+2025-10-23 21:25:57,953 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 21:25:57 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 21:26:04,241 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:26:04 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:26:04,241 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:26:04 - INFO - Попытка подключения к БД...
+2025-10-23 21:26:04,286 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:26:04 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:26:11,180 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:26:11 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:26:11,196 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:26:11 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:26:11,202 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:26:11 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:26:15,293 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:26:15 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:28:12 - INFO - === Запуск приложения ===
+2025-10-23 21:28:12 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:28:19,703 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:28:19 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:28:19,703 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:28:19 - INFO - Попытка подключения к БД...
+2025-10-23 21:28:19,900 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:28:19 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:28:22,372 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:28:22 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:28:22,388 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:28:22 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:28:22,394 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:28:22 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:28:51,868 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:28:51 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:30:47 - INFO - === Запуск приложения ===
+2025-10-23 21:30:47 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:30:54,955 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:30:54 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:30:54,956 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:30:54 - INFO - Попытка подключения к БД...
+2025-10-23 21:30:55,041 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:30:55 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:31:02,777 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:31:02 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:31:02,793 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:31:02 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:31:02,799 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:31:02 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:31:37,681 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:31:37 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:33:53 - INFO - === Запуск приложения ===
+2025-10-23 21:33:53 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:34:01,262 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:34:01 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:34:01,263 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:34:01 - INFO - Попытка подключения к БД...
+2025-10-23 21:34:01,342 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 21:34:01 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 21:34:07,765 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:34:07 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:34:07,766 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:34:07 - INFO - Попытка подключения к БД...
+2025-10-23 21:34:07,804 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 21:34:07 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 21:34:14,837 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:34:14 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:34:14,838 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:34:14 - INFO - Попытка подключения к БД...
+2025-10-23 21:34:14,880 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:34:14 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:34:22,032 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:34:22 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:34:26,149 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:34:26 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:34:26,167 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:34:26 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:34:26,174 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:34:26 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:35:19,230 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:35:19 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:36:05,694 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:36:05 - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:38:34 - INFO - === Запуск приложения ===
+2025-10-23 21:38:34 - INFO - Логирование настроено в db/db_app.log
+2025-10-23 21:38:40,934 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:38:40 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:38:40,934 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:38:40 - INFO - Попытка подключения к БД...
+2025-10-23 21:38:41,014 - DB - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 21:38:41 - ERROR - ❌ Ошибка подключения: Ошибка подключения: 'utf-8' codec can't decode byte 0xc2 in position 61: invalid continuation byte...
+2025-10-23 21:38:49,167 - DB - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:38:49 - INFO - Инициализация DB для library_db на localhost:5432
+2025-10-23 21:38:49,167 - DB - INFO - Попытка подключения к БД...
+2025-10-23 21:38:49 - INFO - Попытка подключения к БД...
+2025-10-23 21:38:49,209 - DB - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:38:49 - INFO - ✅ Подключено: library_db@localhost:5432
+2025-10-23 21:38:53,863 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:38:53 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:27,455 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:27 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:27,474 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:39:27 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:39:27,478 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:27 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:37,456 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:39:37 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:39:42,111 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:42 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:42,118 - DB - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:39:42 - INFO - 📄 Колонки таблицы 'o' (10): ['book_id', 'reader_id', 'issue_date', 'expected_return_date', 'actual_return_date', 'damage_type', 'damage_fine', 'final_rental_cost', 'paid', 'actual_rental_days']
+2025-10-23 21:39:42,121 - DB - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:42 - INFO - 📋 Таблицы в БД (3): ['o', 'Readers', 'Books']
+2025-10-23 21:39:45,801 - DB - INFO - ✅ Соединение с БД успешно закрыто.
+2025-10-23 21:39:45 - INFO - ✅ Соединение с БД успешно закрыто.
