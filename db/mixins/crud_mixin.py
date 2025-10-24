@@ -22,11 +22,11 @@ class CrudMixin:
             return []
 
         if table_name not in self.tables:
-            self.logger.error(f"❌ Таблица '{table_name}' не определена в метаданных.")
+            self.logger.error(f" Таблица '{table_name}' не определена в метаданных.")
             return []
 
         try:
-            self.logger.info(f"📊 SELECT * FROM \"{table_name}\"")
+            self.logger.info(f" SELECT * FROM \"{table_name}\"")
             table = self.tables[table_name]
             with self.engine.connect() as conn:
                 result = conn.execute(table.select())
@@ -38,11 +38,11 @@ class CrudMixin:
                     if isinstance(value, list):
                         row[key] = ', '.join(value)
 
-            self.logger.info(f"✅ Получено {len(rows)} строк из '{table_name}'.")
+            self.logger.info(f" Получено {len(rows)} строк из '{table_name}'.")
             return rows
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка чтения таблицы '{table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка чтения таблицы '{table_name}': {self.format_db_error(e)}")
             return []
 
     def _validate_data(self, table_name: str, data: Dict[str, Any]) -> List[str]:
@@ -52,7 +52,7 @@ class CrudMixin:
         Возвращает список ошибок (пустой = всё корректно).
         """
         if table_name not in self.tables:
-            return [f"❌ Таблица '{table_name}' не найдена в метаданных."]
+            return [f" Таблица '{table_name}' не найдена в метаданных."]
 
         table = self.tables[table_name]
         errors = []
@@ -137,7 +137,7 @@ class CrudMixin:
             with self.engine.connect() as conn:
                 return conn.execute(table.select().where(column == value).limit(1)).first() is not None
         except Exception as e:
-            self.logger.error(f"❌ Ошибка проверки внешнего ключа {table_name}.{column_name}: {e}")
+            self.logger.error(f" Ошибка проверки внешнего ключа {table_name}.{column_name}: {e}")
             return False
 
     def insert_data(self, table_name: str, data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
@@ -150,7 +150,7 @@ class CrudMixin:
         errors = self._validate_data(table_name, data)
         if errors:
             for e in errors:
-                self.logger.warning(f"⚠️ Ошибка валидации: {e}")
+                self.logger.warning(f" Ошибка валидации: {e}")
             return False, "; ".join(errors)
 
         try:
@@ -158,7 +158,7 @@ class CrudMixin:
             pk_col = self._get_primary_key_column(table_name)
             free_id = self._find_min_free_id(table_name)
             if free_id is None:
-                msg = "❌ Не удалось найти свободный ID."
+                msg = " Не удалось найти свободный ID."
                 self.logger.error(msg)
                 return False, msg
 
@@ -178,12 +178,12 @@ class CrudMixin:
             with self.engine.begin() as conn:
                 conn.execute(table.insert().values(**insert_data))
 
-            self.logger.info(f"✅ Успешно вставлена запись с ID={free_id}.")
+            self.logger.info(f" Успешно вставлена запись с ID={free_id}.")
             return True, None
 
         except Exception as e:
             error_msg = f"Ошибка вставки в '{table_name}': {self.format_db_error(e)}"
-            self.logger.error(f"❌ {error_msg}")
+            self.logger.error(f" {error_msg}")
             return False, error_msg
 
     def _find_min_free_id(self, table_name: str) -> int:
@@ -203,7 +203,7 @@ class CrudMixin:
                 return result.scalar() or max_id + 1
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка поиска свободного ID: {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка поиска свободного ID: {self.format_db_error(e)}")
             # fallback — берём MAX+1
             try:
                 with self.engine.connect() as conn:
@@ -215,7 +215,7 @@ class CrudMixin:
     def _get_primary_key_column(self, table_name: str) -> str:
         """Возвращает имя первичного ключа таблицы (универсально, без жёстких привязок)."""
         if table_name not in self.tables:
-            self.logger.error(f"❌ Таблица '{table_name}' не найдена в метаданных.")
+            self.logger.error(f" Таблица '{table_name}' не найдена в метаданных.")
             return "id"
 
         table = self.tables[table_name]
@@ -228,7 +228,7 @@ class CrudMixin:
             if name in table.columns:
                 return name
 
-        self.logger.warning(f"⚠️ Первичный ключ не найден для таблицы '{table_name}'. Возвращено 'id'.")
+        self.logger.warning(f" Первичный ключ не найден для таблицы '{table_name}'. Возвращено 'id'.")
         return "id"
 
     def record_exists(self, table_name: str, condition: Dict[str, Any]) -> bool:
@@ -244,23 +244,23 @@ class CrudMixin:
                 if col is not None:
                     valid_conds.append(col == v)
                 else:
-                    self.logger.warning(f"⚠️ Колонка '{k}' отсутствует в таблице '{table_name}'.")
+                    self.logger.warning(f" Колонка '{k}' отсутствует в таблице '{table_name}'.")
 
             if not valid_conds:
-                self.logger.error(f"❌ Нет корректных условий для поиска в '{table_name}'.")
+                self.logger.error(f" Нет корректных условий для поиска в '{table_name}'.")
                 return False
 
             stmt = table.select().where(*valid_conds).limit(1)
-            self.logger.info(f"🔍 Проверка записи в '{table_name}' по условию {condition}")
+            self.logger.info(f" Проверка записи в '{table_name}' по условию {condition}")
 
             with self.engine.connect() as conn:
                 exists = conn.execute(stmt).first() is not None
 
-            self.logger.info(f"✅ Запись {'найдена' if exists else 'не найдена'} в '{table_name}'.")
+            self.logger.info(f" Запись {'найдена' if exists else 'не найдена'} в '{table_name}'.")
             return exists
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка проверки записи в '{table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка проверки записи в '{table_name}': {self.format_db_error(e)}")
             return False
 
     def delete_data(self, table_name: str, condition: Dict[str, Any]) -> bool:
@@ -276,24 +276,24 @@ class CrudMixin:
                 if col is not None:
                     where_clauses.append(col == v)
                 else:
-                    self.logger.warning(f"⚠️ Колонка '{k}' отсутствует в таблице '{table_name}'.")
+                    self.logger.warning(f" Колонка '{k}' отсутствует в таблице '{table_name}'.")
 
             if not where_clauses:
-                self.logger.error(f"❌ Нет корректных условий для удаления в '{table_name}'.")
+                self.logger.error(f" Нет корректных условий для удаления в '{table_name}'.")
                 return False
 
             stmt = table.delete().where(*where_clauses)
-            self.logger.info(f"🗑 Удаление записей из '{table_name}' по условию {condition}")
+            self.logger.info(f" Удаление записей из '{table_name}' по условию {condition}")
 
             with self.engine.begin() as conn:
                 result = conn.execute(stmt)
                 count = result.rowcount or 0
 
-            self.logger.info(f"✅ Удалено {count} записей из '{table_name}'.")
+            self.logger.info(f" Удалено {count} записей из '{table_name}'.")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка удаления из '{table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка удаления из '{table_name}': {self.format_db_error(e)}")
             return False
 
     def update_data(self, table_name: str, condition: Dict[str, Any], new_values: Dict[str, Any]) -> bool:
@@ -309,10 +309,10 @@ class CrudMixin:
                 if hasattr(table.c, col):
                     valid_values[col] = val
                 else:
-                    self.logger.warning(f"⚠️ Колонка '{col}' отсутствует в таблице '{table_name}'.")
+                    self.logger.warning(f" Колонка '{col}' отсутствует в таблице '{table_name}'.")
 
             if not valid_values:
-                self.logger.error(f"❌ Нет корректных колонок для обновления в '{table_name}'.")
+                self.logger.error(f" Нет корректных колонок для обновления в '{table_name}'.")
                 return False
 
             # --- Формируем WHERE ---
@@ -322,10 +322,10 @@ class CrudMixin:
                 if col is not None:
                     where_clauses.append(col == v)
                 else:
-                    self.logger.warning(f"⚠️ Колонка '{k}' отсутствует в условии WHERE таблицы '{table_name}'.")
+                    self.logger.warning(f" Колонка '{k}' отсутствует в условии WHERE таблицы '{table_name}'.")
 
             if not where_clauses:
-                self.logger.error(f"❌ Нет корректных условий WHERE для обновления в '{table_name}'.")
+                self.logger.error(f" Нет корректных условий WHERE для обновления в '{table_name}'.")
                 return False
 
             # --- Выполнение обновления ---
@@ -336,11 +336,11 @@ class CrudMixin:
                 result = conn.execute(stmt)
                 count = result.rowcount or 0
 
-            self.logger.info(f"✅ Обновлено {count} записей в '{table_name}'.")
+            self.logger.info(f" Обновлено {count} записей в '{table_name}'.")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка обновления '{table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка обновления '{table_name}': {self.format_db_error(e)}")
             return False
 
     def get_sorted_data(
@@ -380,7 +380,7 @@ class CrudMixin:
                     if hasattr(table.c, col):
                         stmt = stmt.where(getattr(table.c, col) == val)
                     else:
-                        self.logger.warning(f"⚠️ Колонка '{col}' не найдена в '{table_name}'")
+                        self.logger.warning(f" Колонка '{col}' не найдена в '{table_name}'")
 
             # --- GROUP BY ---
             if group_by:
@@ -397,15 +397,15 @@ class CrudMixin:
                 if order_clauses:
                     stmt = stmt.order_by(*order_clauses)
 
-            self.logger.info(f"📊 Выполнение запроса сортировки для '{table_name}'")
+            self.logger.info(f" Выполнение запроса сортировки для '{table_name}'")
             with self.engine.connect() as conn:
                 result = conn.execute(stmt)
                 rows = [dict(row._mapping) for row in result]
-            self.logger.info(f"✅ Получено {len(rows)} строк из '{table_name}'")
+            self.logger.info(f" Получено {len(rows)} строк из '{table_name}'")
             return rows
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка сортировки в '{table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка сортировки в '{table_name}': {self.format_db_error(e)}")
             return []
 
     def execute_query(self, query: str, params: Dict[str, Any] = None, fetch: str = None) -> Any:
@@ -414,7 +414,7 @@ class CrudMixin:
             return None
 
         try:
-            self.logger.info(f"🔧 Выполнение SQL: {query[:100]}...")
+            self.logger.info(f" Выполнение SQL: {query[:100]}...")
             with self.engine.begin() as conn:
                 result = conn.execute(text(query), params or {})
 
@@ -430,7 +430,7 @@ class CrudMixin:
                     return result.rowcount
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка выполнения SQL: {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка выполнения SQL: {self.format_db_error(e)}")
             return None
 
     def record_exists_ex_table(self, table_name: str) -> bool:
@@ -440,10 +440,10 @@ class CrudMixin:
         try:
             insp = inspect(self.engine)
             exists = table_name in insp.get_table_names()
-            self.logger.info(f"🔍 Таблица '{table_name}' {'существует' if exists else 'не найдена'} в БД")
+            self.logger.info(f" Таблица '{table_name}' {'существует' if exists else 'не найдена'} в БД")
             return exists
         except Exception as e:
-            self.logger.error(f"⚠️ Ошибка проверки таблицы '{table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка проверки таблицы '{table_name}': {self.format_db_error(e)}")
             return False
 
     def count_records_filtered(self, table_name: str, condition: Dict[str, Any] = None) -> int:
@@ -461,15 +461,15 @@ class CrudMixin:
                     if hasattr(table.c, col):
                         stmt = stmt.where(getattr(table.c, col) == val)
                     else:
-                        self.logger.warning(f"⚠️ Колонка '{col}' отсутствует в таблице '{table_name}'")
+                        self.logger.warning(f" Колонка '{col}' отсутствует в таблице '{table_name}'")
 
             # Выполнение
             with self.engine.connect() as conn:
                 count = conn.execute(stmt).scalar_one()
 
-            self.logger.info(f"🧮 Подсчитано {count} записей в '{table_name}' с фильтрацией: {condition or '{}'}")
+            self.logger.info(f" Подсчитано {count} записей в '{table_name}' с фильтрацией: {condition or '{}'}")
             return count
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка подсчёта записей '{table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка подсчёта записей '{table_name}': {self.format_db_error(e)}")
             return 0

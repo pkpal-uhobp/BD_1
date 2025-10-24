@@ -89,7 +89,7 @@ class MetadataMixin:
     def create_schema(self) -> bool:
         """Создаёт схему БД, если таблицы ещё не существуют."""
         if not self.is_connected():
-            self.logger.warning("⚠️ Нет подключения — создание схемы невозможно.")
+            self.logger.warning(" Нет подключения — создание схемы невозможно.")
             return False
 
         try:
@@ -106,24 +106,24 @@ class MetadataMixin:
 
             missing = set(self.tables) - set(inspect(self.engine).get_table_names())
             if missing:
-                self.logger.error(f"❌ Не удалось создать таблицы: {', '.join(missing)}")
+                self.logger.error(f" Не удалось создать таблицы: {', '.join(missing)}")
                 return False
 
-            self.logger.info("✅ Схема успешно создана.")
+            self.logger.info(" Схема успешно создана.")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка создания схемы: {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка создания схемы: {self.format_db_error(e)}")
             return False
 
     def drop_schema(self) -> bool:
         """Удаляет все таблицы схемы БД вместе с пользовательскими типами ENUM и последовательностями."""
         if not self.is_connected():
-            self.logger.warning("⚠️ Нет подключения — удаление схемы невозможно.")
+            self.logger.warning(" Нет подключения — удаление схемы невозможно.")
             return False
 
         try:
-            self.logger.info("🗑 Удаление всех таблиц схемы...")
+            self.logger.info(" Удаление всех таблиц схемы...")
             self.metadata.drop_all(self.engine)
 
             # Дополнительно удалим пользовательские ENUM-типы и наши последовательности
@@ -141,7 +141,7 @@ class MetadataMixin:
                         conn.execute(text(f'DROP TYPE IF EXISTS "{schema_name}"."{type_name}" CASCADE'))
                     except Exception as e:
                         self.logger.warning(
-                            f"⚠️ Не удалось удалить тип {schema_name}.{type_name}: {self.format_db_error(e)}"
+                            f" Не удалось удалить тип {schema_name}.{type_name}: {self.format_db_error(e)}"
                         )
 
                 # --- Последовательности, созданные для PK ---
@@ -156,14 +156,14 @@ class MetadataMixin:
                         conn.execute(text(f'DROP SEQUENCE IF EXISTS "{seq_schema}"."{seq_name}" CASCADE'))
                     except Exception as e:
                         self.logger.warning(
-                            f"⚠️ Не удалось удалить последовательность {seq_schema}.{seq_name}: {self.format_db_error(e)}"
+                            f" Не удалось удалить последовательность {seq_schema}.{seq_name}: {self.format_db_error(e)}"
                         )
 
-            self.logger.info("✅ Схема успешно очищена (все таблицы, типы и последовательности удалены).")
+            self.logger.info(" Схема успешно очищена (все таблицы, типы и последовательности удалены).")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка удаления схемы: {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка удаления схемы: {self.format_db_error(e)}")
             return False
 
     def get_table_names(self) -> List[str]:
@@ -175,7 +175,7 @@ class MetadataMixin:
             self.logger.info(f"📋 Таблицы в БД ({len(tables)}): {tables}")
             return tables
         except Exception as e:
-            self.logger.error(f"❌ Ошибка при получении списка таблиц: {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка при получении списка таблиц: {self.format_db_error(e)}")
             return []
 
     def get_column_names(self, table_name: str) -> List[str]:
@@ -186,15 +186,15 @@ class MetadataMixin:
         try:
             insp = inspect(self.engine)
             if table_name not in insp.get_table_names():
-                self.logger.error(f"❌ Таблица '{table_name}' не существует в БД.")
+                self.logger.error(f" Таблица '{table_name}' не существует в БД.")
                 return []
 
             columns = [col['name'] for col in insp.get_columns(table_name)]
-            self.logger.info(f"📄 Колонки таблицы '{table_name}' ({len(columns)}): {columns}")
+            self.logger.info(f" Колонки таблицы '{table_name}' ({len(columns)}): {columns}")
             return columns
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка получения колонок '{table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка получения колонок '{table_name}': {self.format_db_error(e)}")
             return []
 
     def get_tables(self) -> List[str]:
@@ -226,13 +226,13 @@ class MetadataMixin:
             return None
             
         except Exception as e:
-            self.logger.error(f"❌ Ошибка получения информации о столбце '{table_name}.{column_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка получения информации о столбце '{table_name}.{column_name}': {self.format_db_error(e)}")
             return None
 
     def _refresh_metadata(self):
         """Обновляет внутренние метаданные и структуру таблиц после изменений в БД (ALTER, DROP, CREATE)."""
         if not self.is_connected():
-            self.logger.warning("⚠️ Невозможно обновить метаданные — отсутствует подключение к БД.")
+            self.logger.warning(" Невозможно обновить метаданные — отсутствует подключение к БД.")
             return
 
         try:
@@ -240,6 +240,6 @@ class MetadataMixin:
             md.reflect(bind=self.engine)
             self.metadata = md
             self.tables = dict(md.tables)
-            self.logger.info(f"🔄 Метаданные обновлены: {len(self.tables)} таблиц загружено.")
+            self.logger.info(f" Метаданные обновлены: {len(self.tables)} таблиц загружено.")
         except Exception as e:
-            self.logger.error(f"❌ Ошибка при обновлении метаданных: {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка при обновлении метаданных: {self.format_db_error(e)}")

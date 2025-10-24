@@ -16,7 +16,7 @@ class ConstraintsDialog(QDialog):
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
-        self.setWindowTitle("🔒 ОГРАНИЧЕНИЯ СТОЛБЦА")
+        self.setWindowTitle("ОГРАНИЧЕНИЯ СТОЛБЦА")
         self.setModal(True)
         self.resize(500, 400)
         self._set_dark_palette()
@@ -48,7 +48,7 @@ class ConstraintsDialog(QDialog):
         layout.addWidget(header)
         
         # Ограничения
-        box_constraints = QGroupBox("🔒 ОГРАНИЧЕНИЯ И КЛЮЧИ")
+        box_constraints = QGroupBox("ОГРАНИЧЕНИЯ И КЛЮЧИ")
         box_constraints.setObjectName("settingsGroup")
         form_cons = QFormLayout(box_constraints)
         form_cons.setLabelAlignment(Qt.AlignRight)
@@ -91,7 +91,7 @@ class ConstraintsDialog(QDialog):
         layout.addWidget(box_constraints)
         
         # Доп. параметры
-        box_extra = QGroupBox("🔧 ДОПОЛНИТЕЛЬНЫЕ ПАРАМЕТРЫ")
+        box_extra = QGroupBox("ДОПОЛНИТЕЛЬНЫЕ ПАРАМЕТРЫ")
         box_extra.setObjectName("settingsGroup")
         form_extra = QFormLayout(box_extra)
         form_extra.setLabelAlignment(Qt.AlignRight)
@@ -464,7 +464,7 @@ class AddColumnDialog(QDialog):
         layout.addWidget(header)
 
         # 1) Таблица
-        box_table = QGroupBox("📋 ВЫБОР ТАБЛИЦЫ")
+        box_table = QGroupBox("ВЫБОР ТАБЛИЦЫ")
         box_table.setObjectName("settingsGroup")
         form_table = QFormLayout(box_table)
         form_table.setLabelAlignment(Qt.AlignRight)
@@ -475,7 +475,7 @@ class AddColumnDialog(QDialog):
         layout.addWidget(box_table)
 
         # 2) Параметры
-        box_params = QGroupBox("⚙️ ПАРАМЕТРЫ СТОЛБЦА")
+        box_params = QGroupBox("ПАРАМЕТРЫ СТОЛБЦА")
         box_params.setObjectName("settingsGroup")
         self.form_params = QFormLayout(box_params)
         self.form_params.setLabelAlignment(Qt.AlignRight)
@@ -572,7 +572,7 @@ class AddColumnDialog(QDialog):
         btn_row = QWidget()
         btn_l = QHBoxLayout(btn_row)
         btn_l.setContentsMargins(16, 10, 16, 10)
-        self.btn_constraints = QPushButton("🔒 НАСТРОИТЬ ОГРАНИЧЕНИЯ")
+        self.btn_constraints = QPushButton("НАСТРОИТЬ ОГРАНИЧЕНИЯ")
         self.btn_constraints.setObjectName("secondaryButton")
         self.btn_ok = QPushButton("ДОБАВИТЬ СТОЛБЕЦ")
         self.btn_ok.setObjectName("primaryButton")

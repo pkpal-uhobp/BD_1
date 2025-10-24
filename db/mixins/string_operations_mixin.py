@@ -461,7 +461,7 @@ class StringOperationsMixin:
             # Обновляем метаданные
             self._refresh_metadata()
             
-            self.logger.info(f"✅ Таблица '{table_name}' успешно создана")
+            self.logger.info(f" Таблица '{table_name}' успешно создана")
             return True
 
         except Exception as e:
@@ -760,7 +760,7 @@ class StringOperationsMixin:
                 result = conn.execute(text(update_sql))
                 updated_count = result.rowcount
             
-            self.logger.info(f"✅ Обновлено {updated_count} записей в {table_name}.{column_name}")
+            self.logger.info(f" Обновлено {updated_count} записей в {table_name}.{column_name}")
             return True
 
         except Exception as e:

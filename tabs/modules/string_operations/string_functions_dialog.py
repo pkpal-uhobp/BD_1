@@ -14,7 +14,7 @@ class StringFunctionsDialog(QDialog):
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
-        self.setWindowTitle("🔤 Строковые функции")
+        self.setWindowTitle("Строковые функции")
         self.setModal(True)
         self.setMinimumSize(1000, 700)
         self.setMaximumSize(1400, 1000)
@@ -63,7 +63,7 @@ class StringFunctionsDialog(QDialog):
     def setup_ui(self):
         """Создает пользовательский интерфейс"""
         # Заголовок
-        header_label = QLabel("🔤 СТРОКОВЫЕ ФУНКЦИИ БАЗЫ ДАННЫХ")
+        header_label = QLabel("СТРОКОВЫЕ ФУНКЦИИ БАЗЫ ДАННЫХ")
         header_label.setObjectName("headerLabel")
         header_label.setAlignment(Qt.AlignCenter)
         self.layout().addWidget(header_label)
@@ -94,13 +94,13 @@ class StringFunctionsDialog(QDialog):
         panel.setLayout(layout)
         
         # Заголовок панели
-        panel_header = QLabel("⚙️ НАСТРОЙКИ ФУНКЦИЙ")
+        panel_header = QLabel("НАСТРОЙКИ ФУНКЦИЙ")
         panel_header.setObjectName("panelHeader")
         panel_header.setAlignment(Qt.AlignCenter)
         layout.addWidget(panel_header)
         
         # Группа выбора таблицы и столбца
-        table_group = QGroupBox("📋 Выбор данных")
+        table_group = QGroupBox("Выбор данных")
         table_group.setObjectName("groupBox")
         table_layout = QFormLayout()
         table_group.setLayout(table_layout)
@@ -183,7 +183,7 @@ class StringFunctionsDialog(QDialog):
         layout.addWidget(table_group)
         
         # Группа выбора функции
-        function_group = QGroupBox("🔧 Строковые функции")
+        function_group = QGroupBox("Строковые функции")
         function_group.setObjectName("groupBox")
         function_layout = QVBoxLayout()
         function_group.setLayout(function_layout)
@@ -243,7 +243,7 @@ class StringFunctionsDialog(QDialog):
         layout.addWidget(function_group)
         
         # Группа предварительного просмотра
-        preview_group = QGroupBox("👁️ Предварительный просмотр")
+        preview_group = QGroupBox("Предварительный просмотр")
         preview_group.setObjectName("groupBox")
         preview_layout = QVBoxLayout()
         preview_group.setLayout(preview_layout)
@@ -270,7 +270,7 @@ class StringFunctionsDialog(QDialog):
         panel.setLayout(layout)
         
         # Заголовок панели
-        panel_header = QLabel("📊 РЕЗУЛЬТАТЫ ВЫПОЛНЕНИЯ")
+        panel_header = QLabel("РЕЗУЛЬТАТЫ ВЫПОЛНЕНИЯ")
         panel_header.setObjectName("panelHeader")
         panel_header.setAlignment(Qt.AlignCenter)
         layout.addWidget(panel_header)
@@ -299,14 +299,14 @@ class StringFunctionsDialog(QDialog):
         button_layout = QHBoxLayout()
         
         # Кнопка выполнения
-        self.execute_button = QPushButton("🚀 Выполнить")
+        self.execute_button = QPushButton("Выполнить")
         self.execute_button.setObjectName("executeButton")
         self.execute_button.setMinimumHeight(45)
         self.execute_button.clicked.connect(self.execute_function)
         button_layout.addWidget(self.execute_button)
         
         # Кнопка применения изменений
-        self.apply_button = QPushButton("✅ Применить изменения")
+        self.apply_button = QPushButton("Применить изменения")
         self.apply_button.setObjectName("applyButton")
         self.apply_button.setMinimumHeight(45)
         self.apply_button.clicked.connect(self.apply_changes)
@@ -315,14 +315,14 @@ class StringFunctionsDialog(QDialog):
         
         
         # Кнопка очистки
-        self.clear_button = QPushButton("🗑️ Очистить")
+        self.clear_button = QPushButton("Очистить")
         self.clear_button.setObjectName("clearButton")
         self.clear_button.setMinimumHeight(45)
         self.clear_button.clicked.connect(self.clear_results)
         button_layout.addWidget(self.clear_button)
         
         # Кнопка закрытия
-        self.close_button = QPushButton("❌ Закрыть")
+        self.close_button = QPushButton("Закрыть")
         self.close_button.setObjectName("closeButton")
         self.close_button.setMinimumHeight(45)
         self.close_button.clicked.connect(self.close)
@@ -342,7 +342,7 @@ class StringFunctionsDialog(QDialog):
             self.table_combo.addItems(tables)
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message=f"Не удалось загрузить список таблиц: {str(e)}",
                 timeout=3
             )
@@ -365,7 +365,7 @@ class StringFunctionsDialog(QDialog):
             
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message=f"Не удалось загрузить столбцы таблицы: {str(e)}",
                 timeout=3
             )
@@ -683,7 +683,7 @@ class StringFunctionsDialog(QDialog):
         """Выполняет выбранную строковую функцию"""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -695,7 +695,7 @@ class StringFunctionsDialog(QDialog):
         
         if not table_name or not column_name or not function_text:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message="Выберите таблицу, столбец и функцию!",
                 timeout=3
             )
@@ -748,7 +748,7 @@ class StringFunctionsDialog(QDialog):
                 self.display_results(results)
                 self.apply_button.setEnabled(True)   # Включаем кнопку применения
                 notification.notify(
-                    title="✅ Успех",
+                    title="Успех",
                     message=f"Функция {function_name} выполнена успешно. Найдено {len(results)} записей.",
                     timeout=3
                 )
@@ -762,7 +762,7 @@ class StringFunctionsDialog(QDialog):
                 
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message=f"Ошибка выполнения функции: {str(e)}",
                 timeout=5
             )
@@ -809,7 +809,7 @@ class StringFunctionsDialog(QDialog):
         """Применяет изменения к исходной таблице"""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -820,7 +820,7 @@ class StringFunctionsDialog(QDialog):
         
         reply = QMessageBox.question(
             self,
-            "⚠️ Подтверждение изменений",
+            "Подтверждение изменений",
             f"Вы уверены, что хотите применить функцию {self.current_function_name} "
             f"к столбцу {self.current_column_name} в таблице {self.current_table_name}?\n\n"
             f"Это изменит данные в исходной таблице!",
@@ -845,7 +845,7 @@ class StringFunctionsDialog(QDialog):
             
             if success:
                 notification.notify(
-                    title="✅ Успех",
+                    title="Успех",
                     message=f"Функция {self.current_function_name} успешно применена к таблице {self.current_table_name}!",
                     timeout=3
                 )
@@ -853,14 +853,14 @@ class StringFunctionsDialog(QDialog):
                 self.execute_function()
             else:
                 notification.notify(
-                    title="❌ Ошибка",
+                    title="Ошибка",
                     message="Не удалось применить изменения к таблице!",
                     timeout=3
                 )
                 
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message=f"Ошибка применения изменений: {str(e)}",
                 timeout=5
             )

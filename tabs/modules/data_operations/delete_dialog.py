@@ -526,12 +526,12 @@ class DeleteRecordDialog(QDialog):
                 self.set_field_error(col_name, "Должно быть целым числом")
                 return False
             else:
-                self.set_field_success(col_name, "✅ Корректное целое число")
+                self.set_field_success(col_name, " Корректное целое число")
                 
         elif isinstance(column.type, Numeric):
             try:
                 float(value)
-                self.set_field_success(col_name, "✅ Корректное число")
+                self.set_field_success(col_name, " Корректное число")
             except ValueError:
                 self.set_field_error(col_name, "Должно быть числом")
                 return False
@@ -541,23 +541,23 @@ class DeleteRecordDialog(QDialog):
                 self.set_field_error(col_name, "Слишком длинная строка (максимум 255 символов)")
                 return False
             else:
-                self.set_field_success(col_name, "✅ Корректная строка")
+                self.set_field_success(col_name, " Корректная строка")
                 
         elif isinstance(column.type, Date):
             # Для QDateEdit валидация уже встроена
-            self.set_field_success(col_name, "✅ Корректная дата")
+            self.set_field_success(col_name, " Корректная дата")
             
         elif isinstance(column.type, Boolean):
             # Для QComboBox с булевыми значениями валидация не нужна
-            self.set_field_success(col_name, "✅ Корректное булево значение")
+            self.set_field_success(col_name, " Корректное булево значение")
             
         elif isinstance(column.type, SQLEnum):
             # Для ENUM валидация не нужна - значения берутся из списка
-            self.set_field_success(col_name, "✅ Корректное значение ENUM")
+            self.set_field_success(col_name, " Корректное значение ENUM")
             
         elif isinstance(column.type, ARRAY):
             # Для массивов валидация происходит в ArrayLineEdit
-            self.set_field_success(col_name, "✅ Корректный массив")
+            self.set_field_success(col_name, " Корректный массив")
             
         return True
 
@@ -735,21 +735,21 @@ class DeleteRecordDialog(QDialog):
                 success = self.db_instance.delete_data(table_name, condition)
                 if success:
                     notification.notify(
-                        title="✅ Успех",
+                        title=" Успех",
                         message=f"Удалено {count} записей из таблицы '{table_name}'.",
                         timeout=5
                     )
                     self.accept()
                 else:
                     notification.notify(
-                        title="❌ Ошибка",
+                        title=" Ошибка",
                         message="Не удалось выполнить удаление. Проверьте логи.",
                         timeout=5
                     )
 
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title=" Ошибка",
                 message=f"Ошибка при проверке записей: {str(e)}",
                 timeout=5
             )

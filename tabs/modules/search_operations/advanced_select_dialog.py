@@ -95,7 +95,7 @@ class AdvancedSelectDialog(QDialog):
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
-        self.setWindowTitle("🔍 Расширенный SELECT")
+        self.setWindowTitle("Расширенный SELECT")
         self.setModal(True)
         self.setMinimumSize(800, 600)
         self.setMaximumSize(1000, 800)
@@ -148,7 +148,7 @@ class AdvancedSelectDialog(QDialog):
         """Создает пользовательский интерфейс"""
         
         # Заголовок
-        header_label = QLabel("🔍 РАСШИРЕННЫЙ SELECT")
+        header_label = QLabel("РАСШИРЕННЫЙ SELECT")
         header_label.setObjectName("headerLabel")
         header_label.setAlignment(Qt.AlignCenter)
         self.content_layout.addWidget(header_label)
@@ -166,11 +166,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки (вне скролл-области)
         buttons_layout = QHBoxLayout()
         
-        self.execute_button = QPushButton("🚀 Выполнить и отправить в главную таблицу")
+        self.execute_button = QPushButton("Выполнить и отправить в главную таблицу")
         self.execute_button.setObjectName("executeButton")
         self.execute_button.clicked.connect(self.execute_and_send_query)
         
-        self.preview_button = QPushButton("👁 Предварительный просмотр SQL")
+        self.preview_button = QPushButton("Предварительный просмотр SQL")
         self.preview_button.setObjectName("previewButton")
         self.preview_button.clicked.connect(self.preview_sql)
         
@@ -178,7 +178,7 @@ class AdvancedSelectDialog(QDialog):
         self.clear_button.setObjectName("clearButton")
         self.clear_button.clicked.connect(self.clear_all)
         
-        self.close_button = QPushButton("❌ Закрыть")
+        self.close_button = QPushButton("Закрыть")
         self.close_button.setObjectName("closeButton")
         self.close_button.clicked.connect(self.accept)
         
@@ -296,7 +296,7 @@ class AdvancedSelectDialog(QDialog):
         basic_layout.addWidget(columns_group)
         
         # Добавляем основную вкладку
-        tab_widget.addTab(basic_tab, "📋 Основные настройки")
+        tab_widget.addTab(basic_tab, "Основные настройки")
         
         # Вкладка "Фильтрация и сортировка"
         filter_tab = QWidget()
@@ -365,7 +365,7 @@ class AdvancedSelectDialog(QDialog):
         filter_layout.addWidget(order_group)
         
         # Добавляем вкладку фильтрации
-        tab_widget.addTab(filter_tab, "🔍 Фильтрация и сортировка")
+        tab_widget.addTab(filter_tab, "Фильтрация и сортировка")
         
         # Вкладка "Группировка и агрегаты"
         group_tab = QWidget()
@@ -487,7 +487,7 @@ class AdvancedSelectDialog(QDialog):
         group_tab_layout.addWidget(having_group)
         
         # Добавляем вкладку группировки
-        tab_widget.addTab(group_tab, "📊 Группировка и агрегаты")
+        tab_widget.addTab(group_tab, "Группировка и агрегаты")
         
         # Добавляем вкладки в основной layout
         layout.addWidget(tab_widget)
@@ -934,10 +934,10 @@ class AdvancedSelectDialog(QDialog):
             # Кнопки
             buttons_layout = QHBoxLayout()
             
-            copy_button = QPushButton("📋 Копировать")
+            copy_button = QPushButton(" Копировать")
             copy_button.clicked.connect(lambda: self.copy_to_clipboard(sql_query))
             
-            close_button = QPushButton("❌ Закрыть")
+            close_button = QPushButton("Закрыть")
             close_button.clicked.connect(dialog.accept)
             
             buttons_layout.addWidget(copy_button)

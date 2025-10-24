@@ -586,71 +586,71 @@ class EditRecordDialog(QDialog):
             if isinstance(widget, QComboBox) and hasattr(column.type, "enums"):
                 value = widget.currentText().strip()
                 if not value and not column.nullable:
-                    return False, None, "⚠️ Обязательное поле", ""
-                return True, value, "", f"✅ {value}"
+                    return False, None, "️ Обязательное поле", ""
+                return True, value, "", f" {value}"
 
             # ARRAY (ArrayLineEdit)
             elif isinstance(widget, ArrayLineEdit):
                 values = widget.getArray()
                 if not values and not column.nullable:
-                    return False, None, "⚠️ Обязательное поле", ""
-                return True, values, "", f"✅ {len(values)} элементов"
+                    return False, None, " Обязательное поле", ""
+                return True, values, "", f" {len(values)} элементов"
 
             # BOOLEAN
             elif isinstance(widget, QCheckBox):
-                return True, widget.isChecked(), "", "✅ Да" if widget.isChecked() else "☑️ Нет"
+                return True, widget.isChecked(), "", " Да" if widget.isChecked() else "☑️ Нет"
 
             # DATE
             elif isinstance(widget, QDateEdit):
                 qd = widget.date()
                 if not qd.isValid() and not column.nullable:
-                    return False, None, "⚠️ Обязательное поле", ""
-                return True, qd.toString("yyyy-MM-dd"), "", f"✅ {qd.toString('dd.MM.yyyy')}"
+                    return False, None, " Обязательное поле", ""
+                return True, qd.toString("yyyy-MM-dd"), "", f" {qd.toString('dd.MM.yyyy')}"
 
             # TEXT
             elif isinstance(widget, QTextEdit):
                 text = widget.toPlainText().strip()
                 if not text and not column.nullable:
-                    return False, None, "⚠️ Обязательное поле", ""
+                    return False, None, " Обязательное поле", ""
                 if not validate_safe_chars(text):
-                    return False, None, "❌ Содержит запрещённые символы", ""
-                return True, text, "", f"✅ {len(text)} символов"
+                    return False, None, " Содержит запрещённые символы", ""
+                return True, text, "", f" {len(text)} символов"
 
             # LINEEDIT
             elif isinstance(widget, QLineEdit):
                 text = widget.text().strip()
                 if not text and not column.nullable:
-                    return False, None, "⚠️ Обязательное поле", ""
+                    return False, None, " Обязательное поле", ""
                 if not validate_safe_chars(text):
-                    return False, None, "❌ Содержит запрещённые символы", ""
+                    return False, None, " Содержит запрещённые символы", ""
 
                 if isinstance(column.type, Integer):
                     if not text.isdigit() and not (text.startswith('-') and text[1:].isdigit()):
-                        return False, None, "❌ Должно быть целым числом", ""
-                    return True, int(text), "", f"✅ {text}"
+                        return False, None, " Должно быть целым числом", ""
+                    return True, int(text), "", f" {text}"
 
                 elif isinstance(column.type, Numeric):
                     if not re.match(r'^-?\d+(\.\d+)?$', text):
-                        return False, None, "❌ Некорректное число", ""
-                    return True, float(text), "", f"✅ {text}"
+                        return False, None, " Некорректное число", ""
+                    return True, float(text), "", f" {text}"
 
                 elif isinstance(column.type, String):
                     max_len = getattr(column.type, 'length', None)
                     if max_len and len(text) > max_len:
-                        return False, None, f"❌ Превышена длина ({len(text)}/{max_len})", ""
+                        return False, None, f" Превышена длина ({len(text)}/{max_len})", ""
                     if "email" in display_name.lower() and not validate_email(text):
-                        return False, None, "❌ Некорректный email", ""
+                        return False, None, " Некорректный email", ""
                     if "phone" in display_name.lower() and not validate_phone(text):
-                        return False, None, "❌ Некорректный номер телефона", ""
-                    return True, text, "", f"✅ {len(text)} символов"
+                        return False, None, " Некорректный номер телефона", ""
+                    return True, text, "", f" {len(text)} символов"
 
-                return True, text, "", f"✅ {text}"
+                return True, text, "", f" {text}"
 
             else:
-                return False, None, "❌ Неизвестный тип поля", ""
+                return False, None, " Неизвестный тип поля", ""
 
         except Exception as e:
-            return False, None, f"❌ Ошибка: {str(e)}", ""
+            return False, None, f" Ошибка: {str(e)}", ""
 
     def validate_date_constraints_real_time(self):
         """Перепроверяет все даты в Issued_Books при изменении любой из них."""
@@ -679,7 +679,7 @@ class EditRecordDialog(QDialog):
         if expected_widget and expected_widget.date().isValid():
             expected_date = expected_widget.date()
             if expected_date < issue_date:
-                self.set_field_error("Ожидаемая дата возврата", "❌ Ожидаемая дата возврата должна быть позже даты выдачи")
+                self.set_field_error("Ожидаемая дата возврата", " Ожидаемая дата возврата должна быть позже даты выдачи")
             else:
                 self.clear_field_error("Ожидаемая дата возврата")
         elif expected_widget:
@@ -689,7 +689,7 @@ class EditRecordDialog(QDialog):
         if actual_widget and actual_widget.date().isValid():
             actual_date = actual_widget.date()
             if actual_date < issue_date:
-                self.set_field_error("Фактическая дата возврата", "❌ Фактическая дата возврата должна быть позже даты выдачи")
+                self.set_field_error("Фактическая дата возврата", " Фактическая дата возврата должна быть позже даты выдачи")
             else:
                 self.clear_field_error("Фактическая дата возврата")
         elif actual_widget:
@@ -710,7 +710,7 @@ class EditRecordDialog(QDialog):
         try:
             column = getattr(table.c, col_name)
         except AttributeError:
-            self.set_field_error(field_name, "❌ Колонка не найдена в таблице")
+            self.set_field_error(field_name, " Колонка не найдена в таблице")
             self.field_validity[field_name] = False
             return
 
@@ -750,7 +750,7 @@ class EditRecordDialog(QDialog):
         try:
             column = getattr(table.c, col_name)
         except AttributeError:
-            self.set_search_field_error(field_name, "❌ Колонка не найдена в таблице")
+            self.set_search_field_error(field_name, " Колонка не найдена в таблице")
             self.search_field_validity[field_name] = False
             return
 
@@ -994,7 +994,7 @@ class EditRecordDialog(QDialog):
 
             if count > 1:
                 notification.notify(
-                    title="⚠️ Несколько записей",
+                    title=" Несколько записей",
                     message=f"Найдено {count} записей. Уточните условия поиска!",
                     timeout=5
                 )
@@ -1040,14 +1040,14 @@ class EditRecordDialog(QDialog):
             self.check_update_button_state()
 
             notification.notify(
-                title="✅ Найдено",
+                title=" Найдено",
                 message="Запись найдена. Введите новые значения и нажмите 'Сохранить'.",
                 timeout=3
             )
 
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка поиска",
+                title=" Ошибка поиска",
                 message=f"Не удалось найти запись: {str(e)}",
                 timeout=5
             )
@@ -1061,7 +1061,7 @@ class EditRecordDialog(QDialog):
         for display_name in self.search_field_validity:
             if not self.search_field_validity[display_name]:
                 notification.notify(
-                    title="❌ Ошибки валидации",
+                    title=" Ошибки валидации",
                     message="Исправьте ошибки в полях поиска перед выполнением поиска",
                     timeout=3
                 )
@@ -1136,7 +1136,7 @@ class EditRecordDialog(QDialog):
                     index = widget.findText(str(value))
                     widget.setCurrentIndex(index if index >= 0 else 0)
 
-                # ✅ ARRAY (ArrayLineEdit)
+                #  ARRAY (ArrayLineEdit)
                 elif isinstance(widget, ArrayLineEdit):
                     if isinstance(value, list):
                         widget.setArray(value, delimiter=":")
@@ -1196,7 +1196,7 @@ class EditRecordDialog(QDialog):
         all_valid = all(self.field_validity.values())
         if not all_valid:
             notification.notify(
-                title="❌ Ошибки валидации",
+                title=" Ошибки валидации",
                 message="Исправьте ошибки в форме перед отправкой",
                 timeout=3
             )
@@ -1213,11 +1213,11 @@ class EditRecordDialog(QDialog):
                 issue_date = issue_widget.date()
                 if expected_widget and expected_widget.date().isValid():
                     if expected_widget.date() < issue_date:
-                        notification.notify(title="❌ Ошибка", message="Ожидаемая дата возврата должна быть позже даты выдачи", timeout=3)
+                        notification.notify(title=" Ошибка", message="Ожидаемая дата возврата должна быть позже даты выдачи", timeout=3)
                         return
                 if actual_widget and actual_widget.date().isValid():
                     if actual_widget.date() < issue_date:
-                        notification.notify(title="❌ Ошибка", message="Фактическая дата возврата должна быть позже даты выдачи", timeout=3)
+                        notification.notify(title=" Ошибка", message="Фактическая дата возврата должна быть позже даты выдачи", timeout=3)
                         return
 
         new_values = self.build_update_values(table_name)
@@ -1236,14 +1236,14 @@ class EditRecordDialog(QDialog):
         success = self.db_instance.update_data(table_name, condition, new_values)
         if success:
             notification.notify(
-                title="✅ Успех",
+                title=" Успех",
                 message=f"Запись успешно обновлена в таблице '{table_name}'.",
                 timeout=5
             )
             self.accept()
         else:
             notification.notify(
-                title="❌ Ошибка",
+                title=" Ошибка",
                 message="Не удалось обновить запись. Проверьте логи.",
                 timeout=5
             )

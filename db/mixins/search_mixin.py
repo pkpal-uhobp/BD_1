@@ -213,14 +213,14 @@ class SearchMixin:
                 # По умолчанию используем ILIKE (без автоматических %)
                 sql_query = f'SELECT * FROM "{table_name}" WHERE "{column_name}"::text ILIKE \'{escaped_query}\''
 
-            self.logger.info(f"🔍 Поиск в '{table_name}.{column_name}' ({search_type}) с запросом '{search_query}'")
+            self.logger.info(f" Поиск в '{table_name}.{column_name}' ({search_type}) с запросом '{search_query}'")
             self.logger.info(f"📝 SQL: {sql_query}")
 
             with self.engine.connect() as conn:
                 result = conn.execute(text(sql_query))
                 rows = [dict(row._mapping) for row in result]
 
-            self.logger.info(f"✅ Найдено {len(rows)} строк по '{search_query}' ({search_type})")
+            self.logger.info(f" Найдено {len(rows)} строк по '{search_query}' ({search_type})")
             return rows
 
         except Exception as e:
@@ -244,20 +244,20 @@ class SearchMixin:
             Список словарей с найденными записями
         """
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к базе данных")
+            self.logger.error(" Нет подключения к базе данных")
             return []
             
         try:
             # Проверяем существование таблицы через inspect
             insp = inspect(self.engine)
             if table_name not in insp.get_table_names():
-                self.logger.error(f"❌ Таблица '{table_name}' не найдена")
+                self.logger.error(f" Таблица '{table_name}' не найдена")
                 return []
             
             # Проверяем существование столбца
             columns = [col['name'] for col in insp.get_columns(table_name)]
             if column_name not in columns:
-                self.logger.error(f"❌ Столбец '{column_name}' не найден в таблице '{table_name}'")
+                self.logger.error(f" Столбец '{column_name}' не найден в таблице '{table_name}'")
                 return []
             
             # Формируем SQL запрос в зависимости от типа поиска
@@ -298,13 +298,13 @@ class SearchMixin:
                         
                 escaped_query = search_query
             else:
-                self.logger.error(f"❌ Неподдерживаемый тип поиска: {search_type}")
+                self.logger.error(f" Неподдерживаемый тип поиска: {search_type}")
                 return []
             
             # Формируем полный SQL запрос
             sql_query = f'SELECT * FROM "{table_name}" WHERE {where_clause}'
             
-            self.logger.info(f"🔍 Выполняется поиск: {sql_query} с параметром: {escaped_query}")
+            self.logger.info(f" Выполняется поиск: {sql_query} с параметром: {escaped_query}")
             
             # Выполняем запрос
             with self.engine.connect() as conn:
@@ -327,11 +327,11 @@ class SearchMixin:
                         row_dict[col] = value
                     results.append(row_dict)
                 
-                self.logger.info(f"✅ Найдено {len(results)} записей")
+                self.logger.info(f" Найдено {len(results)} записей")
                 return results
                 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка поиска по тексту: {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка поиска по тексту: {self.format_db_error(e)}")
             return []
 
     def execute_custom_query(self, sql_query: str) -> List[Dict[str, Any]]:
@@ -345,11 +345,11 @@ class SearchMixin:
             Список словарей с результатами запроса
         """
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к базе данных")
+            self.logger.error(" Нет подключения к базе данных")
             return []
             
         try:
-            self.logger.info(f"🔍 Выполняется SQL запрос: {sql_query}")
+            self.logger.info(f" Выполняется SQL запрос: {sql_query}")
             
             # Выполняем запрос
             with self.engine.connect() as conn:
@@ -378,11 +378,11 @@ class SearchMixin:
                         row_dict[col] = value
                     results.append(row_dict)
                 
-                self.logger.info(f"✅ Запрос выполнен успешно. Найдено {len(results)} записей")
+                self.logger.info(f" Запрос выполнен успешно. Найдено {len(results)} записей")
                 return results
                 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка выполнения SQL запроса: {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка выполнения SQL запроса: {self.format_db_error(e)}")
             return []
 
     def get_foreign_keys(self, table_name: str) -> List[Dict[str, Any]]:

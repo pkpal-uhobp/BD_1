@@ -37,19 +37,19 @@ class ConstraintsMixin:
             constraint_type = constraint_type.upper()
             sql = f'ALTER TABLE "{table_name}" ADD CONSTRAINT "{constraint_name}" '
 
-            # ✅ Универсальные шаблоны для трёх типов ограничений
+            #  Универсальные шаблоны для трёх типов ограничений
             match constraint_type:
                 case "CHECK":
                     cond = kwargs.get("check_condition")
                     if not cond:
-                        self.logger.error("❌ Для CHECK-ограничения необходимо указать параметр 'check_condition'")
+                        self.logger.error(" Для CHECK-ограничения необходимо указать параметр 'check_condition'")
                         return False
                     sql += f"CHECK ({cond})"
 
                 case "UNIQUE":
                     cols = kwargs.get("columns")
                     if not cols:
-                        self.logger.error("❌ Для UNIQUE необходимо указать 'columns'")
+                        self.logger.error(" Для UNIQUE необходимо указать 'columns'")
                         return False
                     cols_str = ", ".join(f'"{c}"' for c in (cols if isinstance(cols, list) else [cols]))
                     sql += f"UNIQUE ({cols_str})"
@@ -60,7 +60,7 @@ class ConstraintsMixin:
                     ref_cols = kwargs.get("foreign_columns")
 
                     if not all([cols, ref_table, ref_cols]):
-                        self.logger.error("❌ Для FOREIGN KEY нужны 'columns', 'foreign_table' и 'foreign_columns'")
+                        self.logger.error(" Для FOREIGN KEY нужны 'columns', 'foreign_table' и 'foreign_columns'")
                         return False
 
                     if not self.record_exists_ex_table(ref_table):
@@ -82,12 +82,12 @@ class ConstraintsMixin:
                 conn.execute(text(sql))
 
             self._refresh_metadata()
-            self.logger.info(f"✅ Ограничение '{constraint_name}' успешно добавлено к '{table_name}'")
+            self.logger.info(f" Ограничение '{constraint_name}' успешно добавлено к '{table_name}'")
             return True
 
         except Exception as e:
             msg = self.format_db_error(e)
-            self.logger.error(f"❌ Ошибка добавления ограничения: {msg}")
+            self.logger.error(f" Ошибка добавления ограничения: {msg}")
             return False
 
     def drop_constraint(self, table_name: str, constraint_name: str) -> bool:
@@ -109,7 +109,7 @@ class ConstraintsMixin:
             # Проверяем существование ограничения (если метод get_table_constraints реализован)
             constraints = self.get_table_constraints(table_name)
             if not any(c.get("name") == constraint_name for c in constraints):
-                self.logger.warning(f"⚠️ Ограничение '{constraint_name}' не найдено — возможно, оно уже удалено")
+                self.logger.warning(f" Ограничение '{constraint_name}' не найдено — возможно, оно уже удалено")
                 return False
 
             sql = f'ALTER TABLE "{table_name}" DROP CONSTRAINT "{constraint_name}";'
@@ -119,12 +119,12 @@ class ConstraintsMixin:
                 conn.execute(text(sql))
 
             self._refresh_metadata()
-            self.logger.info(f"✅ Ограничение '{constraint_name}' успешно удалено из '{table_name}'")
+            self.logger.info(f" Ограничение '{constraint_name}' успешно удалено из '{table_name}'")
             return True
 
         except Exception as e:
             msg = self.format_db_error(e)
-            self.logger.error(f"❌ Ошибка удаления ограничения '{constraint_name}': {msg}")
+            self.logger.error(f" Ошибка удаления ограничения '{constraint_name}': {msg}")
             return False
 
     def get_table_constraints(self, table_name: str) -> List[Dict[str, Any]]:
@@ -381,7 +381,7 @@ class ConstraintsMixin:
         """
         predefined_joins = {}
         if not self.tables:
-            self.logger.warning("⚠️ Метаданные таблиц не загружены. Невозможно сгенерировать соединения.")
+            self.logger.warning(" Метаданные таблиц не загружены. Невозможно сгенерировать соединения.")
             return predefined_joins
 
         for table in self.tables.values():
@@ -408,17 +408,17 @@ class ConstraintsMixin:
         Изменяет ограничения столбца: NULL/NOT NULL, DEFAULT, CHECK.
         """
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к БД.")
+            self.logger.error(" Нет подключения к БД.")
             return False
 
         try:
             if not self.record_exists_ex_table(table_name):
-                self.logger.error(f"❌ Таблица '{table_name}' не существует.")
+                self.logger.error(f" Таблица '{table_name}' не существует.")
                 return False
 
             columns = self.get_column_names(table_name)
             if column_name not in columns:
-                self.logger.error(f"❌ Столбец '{column_name}' не найден в '{table_name}'.")
+                self.logger.error(f" Столбец '{column_name}' не найден в '{table_name}'.")
                 return False
 
             with self.engine.begin() as conn:
@@ -431,7 +431,7 @@ class ConstraintsMixin:
                         )).scalar() or 0
                         
                         if null_count > 0:
-                            self.logger.error(f"❌ Невозможно установить NOT NULL: найдено {null_count} NULL значений.")
+                            self.logger.error(f" Невозможно установить NOT NULL: найдено {null_count} NULL значений.")
                             return False
 
                     action = "DROP NOT NULL" if nullable else "SET NOT NULL"
@@ -461,9 +461,9 @@ class ConstraintsMixin:
                     conn.execute(text(sql))
 
             self._refresh_metadata()
-            self.logger.info(f"✅ Ограничения столбца '{column_name}' успешно изменены в '{table_name}'.")
+            self.logger.info(f" Ограничения столбца '{column_name}' успешно изменены в '{table_name}'.")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка изменения ограничений столбца '{table_name}.{column_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка изменения ограничений столбца '{table_name}.{column_name}': {self.format_db_error(e)}")
             return False

@@ -13,7 +13,7 @@ class ChangeTypeDialog(QDialog):
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
-        self.setWindowTitle("✏️ ИЗМЕНЕНИЕ ТИПА СТОЛБЦА")
+        self.setWindowTitle("ИЗМЕНЕНИЕ ТИПА СТОЛБЦА")
         self.setModal(True)
         self.setFixedSize(600, 600)
         self._set_dark_palette()
@@ -62,7 +62,7 @@ class ChangeTypeDialog(QDialog):
         hl.addWidget(t)
         root.addWidget(header)
 
-        box = QGroupBox("⚙️ НАСТРОЙКА")
+        box = QGroupBox("НАСТРОЙКА")
         box.setObjectName("settingsGroup")
         form = QFormLayout(box)
         form.setLabelAlignment(Qt.AlignRight)
@@ -86,7 +86,7 @@ class ChangeTypeDialog(QDialog):
         self.array_base_combo.setVisible(False)
 
         # Кнопка: дополнительные ограничения
-        self.btn_constraints = QPushButton("🔒 ОГРАНИЧЕНИЯ")
+        self.btn_constraints = QPushButton("ОГРАНИЧЕНИЯ")
         self.btn_constraints.setObjectName("secondaryButton")
         self.btn_constraints.clicked.connect(self._open_constraints_window)
 
@@ -105,7 +105,7 @@ class ChangeTypeDialog(QDialog):
         btn_row = QWidget()
         bl = QHBoxLayout(btn_row)
         bl.addStretch()
-        ok = QPushButton("✅ ИЗМЕНИТЬ")
+        ok = QPushButton("ИЗМЕНИТЬ")
         ok.setObjectName("primaryButton")
         cancel = QPushButton("✖ ОТМЕНА")
         cancel.setObjectName("secondaryButton")
@@ -173,7 +173,7 @@ class ChangeTypeDialog(QDialog):
             QMessageBox.warning(self, "Ошибка", "Выберите таблицу, столбец и новый тип")
             return
 
-        # ⚙️ Меняем тип
+        # Меняем тип
         if new_type:
             ok = self.db_instance.alter_column_type(table, column, new_type, None)
             if ok is True:

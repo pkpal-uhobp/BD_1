@@ -12,7 +12,7 @@ class DropColumnDialog(QDialog):
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
-        self.setWindowTitle("🗑 УДАЛЕНИЕ СТОЛБЦА")
+        self.setWindowTitle("УДАЛЕНИЕ СТОЛБЦА")
         self.setModal(True)
         self.setFixedSize(600, 500)
         self._set_dark_palette()
@@ -93,7 +93,7 @@ class DropColumnDialog(QDialog):
         btn_l = QHBoxLayout(btn_row)
         btn_l.setContentsMargins(0, 0, 0, 0)
         btn_l.addStretch()
-        self.btn_ok = QPushButton("🗑 УДАЛИТЬ")
+        self.btn_ok = QPushButton("УДАЛИТЬ")
         self.btn_ok.setObjectName("primaryButton")
         self.btn_cancel = QPushButton("ОТМЕНА")
         self.btn_cancel.setObjectName("secondaryButton")

@@ -13,7 +13,7 @@ class TextSearchDialog(QDialog):
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
-        self.setWindowTitle("🔍 Поиск по тексту")
+        self.setWindowTitle("Поиск по тексту")
         self.setModal(True)
         self.setMinimumSize(800, 600)
         self.setMaximumSize(1200, 900)
@@ -58,7 +58,7 @@ class TextSearchDialog(QDialog):
         """Создает пользовательский интерфейс"""
         
         # Заголовок
-        header_label = QLabel("🔍 ПОИСК ПО ТЕКСТУ")
+        header_label = QLabel("ПОИСК ПО ТЕКСТУ")
         header_label.setObjectName("headerLabel")
         header_label.setAlignment(Qt.AlignCenter)
         self.layout().addWidget(header_label)
@@ -137,7 +137,7 @@ class TextSearchDialog(QDialog):
         search_layout.addRow("Тип данных:", self.column_type_label)
         
         # Информационная подсказка
-        info_label = QLabel("💡 Универсальный поиск: работает со всеми типами данных (строки, числа, даты, boolean, enum, array, json)")
+        info_label = QLabel("Универсальный поиск: работает со всеми типами данных (строки, числа, даты, boolean, enum, array, json)")
         info_label.setObjectName("infoLabel")
         info_label.setWordWrap(True)
         search_layout.addRow("", info_label)
@@ -165,7 +165,7 @@ class TextSearchDialog(QDialog):
         # Кнопки
         buttons_layout = QHBoxLayout()
         
-        self.search_button = QPushButton("🔍 Найти")
+        self.search_button = QPushButton("Найти")
         self.search_button.setObjectName("searchButton")
         self.search_button.clicked.connect(self.perform_search)
         
@@ -173,7 +173,7 @@ class TextSearchDialog(QDialog):
         self.clear_button.setObjectName("clearButton")
         self.clear_button.clicked.connect(self.clear_results)
         
-        self.close_button = QPushButton("❌ Закрыть")
+        self.close_button = QPushButton("Закрыть")
         self.close_button.setObjectName("closeButton")
         self.close_button.clicked.connect(self.accept)
         
@@ -257,9 +257,9 @@ class TextSearchDialog(QDialog):
                         is_numeric = any(num_type in column_type for num_type in ['INTEGER', 'BIGINT', 'SMALLINT', 'NUMERIC', 'DECIMAL', 'FLOAT', 'REAL', 'DOUBLE'])
                         
                         if is_numeric:
-                            self.column_type_label.setText(f"🔢 Числовой ({column_type}) - универсальный поиск")
+                            self.column_type_label.setText(f"Числовой ({column_type}) - универсальный поиск")
                         else:
-                            self.column_type_label.setText(f"📝 Текстовый ({column_type}) - универсальный поиск")
+                            self.column_type_label.setText(f"Текстовый ({column_type}) - универсальный поиск")
                         return
                 except:
                     pass
@@ -282,17 +282,17 @@ class TextSearchDialog(QDialog):
                         is_numeric = any(num_type in column_type for num_type in ['INTEGER', 'BIGINT', 'SMALLINT', 'NUMERIC', 'DECIMAL', 'FLOAT', 'REAL', 'DOUBLE'])
                         
                         if is_numeric:
-                            self.column_type_label.setText(f"🔢 Числовой ({column_type}) - универсальный поиск")
+                            self.column_type_label.setText(f"Числовой ({column_type}) - универсальный поиск")
                         else:
-                            self.column_type_label.setText(f"📝 Текстовый ({column_type}) - универсальный поиск")
+                            self.column_type_label.setText(f"Текстовый ({column_type}) - универсальный поиск")
                     else:
-                        self.column_type_label.setText("❌ Столбец не найден")
+                        self.column_type_label.setText("Столбец не найден")
             except Exception as e:
                 # Если ничего не работает, показываем общую информацию
-                self.column_type_label.setText("🔍 Универсальный поиск - работает с любыми типами данных")
+                self.column_type_label.setText("Универсальный поиск - работает с любыми типами данных")
                 
         except Exception as e:
-            self.column_type_label.setText(f"❌ Ошибка: {e}")
+            self.column_type_label.setText(f"Ошибка: {e}")
             
     def on_search_type_changed(self, search_type):
         """Обработчик изменения типа поиска"""
@@ -412,7 +412,7 @@ class TextSearchDialog(QDialog):
             search_type = self.extract_search_type_code(search_type_full)
             
             # Отладочная информация
-            print(f"🔍 Параметры поиска:")
+            print(f"Параметры поиска:")
             print(f"   Таблица: {table_name}")
             print(f"   Столбец: {column_name}")
             print(f"   Запрос: {search_query}")
@@ -447,7 +447,7 @@ class TextSearchDialog(QDialog):
             )
             
             # Отладочная информация о результатах
-            print(f"📊 Результаты поиска: найдено {len(results)} строк")
+            print(f"Результаты поиска: найдено {len(results)} строк")
             if results:
                 print(f"   Первая строка: {results[0]}")
             
@@ -475,13 +475,13 @@ class TextSearchDialog(QDialog):
     def display_results(self, results, table_name, column_name, search_query):
         """Отображает результаты поиска"""
         if not results:
-            self.results_text.setHtml("<p style='color: #ff6b6b;'>🔍 Поиск не дал результатов</p>")
+            self.results_text.setHtml("<p style='color: #ff6b6b;'>Поиск не дал результатов</p>")
             return
             
         # Формируем HTML для отображения результатов
         html = f"""
         <div style='color: #64ffda; font-weight: bold; margin-bottom: 10px;'>
-            🔍 Результаты поиска в таблице "{table_name}" по столбцу "{column_name}"
+            Результаты поиска в таблице "{table_name}" по столбцу "{column_name}"
         </div>
         <div style='color: #8892b0; margin-bottom: 15px;'>
             Поисковый запрос: <span style='color: #f8f8f2;'>{search_query}</span>
@@ -540,7 +540,7 @@ class TextSearchDialog(QDialog):
     
     def show_error(self, message):
         """Показывает сообщение об ошибке"""
-        self.results_text.setHtml(f"<p style='color: #ff6b6b;'>❌ {message}</p>")
+        self.results_text.setHtml(f"<p style='color: #ff6b6b;'>{message}</p>")
         
     def apply_styles(self):
         """Применяет стили"""

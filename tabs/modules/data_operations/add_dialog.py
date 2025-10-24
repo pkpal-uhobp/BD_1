@@ -473,62 +473,62 @@ class AddRecordDialog(QDialog):
                 value = widget.currentText().strip()
                 if not value:
                     if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
+                        return False, None, " Обязательное поле", ""
                     return True, None, "", ""
                 else:
                     allowed_values = getattr(column.type, 'enums', [])
                     if allowed_values and value not in allowed_values:
-                        return False, None, f"❌ Допустимые значения: {', '.join(allowed_values)}", ""
-                    return True, value, "", f"✅ Выбрано: {value}"
+                        return False, None, f" Допустимые значения: {', '.join(allowed_values)}", ""
+                    return True, value, "", f" Выбрано: {value}"
 
             # ARRAY
             elif isinstance(widget, QLineEdit) and isinstance(column.type, ARRAY):
                 text = widget.text().strip()
                 if not text:
                     if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
+                        return False, None, " Обязательное поле", ""
                     return True, [], "", ""
                 items = [item.strip() for item in text.split(":") if item.strip()]
                 if not items and not column.nullable:
-                    return False, None, "❌ Не может быть пустым", ""
+                    return False, None, " Не может быть пустым", ""
 
                 validated_items = []
                 for i, item in enumerate(items):
                     if isinstance(column.type.item_type, Integer):
                         if not item.isdigit() and not (item.startswith('-') and item[1:].isdigit()):
-                            return False, None, f"❌ Элемент {i + 1} должен быть целым числом", ""
+                            return False, None, f" Элемент {i + 1} должен быть целым числом", ""
                         validated_items.append(int(item))
                     elif isinstance(column.type.item_type, Numeric):
                         if not re.match(r'^-?\d+(\.\d+)?$', item):
-                            return False, None, f"❌ Элемент {i + 1} должен быть числом", ""
+                            return False, None, f" Элемент {i + 1} должен быть числом", ""
                         validated_items.append(float(item))
                     else:
                         if not validate_safe_chars(item):
-                            return False, None, f"❌ Элемент {i + 1} содержит запрещенные символы", ""
+                            return False, None, f" Элемент {i + 1} содержит запрещенные символы", ""
                         validated_items.append(item)
 
                 # Проверка: длина массива > 0 (для Books.authors)
                 if table_name == "Books" and column.name == "authors" and len(validated_items) == 0:
-                    return False, None, "❌ Массив авторов не может быть пустым", ""
+                    return False, None, " Массив авторов не может быть пустым", ""
 
-                return True, validated_items, "", f"✅ {len(validated_items)} элементов"
+                return True, validated_items, "", f" {len(validated_items)} элементов"
 
             # BOOLEAN
             elif isinstance(widget, QCheckBox):
-                return True, widget.isChecked(), "", "✅ Установлено" if widget.isChecked() else "☑️ Не установлено"
+                return True, widget.isChecked(), "", " Установлено" if widget.isChecked() else "☑️ Не установлено"
 
             # DATE
             elif isinstance(widget, QDateEdit):
                 qdate = widget.date()
                 if not qdate.isValid():
                     if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
+                        return False, None, " Обязательное поле", ""
                     return True, None, "", ""
                 current_date = QDate.currentDate()
                 if qdate < QDate(1900, 1, 1):
-                    return False, None, "❌ Дата слишком старая", ""
+                    return False, None, " Дата слишком старая", ""
                 if qdate > current_date.addYears(100):
-                    return False, None, "❌ Дата слишком далекая в будущем", ""
+                    return False, None, " Дата слишком далекая в будущем", ""
 
                 # Проверка для Issued_Books: даты должны быть >= issue_date
                 if table_name == "Issued_Books":
@@ -537,107 +537,107 @@ class AddRecordDialog(QDialog):
                         issue_date = issue_date_widget.date()
                         if qdate < issue_date:
                             if column.name == "expected_return_date":
-                                return False, None, "❌ Ожидаемая дата возврата должна быть позже даты выдачи", ""
+                                return False, None, " Ожидаемая дата возврата должна быть позже даты выдачи", ""
                             elif column.name == "actual_return_date":
-                                return False, None, "❌ Фактическая дата возврата должна быть позже даты выдачи", ""
+                                return False, None, " Фактическая дата возврата должна быть позже даты выдачи", ""
 
-                return True, qdate.toString("yyyy-MM-dd"), "", f"✅ {qdate.toString('dd.MM.yyyy')}"
+                return True, qdate.toString("yyyy-MM-dd"), "", f" {qdate.toString('dd.MM.yyyy')}"
 
             # DATETIME
             elif isinstance(widget, QDateTimeEdit):
                 qdatetime = widget.dateTime()
                 if not qdatetime.isValid():
                     if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
+                        return False, None, " Обязательное поле", ""
                     return True, None, "", ""
-                return True, qdatetime.toString("yyyy-MM-dd HH:mm:ss"), "", f"✅ {qdatetime.toString('dd.MM.yyyy HH:mm')}"
+                return True, qdatetime.toString("yyyy-MM-dd HH:mm:ss"), "", f" {qdatetime.toString('dd.MM.yyyy HH:mm')}"
 
             # TEXT
             elif isinstance(widget, QTextEdit):
                 text = widget.toPlainText().strip()
                 if not text:
                     if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
+                        return False, None, " Обязательное поле", ""
                     return True, None, "", ""
                 if not validate_safe_chars(text):
-                    return False, None, "❌ Содержит запрещенные символы", ""
-                return True, text, "", f"✅ {len(text)} символов"
+                    return False, None, " Содержит запрещенные символы", ""
+                return True, text, "", f" {len(text)} символов"
 
             # LINEEDIT (String, Integer, Numeric)
             elif isinstance(widget, QLineEdit):
                 text = widget.text().strip()
                 if not text:
                     if not column.nullable:
-                        return False, None, "⚠️ Обязательное поле", ""
+                        return False, None, " Обязательное поле", ""
                     return True, None, "", ""
 
                 if not validate_safe_chars(text):
-                    return False, None, "❌ Содержит запрещенные символы", ""
+                    return False, None, " Содержит запрещенные символы", ""
 
                 # INTEGER
                 if isinstance(column.type, Integer):
                     if not text.isdigit() and not (text.startswith('-') and text[1:].isdigit()):
-                        return False, None, "❌ Должно быть целым числом", ""
+                        return False, None, " Должно быть целым числом", ""
                     value = int(text)
                     # CheckConstraint: discount_percent BETWEEN 0 AND 100
                     if table_name == "Readers" and column.name == "discount_percent":
                         if value < 0 or value > 100:
-                            return False, None, "❌ Скидка должна быть от 0 до 100%", ""
+                            return False, None, " Скидка должна быть от 0 до 100%", ""
                     # CheckConstraint: actual_rental_days >= 0
                     elif table_name == "Issued_Books" and column.name == "actual_rental_days":
                         if value < 0:
-                            return False, None, "❌ Дни не могут быть отрицательными", ""
-                    return True, value, "", f"✅ Целое: {value}"
+                            return False, None, " Дни не могут быть отрицательными", ""
+                    return True, value, "", f" Целое: {value}"
 
                 # NUMERIC
                 elif isinstance(column.type, Numeric):
                     if not re.match(r'^-?\d+(\.\d+)?$', text):
-                        return False, None, "❌ Должно быть числом (например: 15 или 3.14)", ""
+                        return False, None, " Должно быть числом (например: 15 или 3.14)", ""
                     try:
                         value = float(text)
                         # CheckConstraint: deposit_amount >= 0
                         if table_name == "Books" and column.name == "deposit_amount":
                             if value < 0:
-                                return False, None, "❌ Залог не может быть отрицательным", ""
+                                return False, None, " Залог не может быть отрицательным", ""
                         # CheckConstraint: daily_rental_rate > 0
                         elif table_name == "Books" and column.name == "daily_rental_rate":
                             if value <= 0:
-                                return False, None, "❌ Стоимость аренды должна быть больше 0", ""
+                                return False, None, " Стоимость аренды должна быть больше 0", ""
                         # CheckConstraint: damage_fine >= 0
                         elif table_name == "Issued_Books" and column.name == "damage_fine":
                             if value < 0:
-                                return False, None, "❌ Штраф не может быть отрицательным", ""
+                                return False, None, " Штраф не может быть отрицательным", ""
                         # CheckConstraint: final_rental_cost >= 0 (если указано)
                         elif table_name == "Issued_Books" and column.name == "final_rental_cost":
                             if value < 0:
-                                return False, None, "❌ Стоимость аренды не может быть отрицательной", ""
+                                return False, None, " Стоимость аренды не может быть отрицательной", ""
                         # Проверка точности NUMERIC(10,2)
                         if abs(value) > 99999999.99:
-                            return False, None, "❌ Слишком большое число (макс. 99999999.99)", ""
-                        return True, value, "", f"✅ Число: {value}"
+                            return False, None, " Слишком большое число (макс. 99999999.99)", ""
+                        return True, value, "", f" Число: {value}"
                     except (ValueError, OverflowError):
-                        return False, None, "❌ Некорректное числовое значение", ""
+                        return False, None, " Некорректное числовое значение", ""
 
                 # STRING
                 elif isinstance(column.type, String):
                     max_length = getattr(column.type, 'length', None)
                     if max_length and len(text) > max_length:
-                        return False, None, f"❌ Превышена длина ({len(text)}/{max_length} символов)", ""
+                        return False, None, f" Превышена длина ({len(text)}/{max_length} символов)", ""
                     # Специфическая валидация
                     if is_email_field(display_name) and not validate_email(text):
-                        return False, None, "❌ Некорректный email адрес", ""
+                        return False, None, " Некорректный email адрес", ""
                     if is_phone_field(display_name) and not validate_phone(text):
-                        return False, None, "❌ Некорректный номер телефона", ""
-                    return True, text, "", f"✅ {len(text)} символов"
+                        return False, None, " Некорректный номер телефона", ""
+                    return True, text, "", f" {len(text)} символов"
 
                 else:
-                    return True, text, "", f"✅ Текст: {text}"
+                    return True, text, "", f" Текст: {text}"
 
             else:
-                return False, None, "❌ Неизвестный тип поля", ""
+                return False, None, " Неизвестный тип поля", ""
 
         except Exception as e:
-            return False, None, f"❌ Ошибка валидации: {str(e)}", ""
+            return False, None, f" Ошибка валидации: {str(e)}", ""
 
     def load_table_fields(self, table_name: str):
         """Загружает и отображает поля для выбранной таблицы."""
@@ -744,7 +744,7 @@ class AddRecordDialog(QDialog):
         try:
             column = getattr(table.c, col_name)
         except AttributeError:
-            self.set_field_error(field_name, "❌ Колонка не найдена в таблице")
+            self.set_field_error(field_name, " Колонка не найдена в таблице")
             self.field_validity[field_name] = False
             return
 
@@ -793,7 +793,7 @@ class AddRecordDialog(QDialog):
         if expected_widget and expected_widget.date().isValid():
             expected_date = expected_widget.date()
             if expected_date < issue_date:
-                self.set_field_error("Ожидаемая дата возврата", "❌ Ожидаемая дата возврата должна быть позже даты выдачи")
+                self.set_field_error("Ожидаемая дата возврата", " Ожидаемая дата возврата должна быть позже даты выдачи")
             else:
                 self.clear_field_error("Ожидаемая дата возврата")
         elif expected_widget:
@@ -803,7 +803,7 @@ class AddRecordDialog(QDialog):
         if actual_widget and actual_widget.date().isValid():
             actual_date = actual_widget.date()
             if actual_date < issue_date:
-                self.set_field_error("Фактическая дата возврата", "❌ Фактическая дата возврата должна быть позже даты выдачи")
+                self.set_field_error("Фактическая дата возврата", " Фактическая дата возврата должна быть позже даты выдачи")
             else:
                 self.clear_field_error("Фактическая дата возврата")
         elif actual_widget:
@@ -830,7 +830,7 @@ class AddRecordDialog(QDialog):
             try:
                 column = getattr(table.c, col_name)
             except AttributeError:
-                error_fields[display_name] = "❌ Колонка не найдена в таблице"
+                error_fields[display_name] = " Колонка не найдена в таблице"
                 continue
 
             # Используем встроенный валидатор
@@ -839,7 +839,7 @@ class AddRecordDialog(QDialog):
             )
 
             if not is_valid:
-                error_fields[display_name] = error_message or "❌ Ошибка валидации"
+                error_fields[display_name] = error_message or " Ошибка валидации"
             else:
                 data[col_name] = value
 
@@ -848,7 +848,7 @@ class AddRecordDialog(QDialog):
             for field, message in error_fields.items():
                 self.set_field_error(field, message)
             notification.notify(
-                title="❌ Ошибки валидации",
+                title=" Ошибки валидации",
                 message=f"Исправьте {len(error_fields)} ошиб(ки/ок) перед добавлением.",
                 timeout=4
             )
@@ -860,14 +860,14 @@ class AddRecordDialog(QDialog):
 
             if success:
                 notification.notify(
-                    title="✅ Успех",
+                    title=" Успех",
                     message=f"Запись успешно добавлена в '{table_name}'",
                     timeout=4
                 )
                 self.accept()
             else:
                 notification.notify(
-                    title="❌ Ошибка базы данных",
+                    title=" Ошибка базы данных",
                     message=f"Не удалось добавить запись в таблицу '{table_name}'",
                     timeout=5
                 )
@@ -877,7 +877,7 @@ class AddRecordDialog(QDialog):
 
         except Exception as e:
             notification.notify(
-                title="❌ Исключение",
+                title=" Исключение",
                 message=f"Ошибка при добавлении записи: {str(e)}",
                 timeout=5
             )
@@ -888,7 +888,7 @@ class AddRecordDialog(QDialog):
             for col in table.columns:
                 if col.name.lower() in err_text:
                     display = self.COLUMN_HEADERS_MAP.get(col.name, col.name)
-                    self.set_field_error(display, f"❌ Ошибка в поле '{display}'")
+                    self.set_field_error(display, f" Ошибка в поле '{display}'")
                     matched = True
 
             # Если не удалось определить конкретные — подсвечиваем все

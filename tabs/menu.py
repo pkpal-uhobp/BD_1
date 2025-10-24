@@ -135,13 +135,13 @@ class MainWindow(QMainWindow):
         center_widget.setLayout(center_layout)
 
         # === 📋 Выпадающая кнопка "Действия" ===
-        actions_button = QPushButton("📋 Действия ▼")
+        actions_button = QPushButton("Действия ▼")
         actions_menu = QMenu(actions_button)
 
         # Добавляем пункты меню
-        actions_menu.addAction("📗 Добавить", lambda: self.add_data())
-        actions_menu.addAction("✏️ Изменить", lambda: self.edit_data())
-        actions_menu.addAction("🗑 Удалить", lambda: self.delete_data())
+        actions_menu.addAction("Добавить", lambda: self.add_data())
+        actions_menu.addAction("Изменить", lambda: self.edit_data())
+        actions_menu.addAction("Удалить", lambda: self.delete_data())
 
         # Применяем стиль
         self.style_dropdown_button(actions_button, actions_menu)
@@ -150,14 +150,14 @@ class MainWindow(QMainWindow):
         actions_button.setMenu(actions_menu)
         center_layout.addWidget(actions_button)
 
-        # === 🔍 Выпадающая кнопка "Поиск" ===
-        search_button = QPushButton("🔍 Поиск ▼")
+        # === Выпадающая кнопка "Поиск" ===
+        search_button = QPushButton("Поиск ▼")
         search_menu = QMenu(search_button)
 
         # Добавляем пункты меню поиска
-        search_menu.addAction("🔍 Поиск по тексту", lambda: self.open_text_search())
-        search_menu.addAction("🚀 Расширенный SELECT", lambda: self.open_advanced_select())
-        search_menu.addAction("🔤 Строковые функции", lambda: self.open_string_functions())
+        search_menu.addAction("Поиск по тексту", lambda: self.open_text_search())
+        search_menu.addAction("Расширенный SELECT", lambda: self.open_advanced_select())
+        search_menu.addAction("Строковые функции", lambda: self.open_string_functions())
 
         # Применяем стиль
         self.style_dropdown_button(search_button, search_menu)
@@ -221,10 +221,10 @@ class MainWindow(QMainWindow):
             }
         """)
 
-        alter_menu.addAction("➕ Добавить столбец", lambda: self.alter_table_action("add"))
-        alter_menu.addAction("➖ Удалить столбец", lambda: self.alter_table_action("drop"))
-        alter_menu.addAction("✏️ Переименовать", lambda: self.alter_table_action("rename"))
-        alter_menu.addAction("🔁 Изменить тип столбца", lambda: self.alter_table_action("type"))
+        alter_menu.addAction("Добавить столбец", lambda: self.alter_table_action("add"))
+        alter_menu.addAction("Удалить столбец", lambda: self.alter_table_action("drop"))
+        alter_menu.addAction("Переименовать", lambda: self.alter_table_action("rename"))
+        alter_menu.addAction("Изменить тип столбца", lambda: self.alter_table_action("type"))
 
         alter_menu_button.setMenu(alter_menu)
         center_layout.addWidget(alter_menu_button)
@@ -601,7 +601,7 @@ class MainWindow(QMainWindow):
         """Создаёт схему и таблицы в БД."""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="❌ Ошибка подключения",
+                title="Ошибка подключения",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -611,13 +611,13 @@ class MainWindow(QMainWindow):
 
         if success:
             notification.notify(
-                title="✅ Успех",
+                title="Успех",
                 message="Схема успешно создана или уже существовала.",
                 timeout=5
             )
         else:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message="Не удалось создать схему. Проверьте логи (db/db_app.log).",
                 timeout=5
             )
@@ -626,7 +626,7 @@ class MainWindow(QMainWindow):
         """Удаляет схему и все таблицы из БД."""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="❌ Ошибка подключения",
+                title="Ошибка подключения",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -634,7 +634,7 @@ class MainWindow(QMainWindow):
 
         # Стилизованный QMessageBox
         msg = QMessageBox(self)
-        msg.setWindowTitle("⚠️ Подтверждение удаления")
+        msg.setWindowTitle("Подтверждение удаления")
         msg.setText("Вы уверены, что хотите УДАЛИТЬ ВСЮ СХЕМУ и ВСЕ ДАННЫЕ?\nЭто действие необратимо!")
         msg.setIcon(QMessageBox.Warning)
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -650,7 +650,7 @@ class MainWindow(QMainWindow):
 
         if success:
             notification.notify(
-                title="✅ Схема удалена",
+                title="Схема удалена",
                 message="Схема успешно удалена из базы данных.",
                 timeout=5
             )
@@ -658,7 +658,7 @@ class MainWindow(QMainWindow):
             self.current_table_data = []
         else:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message="Не удалось удалить схему. Проверьте логи (db/db_app.log).",
                 timeout=5
             )
@@ -730,7 +730,7 @@ class MainWindow(QMainWindow):
         """Открывает диалоговое окно поиска по тексту"""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="❌ Ошибка подключения",
+                title="Ошибка подключения",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -744,7 +744,7 @@ class MainWindow(QMainWindow):
         """Открывает диалоговое окно расширенного SELECT"""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="❌ Ошибка подключения",
+                title="Ошибка подключения",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -759,7 +759,7 @@ class MainWindow(QMainWindow):
         """Открывает диалоговое окно строковых функций"""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="❌ Ошибка подключения",
+                title="Ошибка подключения",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -828,7 +828,7 @@ class MainWindow(QMainWindow):
         
         # Показываем уведомление
         notification.notify(
-            title="✅ Результаты загружены",
+            title="Результаты загружены",
             message=f"Найдено {len(results)} записей",
             timeout=3
         )
@@ -968,7 +968,7 @@ class MainWindow(QMainWindow):
         """Обрабатывает действия из выпадающего списка ALTER TABLE"""
         if not self.db_instance or not self.db_instance.is_connected():
             notification.notify(
-                title="❌ Ошибка подключения",
+                title="Ошибка подключения",
                 message="Нет подключения к базе данных!",
                 timeout=3
             )
@@ -1039,7 +1039,7 @@ class MainWindow(QMainWindow):
     def logout(self):
         # Стилизованный QMessageBox
         msg = QMessageBox(self)
-        msg.setWindowTitle("⚠️ Подтверждение")
+        msg.setWindowTitle("Подтверждение")
         msg.setText("Вы действительно хотите отключиться?")
         msg.setIcon(QMessageBox.Question)
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -1053,7 +1053,7 @@ class MainWindow(QMainWindow):
             self.login_window = DBConnectionWindow()
             self.login_window.show()
             notification.notify(
-                title="✅ Успешное отключение",
+                title="Успешное отключение",
                 message="Вы отключились от базы данных.")
             self.close()
 
@@ -1062,13 +1062,13 @@ class MainWindow(QMainWindow):
             try:
                 self.db_instance.disconnect()
                 notification.notify(
-                    title="ℹ️ Информация",
+                    title="Информация",
                     message="Отключение от базы данных выполнено.",
                     timeout=5
                 )
             except Exception as e:
                 notification.notify(
-                    title="❌ Ошибка",
+                    title="Ошибка",
                     message=f"Ошибка при отключении от базы данных: {e}",
                     timeout=5
                 )

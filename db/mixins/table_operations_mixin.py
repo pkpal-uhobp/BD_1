@@ -30,7 +30,7 @@ class TableOperationsMixin:
             self.logger.info(f"🧩 ALTER TABLE '{table_name}': добавление колонки '{column_name}'")
 
             if not self.record_exists_ex_table(table_name):
-                self.logger.error(f"❌ Таблица '{table_name}' не существует в БД")
+                self.logger.error(f" Таблица '{table_name}' не существует в БД")
                 return False
 
             type_str = column_type.compile(dialect=self.engine.dialect)
@@ -81,7 +81,7 @@ class TableOperationsMixin:
                     )
                     dups = conn.execute(dup_sql).fetchall()
                     if dups:
-                        self.logger.error("❌ Невозможно создать UNIQUE — найдены дубликаты")
+                        self.logger.error(" Невозможно создать UNIQUE — найдены дубликаты")
                         return False
                     uq_name = f'uq_{table_name}_{column_name}'
                     uq_sql = f'ALTER TABLE "{table_name}" ADD CONSTRAINT "{uq_name}" UNIQUE ("{column_name}");'
@@ -106,13 +106,13 @@ class TableOperationsMixin:
                         null_cnt = 0
                     # Повторная проверка NULL
                     if null_cnt > 0:
-                        self.logger.error("❌ Невозможно создать PRIMARY KEY — есть NULL значения и тип нецелочисленный для авто-заполнения")
+                        self.logger.error(" Невозможно создать PRIMARY KEY — есть NULL значения и тип нецелочисленный для авто-заполнения")
                         return False
                     dup_cnt = conn.execute(text(
                         f'SELECT COUNT(*) FROM (SELECT "{column_name}" FROM "{table_name}" GROUP BY "{column_name}" HAVING COUNT(*)>1) t'
                     )).scalar() or 0
                     if dup_cnt > 0:
-                        self.logger.error("❌ Невозможно создать PRIMARY KEY — есть дубликаты")
+                        self.logger.error(" Невозможно создать PRIMARY KEY — есть дубликаты")
                         return False
                     # Установим NOT NULL перед созданием PK
                     conn.execute(text(
@@ -141,7 +141,7 @@ class TableOperationsMixin:
                             )
                             conn.execute(setval_sql, {"t": table_name, "c": column_name, "m": max_val})
                         except Exception as e:
-                            self.logger.warning(f"⚠️ Не удалось включить IDENTITY для {table_name}.{column_name}: {self.format_db_error(e)}")
+                            self.logger.warning(f"⚠ Не удалось включить IDENTITY для {table_name}.{column_name}: {self.format_db_error(e)}")
 
                 # 7) FOREIGN KEY
                 if "foreign_key" in kwargs and kwargs["foreign_key"]:
@@ -160,14 +160,14 @@ class TableOperationsMixin:
                         conn.execute(text(val_sql))
                     except Exception as e:
                         # Если валидация не прошла, оставляем NOT VALID и сообщаем пользователю, что нужно заполнить данные
-                        self.logger.warning(f"⚠️ Валидация FK не прошла, ограничение оставлено NOT VALID: {self.format_db_error(e)}")
+                        self.logger.warning(f"️ Валидация FK не прошла, ограничение оставлено NOT VALID: {self.format_db_error(e)}")
 
             self._refresh_metadata()
-            self.logger.info(f"✅ Колонка '{column_name}' успешно добавлена в '{table_name}'")
+            self.logger.info(f" Колонка '{column_name}' успешно добавлена в '{table_name}'")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка добавления колонки '{column_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка добавления колонки '{column_name}': {self.format_db_error(e)}")
             return False
 
     def drop_column_safe(self, table_name: str, column_name: str, force: bool = False) -> bool:
@@ -176,20 +176,20 @@ class TableOperationsMixin:
         force=True — удаляет столбец вместе с зависимостями (CASCADE).
         """
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к БД.")
+            self.logger.error(" Нет подключения к БД.")
             return False
 
         try:
             # --- Проверка существования таблицы ---
             if not self.record_exists_ex_table(table_name):
-                self.logger.error(f"❌ Таблица '{table_name}' не существует в БД.")
+                self.logger.error(f" Таблица '{table_name}' не существует в БД.")
                 return False
 
             # --- Проверка существования колонки ---
             columns = self.get_column_names(table_name)
             actual_col = next((c for c in columns if c.lower() == column_name.lower()), None)
             if not actual_col:
-                self.logger.error(f"❌ Столбец '{column_name}' не найден в таблице '{table_name}'.")
+                self.logger.error(f" Столбец '{column_name}' не найден в таблице '{table_name}'.")
                 return False
 
             # --- Проверка зависимостей ---
@@ -197,29 +197,29 @@ class TableOperationsMixin:
             if not force:
                 if dependencies.get("foreign_keys"):
                     self.logger.error(
-                        f"⚠️ Столбец '{actual_col}' участвует во внешних ключах: {dependencies['foreign_keys']}")
+                        f"️ Столбец '{actual_col}' участвует во внешних ключах: {dependencies['foreign_keys']}")
                     return False
                 if dependencies.get("constraints"):
                     self.logger.warning(
-                        f"⚠️ Столбец '{actual_col}' используется в ограничениях: {dependencies['constraints']}")
+                        f"️ Столбец '{actual_col}' используется в ограничениях: {dependencies['constraints']}")
                 if dependencies.get("indexes"):
-                    self.logger.warning(f"⚠️ Столбец '{actual_col}' используется в индексах: {dependencies['indexes']}")
+                    self.logger.warning(f"️ Столбец '{actual_col}' используется в индексах: {dependencies['indexes']}")
 
             # --- Удаление ---
             sql = f'ALTER TABLE "{table_name}" DROP COLUMN "{actual_col}"{" CASCADE" if force else ""};'
-            self.logger.info(f"🧩 ALTER TABLE: удаление столбца '{actual_col}' из '{table_name}' (force={force})")
+            self.logger.info(f" ALTER TABLE: удаление столбца '{actual_col}' из '{table_name}' (force={force})")
             self.logger.debug(f"SQL → {sql}")
 
             with self.engine.begin() as conn:
                 conn.execute(text(sql))
 
             self._refresh_metadata()
-            self.logger.info(f"✅ Столбец '{actual_col}' успешно удалён из таблицы '{table_name}'.")
+            self.logger.info(f" Столбец '{actual_col}' успешно удалён из таблицы '{table_name}'.")
             return True
 
         except Exception as e:
             self.logger.error(
-                f"❌ Ошибка при удалении столбца '{column_name}' из '{table_name}': {self.format_db_error(e)}")
+                f" Ошибка при удалении столбца '{column_name}' из '{table_name}': {self.format_db_error(e)}")
             return False
 
     def get_column_dependencies(self, table_name: str, column_name: str) -> Dict[str, List[str]]:
@@ -232,7 +232,7 @@ class TableOperationsMixin:
         deps = {'foreign_keys': [], 'constraints': [], 'indexes': []}
 
         if not self.is_connected():
-            self.logger.warning("⚠️ Невозможно проверить зависимости — нет подключения к БД.")
+            self.logger.warning("️ Невозможно проверить зависимости — нет подключения к БД.")
             return deps
 
         try:
@@ -264,22 +264,22 @@ class TableOperationsMixin:
             return deps
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка анализа зависимостей '{table_name}.{column_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка анализа зависимостей '{table_name}.{column_name}': {self.format_db_error(e)}")
             return deps
 
     def rename_table(self, old_table_name: str, new_table_name: str) -> bool:
         """Переименовывает таблицу в БД с обновлением метаданных."""
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к БД.")
+            self.logger.error(" Нет подключения к БД.")
             return False
 
         try:
             # --- Проверки существования ---
             if not self.record_exists_ex_table(old_table_name):
-                self.logger.error(f"❌ Таблица '{old_table_name}' не существует.")
+                self.logger.error(f" Таблица '{old_table_name}' не существует.")
                 return False
             if self.record_exists_ex_table(new_table_name):
-                self.logger.error(f"⚠️ Таблица '{new_table_name}' уже существует.")
+                self.logger.error(f" Таблица '{new_table_name}' уже существует.")
                 return False
 
             # --- Выполнение ---
@@ -292,23 +292,23 @@ class TableOperationsMixin:
 
             # --- Обновление метаданных ---
             self._refresh_metadata()
-            self.logger.info(f"✅ Таблица успешно переименована: '{old_table_name}' → '{new_table_name}'")
+            self.logger.info(f" Таблица успешно переименована: '{old_table_name}' → '{new_table_name}'")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка переименования таблицы '{old_table_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка переименования таблицы '{old_table_name}': {self.format_db_error(e)}")
             return False
 
     def rename_column(self, table_name: str, old_column_name: str, new_column_name: str) -> bool:
         """Переименовывает столбец в таблице с обновлением метаданных и проверкой зависимостей."""
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к БД.")
+            self.logger.error(" Нет подключения к БД.")
             return False
 
         try:
             # --- Проверки существования таблицы ---
             if not self.record_exists_ex_table(table_name):
-                self.logger.error(f"❌ Таблица '{table_name}' не существует.")
+                self.logger.error(f" Таблица '{table_name}' не существует.")
                 return False
 
             columns = self.get_column_names(table_name)
@@ -316,10 +316,10 @@ class TableOperationsMixin:
             actual_new = next((c for c in columns if c.lower() == new_column_name.lower()), None)
 
             if not actual_old:
-                self.logger.error(f"❌ Столбец '{old_column_name}' не найден в таблице '{table_name}'.")
+                self.logger.error(f" Столбец '{old_column_name}' не найден в таблице '{table_name}'.")
                 return False
             if actual_new:
-                self.logger.error(f"⚠️ Столбец '{new_column_name}' уже существует в '{table_name}'.")
+                self.logger.error(f"️ Столбец '{new_column_name}' уже существует в '{table_name}'.")
                 return False
 
             # --- Проверка зависимостей (предупреждения, но не блокировка) ---
@@ -327,13 +327,13 @@ class TableOperationsMixin:
             total_deps = sum(len(v) for v in deps.values())
             if total_deps > 0:
                 self.logger.warning(
-                    f"⚠️ Переименование '{actual_old}' затронет {total_deps} зависимостей "
+                    f"️ Переименование '{actual_old}' затронет {total_deps} зависимостей "
                     f"(FK={len(deps['foreign_keys'])}, CHECK={len(deps['constraints'])}, IDX={len(deps['indexes'])})"
                 )
 
             # --- Выполнение SQL ---
             sql = f'ALTER TABLE "{table_name}" RENAME COLUMN "{actual_old}" TO "{new_column_name}";'
-            self.logger.info(f"🧩 Переименование столбца: '{table_name}.{actual_old}' → '{new_column_name}'")
+            self.logger.info(f" Переименование столбца: '{table_name}.{actual_old}' → '{new_column_name}'")
             self.logger.debug(f"SQL → {sql}")
 
             with self.engine.begin() as conn:
@@ -341,11 +341,11 @@ class TableOperationsMixin:
 
             # --- Обновляем метаданные ---
             self._refresh_metadata()
-            self.logger.info(f"✅ Столбец '{actual_old}' успешно переименован в '{new_column_name}' в '{table_name}'.")
+            self.logger.info(f" Столбец '{actual_old}' успешно переименован в '{new_column_name}' в '{table_name}'.")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка переименования '{table_name}.{old_column_name}': {self.format_db_error(e)}")
+            self.logger.error(f" Ошибка переименования '{table_name}.{old_column_name}': {self.format_db_error(e)}")
             return False
 
     def alter_column_type(self, table_name: str, column_name: str, new_type: str, using_expr: str = None):
@@ -354,7 +354,7 @@ class TableOperationsMixin:
         Запрещает изменение типа для FK/PK столбцов.
         """
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к базе данных.")
+            self.logger.error(" Нет подключения к базе данных.")
             return "Нет подключения к базе данных."
 
         try:
@@ -364,13 +364,13 @@ class TableOperationsMixin:
 
             insp = inspect(self.engine)
             if table_name not in insp.get_table_names():
-                self.logger.error(f"❌ Таблица '{table_name}' не найдена.")
+                self.logger.error(f" Таблица '{table_name}' не найдена.")
                 return f"Таблица '{table_name}' не найдена."
 
             # Проверяем наличие колонки
             columns = [c['name'] for c in insp.get_columns(table_name)]
             if column_name not in columns:
-                self.logger.error(f"❌ Колонка '{column_name}' не найдена в '{table_name}'.")
+                self.logger.error(f" Колонка '{column_name}' не найдена в '{table_name}'.")
                 return f"Колонка '{column_name}' не найдена в '{table_name}'."
 
             with self.engine.begin() as conn:
@@ -435,7 +435,7 @@ class TableOperationsMixin:
                     
                     # Создаём ENUM-тип
                     create_enum_sql = f"CREATE TYPE {enum_name} AS ENUM ({', '.join(enum_values)});"
-                    self.logger.info(f"🎯 Создание ENUM-типа: {enum_name}")
+                    self.logger.info(f" Создание ENUM-типа: {enum_name}")
                     conn.execute(text(create_enum_sql))
                     
                     # Простое USING выражение - всегда через text
@@ -473,28 +473,28 @@ class TableOperationsMixin:
 
             # Обновляем метаданные
             self._refresh_metadata()
-            self.logger.info(f"✅ Тип столбца '{column_name}' успешно изменён на '{new_type}' в '{table_name}'.")
+            self.logger.info(f" Тип столбца '{column_name}' успешно изменён на '{new_type}' в '{table_name}'.")
             return True
 
         except Exception as e:
             error_msg = f"Ошибка изменения типа столбца '{table_name}.{column_name}': {self.format_db_error(e)}"
-            self.logger.error(f"❌ {error_msg}")
+            self.logger.error(f" {error_msg}")
             return error_msg
 
     def set_column_nullable(self, table_name: str, column_name: str, nullable: bool) -> bool:
         """Устанавливает возможность NULL для столбца."""
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к БД.")
+            self.logger.error(" Нет подключения к БД.")
             return False
 
         try:
             if not self.record_exists_ex_table(table_name):
-                self.logger.error(f"❌ Таблица '{table_name}' не существует.")
+                self.logger.error(f" Таблица '{table_name}' не существует.")
                 return False
 
             columns = self.get_column_names(table_name)
             if column_name not in columns:
-                self.logger.error(f"❌ Столбец '{column_name}' не найден в '{table_name}'.")
+                self.logger.error(f" Столбец '{column_name}' не найден в '{table_name}'.")
                 return False
 
             # Проверяем, есть ли NULL значения, если пытаемся сделать NOT NULL
@@ -505,7 +505,7 @@ class TableOperationsMixin:
                     )).scalar() or 0
                     
                     if null_count > 0:
-                        self.logger.error(f"❌ Невозможно установить NOT NULL: найдено {null_count} NULL значений.")
+                        self.logger.error(f"  Невозможно установить NOT NULL: найдено {null_count} NULL значений.")
                         return False
 
             # Выполняем изменение
@@ -518,27 +518,27 @@ class TableOperationsMixin:
                 conn.execute(text(sql))
 
             self._refresh_metadata()
-            self.logger.info(f"✅ Столбец '{column_name}' успешно изменён в '{table_name}'.")
+            self.logger.info(f" Столбец '{column_name}' успешно изменён в '{table_name}'.")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка изменения NULL для '{table_name}.{column_name}': {self.format_db_error(e)}")
+            self.logger.error(f"  Ошибка изменения NULL для '{table_name}.{column_name}': {self.format_db_error(e)}")
             return False
 
     def set_column_default(self, table_name: str, column_name: str, default_value: Any) -> bool:
         """Устанавливает значение по умолчанию для столбца."""
         if not self.is_connected():
-            self.logger.error("❌ Нет подключения к БД.")
+            self.logger.error("  Нет подключения к БД.")
             return False
 
         try:
             if not self.record_exists_ex_table(table_name):
-                self.logger.error(f"❌ Таблица '{table_name}' не существует.")
+                self.logger.error(f"  Таблица '{table_name}' не существует.")
                 return False
 
             columns = self.get_column_names(table_name)
             if column_name not in columns:
-                self.logger.error(f"❌ Столбец '{column_name}' не найден в '{table_name}'.")
+                self.logger.error(f"  Столбец '{column_name}' не найден в '{table_name}'.")
                 return False
 
             # Формируем SQL для установки DEFAULT
@@ -558,10 +558,10 @@ class TableOperationsMixin:
                 conn.execute(text(sql))
 
             self._refresh_metadata()
-            self.logger.info(f"✅ DEFAULT для столбца '{column_name}' успешно установлен в '{table_name}'.")
+            self.logger.info(f" DEFAULT для столбца '{column_name}' успешно установлен в '{table_name}'.")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка установки DEFAULT для '{table_name}.{column_name}': {self.format_db_error(e)}")
+            self.logger.error(f"  Ошибка установки DEFAULT для '{table_name}.{column_name}': {self.format_db_error(e)}")
             return False
 

@@ -575,5 +575,5 @@ class ShowTableDialog(QDialog):
             self.accept()
 
         except Exception as e:
-            notification.notify(title="❌ Ошибка", message=f"Не удалось собрать параметры: {str(e)}", timeout=5)
+            notification.notify(title=" Ошибка", message=f"Не удалось собрать параметры: {str(e)}", timeout=5)
 

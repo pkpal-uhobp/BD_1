@@ -179,9 +179,9 @@ class ArrayEditDialog(QDialog):
 
         # --- Кнопки управления ---
         btns_layout = QHBoxLayout()
-        self.add_button = QPushButton("➕ Добавить элемент")
+        self.add_button = QPushButton("Добавить элемент")
         self.add_button.clicked.connect(lambda: self.addField(""))
-        self.remove_button = QPushButton("➖ Удалить элемент")
+        self.remove_button = QPushButton("Удалить элемент")
         self.remove_button.clicked.connect(self.removeField)
         btns_layout.addWidget(self.add_button)
         btns_layout.addWidget(self.remove_button)
@@ -189,9 +189,9 @@ class ArrayEditDialog(QDialog):
 
         # --- Кнопки сохранения ---
         bottom_layout = QHBoxLayout()
-        self.save_button = QPushButton("✅ Сохранить")
+        self.save_button = QPushButton("Сохранить")
         self.save_button.clicked.connect(self.validate_and_accept)
-        self.cancel_button = QPushButton("❌ Отмена")
+        self.cancel_button = QPushButton("Отмена")
         self.cancel_button.clicked.connect(self.reject)
         bottom_layout.addWidget(self.save_button)
         bottom_layout.addWidget(self.cancel_button)
@@ -239,7 +239,7 @@ class ArrayEditDialog(QDialog):
 
         # Пустое значение — ошибка
         if not value:
-            self.set_field_error(widget, "❌ Элемент не может быть пустым")
+            self.set_field_error(widget, "Элемент не может быть пустым")
             self.field_validity[widget] = False
             return
 
@@ -259,7 +259,7 @@ class ArrayEditDialog(QDialog):
                     datetime.strptime(value, "%Y-%m-%d")
                 # строки не требуют проверки
             except Exception:
-                self.set_field_error(widget, f"❌ Неверный формат для типа {expected_type}")
+                self.set_field_error(widget, f"Неверный формат для типа {expected_type}")
                 self.field_validity[widget] = False
                 return
 
@@ -368,7 +368,7 @@ class ArrayEditDialog(QDialog):
         """Подсвечивает только поле ввода, а не весь контейнер"""
         if widget in self.error_labels:
             lbl = self.error_labels[widget]
-            lbl.setText(msg or "❌ Ошибка")
+            lbl.setText(msg or "Ошибка")
             lbl.show()
 
             # только само поле делаем красным

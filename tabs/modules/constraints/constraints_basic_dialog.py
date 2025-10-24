@@ -16,7 +16,7 @@ class ConstraintsBasicDialog(QDialog):
         self.db_instance = db_instance
         self.table_name = table_name
         self.column_name = column_name
-        self.setWindowTitle("🔒 ОГРАНИЧЕНИЯ (без PK/FK)")
+        self.setWindowTitle(" ОГРАНИЧЕНИЯ (без PK/FK)")
         self.setModal(True)
         self.setFixedSize(800, 500)
         self._set_dark_palette()
@@ -113,7 +113,7 @@ class ConstraintsBasicDialog(QDialog):
         hl.addWidget(t)
         root.addWidget(header)
 
-        box = QGroupBox("⚙️ ОГРАНИЧЕНИЯ")
+        box = QGroupBox(" ОГРАНИЧЕНИЯ")
         box.setObjectName("settingsGroup")
         form = QFormLayout(box)
         form.setLabelAlignment(Qt.AlignRight)
@@ -160,7 +160,7 @@ class ConstraintsBasicDialog(QDialog):
         btn_row = QWidget()
         bl = QHBoxLayout(btn_row)
         bl.addStretch()
-        ok = QPushButton("✅ ПРИМЕНИТЬ")
+        ok = QPushButton(" ПРИМЕНИТЬ")
         ok.setObjectName("primaryButton")
         cancel = QPushButton("✖ ОТМЕНА")
         cancel.setObjectName("secondaryButton")
