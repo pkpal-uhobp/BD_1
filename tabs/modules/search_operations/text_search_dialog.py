@@ -169,7 +169,7 @@ class TextSearchDialog(QDialog):
         self.search_button.setObjectName("searchButton")
         self.search_button.clicked.connect(self.perform_search)
         
-        self.clear_button = QPushButton("🗑 Очистить")
+        self.clear_button = QPushButton("Очистить")
         self.clear_button.setObjectName("clearButton")
         self.clear_button.clicked.connect(self.clear_results)
         

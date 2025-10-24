@@ -47,12 +47,12 @@ class ConnectionMixin:
             with self.engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
 
-            self.logger.info(f"✅ Подключено: {self.dbname}@{self.host}:{self.port}")
+            self.logger.info(f"Подключено: {self.dbname}@{self.host}:{self.port}")
             self._build_metadata()
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Ошибка подключения: {self.format_db_error(e)}")
+            self.logger.error(f"Ошибка подключения: {self.format_db_error(e)}")
             self.engine = None
             return False
 
@@ -67,13 +67,13 @@ class ConnectionMixin:
             self.engine = None
             self.metadata = None
             self.tables.clear()
-            self.logger.info("✅ Соединение с БД успешно закрыто.")
+            self.logger.info(" Соединение с БД успешно закрыто.")
         except Exception as e:
-            self.logger.error(f"❌ Ошибка при закрытии соединения: {e}")
+            self.logger.error(f"Ошибка при закрытии соединения: {e}")
 
     def is_connected(self) -> bool:
         """Проверяет, активно ли соединение с БД (логирует только при ошибке)."""
         if self.engine is None:
-            self.logger.warning("⚠️ Проверка подключения: соединение не активно.")
+            self.logger.warning("⚠Проверка подключения: соединение не активно.")
             return False
         return True

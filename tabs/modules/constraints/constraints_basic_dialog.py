@@ -162,7 +162,7 @@ class ConstraintsBasicDialog(QDialog):
         bl.addStretch()
         ok = QPushButton(" ПРИМЕНИТЬ")
         ok.setObjectName("primaryButton")
-        cancel = QPushButton("✖ ОТМЕНА")
+        cancel = QPushButton("ОТМЕНА")
         cancel.setObjectName("secondaryButton")
         cancel.clicked.connect(self.reject)
         ok.clicked.connect(self.accept)

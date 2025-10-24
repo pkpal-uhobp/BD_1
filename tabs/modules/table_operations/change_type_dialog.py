@@ -107,7 +107,7 @@ class ChangeTypeDialog(QDialog):
         bl.addStretch()
         ok = QPushButton("ИЗМЕНИТЬ")
         ok.setObjectName("primaryButton")
-        cancel = QPushButton("✖ ОТМЕНА")
+        cancel = QPushButton("ОТМЕНА")
         cancel.setObjectName("secondaryButton")
         cancel.clicked.connect(self.reject)
         ok.clicked.connect(self._on_ok)

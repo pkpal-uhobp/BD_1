@@ -97,9 +97,8 @@ class AdvancedSelectDialog(QDialog):
         self.db_instance = db_instance
         self.setWindowTitle("Расширенный SELECT")
         self.setModal(True)
-        self.setMinimumSize(800, 600)
-        self.setMaximumSize(1000, 800)
-        self.resize(900, 700)
+        self.setMinimumSize(1000, 800)
+        self.resize(1000, 800)
         
         # Устанавливаем темную палитру
         self.set_dark_palette()
@@ -161,7 +160,7 @@ class AdvancedSelectDialog(QDialog):
         self.scroll_area.setWidget(self.content_widget)
         
         # Добавляем скролл-область в основной layout
-        self.layout().addWidget(self.scroll_area)
+        self.layout().addWidget(self.scroll_area, 1)
         
         # Кнопки (вне скролл-области)
         buttons_layout = QHBoxLayout()
@@ -174,7 +173,7 @@ class AdvancedSelectDialog(QDialog):
         self.preview_button.setObjectName("previewButton")
         self.preview_button.clicked.connect(self.preview_sql)
         
-        self.clear_button = QPushButton("🗑 Очистить")
+        self.clear_button = QPushButton("Очистить")
         self.clear_button.setObjectName("clearButton")
         self.clear_button.clicked.connect(self.clear_all)
         
@@ -435,7 +434,7 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для добавления агрегатных функций
         agg_add_buttons_layout = QHBoxLayout()
         
-        self.add_agg_btn = QPushButton("➕ Добавить функцию")
+        self.add_agg_btn = QPushButton("Добавить функцию")
         self.add_agg_btn.setObjectName("addAggBtn")
         self.add_agg_btn.clicked.connect(self.add_aggregate_function)
         
@@ -491,6 +490,8 @@ class AdvancedSelectDialog(QDialog):
         
         # Добавляем вкладки в основной layout
         layout.addWidget(tab_widget)
+        layout.addSpacing(20)
+
         
         return panel
         
@@ -951,7 +952,7 @@ class AdvancedSelectDialog(QDialog):
                     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                                               stop: 0 #0a0a0f, 
                                               stop: 1 #1a1a2e);
-                    border: 2px solid #44475a;
+                    border: none;
                     border-radius: 10px;
                 }
                 QTextEdit {
@@ -1190,7 +1191,7 @@ class AdvancedSelectDialog(QDialog):
                 background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                                           stop: 0 #0a0a0f, 
                                           stop: 1 #1a1a2e);
-                border: 2px solid #44475a;
+                border: none;
                 border-radius: 10px;
             }
             
@@ -1203,7 +1204,7 @@ class AdvancedSelectDialog(QDialog):
                 padding: 15px;
                 background: rgba(10, 10, 15, 0.7);
                 border-radius: 8px;
-                border: 1px solid #64ffda;
+                border: none;
             }
             
             
@@ -1213,9 +1214,10 @@ class AdvancedSelectDialog(QDialog):
             }
             
             QTabWidget::pane {
-                border: 2px solid #44475a;
+                border: none;
                 border-radius: 8px;
                 background: rgba(15, 15, 25, 0.6);
+                margin-top: 20px;
             }
             
             QTabWidget::tab-bar {

@@ -71,7 +71,7 @@ class DropColumnDialog(QDialog):
         header_l.addWidget(subtitle)
         root.addWidget(header)
 
-        box_select = QGroupBox("📋 ВЫБОР ТАБЛИЦЫ И СТОЛБЦА")
+        box_select = QGroupBox("ВЫБОР ТАБЛИЦЫ И СТОЛБЦА")
         box_select.setObjectName("settingsGroup")
         form = QFormLayout(box_select)
         form.setLabelAlignment(Qt.AlignRight)
