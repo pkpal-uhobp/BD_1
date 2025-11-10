@@ -12,6 +12,7 @@ import re
 # Import new dialogs
 from .case_expression_dialog import CaseExpressionDialog
 from .null_functions_dialog import NullFunctionsDialog
+from .subquery_filter_dialog import SubqueryFilterDialog
 
 
 class SortColumnWidget(QWidget):
@@ -316,6 +317,12 @@ class AdvancedSelectDialog(QDialog):
         self.where_input.setObjectName("whereInput")
         self.where_input.setPlaceholderText("Например: age > 18 AND name LIKE '%John%'")
         where_layout.addWidget(self.where_input)
+        
+        # Кнопка добавления подзапроса
+        add_subquery_btn = QPushButton("➕ Добавить подзапрос (ANY/ALL/EXISTS)")
+        add_subquery_btn.setObjectName("addSubqueryBtn")
+        add_subquery_btn.clicked.connect(self.add_subquery_filter)
+        where_layout.addWidget(add_subquery_btn)
         
         # Метка для отображения ошибок/успеха валидации WHERE
         self.where_error_label = QLabel()
@@ -742,6 +749,29 @@ class AdvancedSelectDialog(QDialog):
         self.special_functions.clear()
         # Обновляем доступные столбцы для сортировки
         self.update_available_order_columns()
+    
+    def add_subquery_filter(self):
+        """Добавляет фильтр с подзапросом"""
+        table_name = self.table_combo.currentText()
+        if not table_name:
+            self.show_error("Сначала выберите таблицу")
+            return
+        
+        # Создаем диалог для создания подзапроса
+        dialog = SubqueryFilterDialog(self.db_instance, table_name, self)
+        if dialog.exec() == QDialog.Accepted:
+            subquery_condition = dialog.get_subquery_condition()
+            if subquery_condition:
+                # Добавляем условие к WHERE
+                current_where = self.where_input.text().strip()
+                if current_where:
+                    # Если уже есть условие, добавляем через AND
+                    new_where = f"{current_where} AND {subquery_condition}"
+                else:
+                    new_where = subquery_condition
+                
+                self.where_input.setText(new_where)
+                self.show_info("Условие с подзапросом добавлено в WHERE")
             
     def add_order_column(self):
         """Добавляет столбец для сортировки"""
