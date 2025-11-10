@@ -9,6 +9,7 @@ from .table_operations_mixin import TableOperationsMixin
 from .constraints_mixin import ConstraintsMixin
 from .search_mixin import SearchMixin
 from .string_operations_mixin import StringOperationsMixin
+from .custom_types_mixin import CustomTypesMixin
 
 __all__ = [
     'ConnectionMixin',
@@ -17,5 +18,6 @@ __all__ = [
     'TableOperationsMixin',
     'ConstraintsMixin',
     'SearchMixin',
-    'StringOperationsMixin'
+    'StringOperationsMixin',
+    'CustomTypesMixin'
 ]
