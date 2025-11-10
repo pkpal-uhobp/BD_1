@@ -9,6 +9,10 @@ from PySide6.QtGui import QFont, QPalette, QColor
 from plyer import notification
 import re
 
+# Import new dialogs
+from .case_expression_dialog import CaseExpressionDialog
+from .null_functions_dialog import NullFunctionsDialog
+
 
 class SortColumnWidget(QWidget):
     """Виджет для отображения столбца с его направлением сортировки"""
@@ -465,6 +469,50 @@ class AdvancedSelectDialog(QDialog):
         
         group_tab_layout.addWidget(agg_group)
         
+        # Группа дополнительных функций (CASE, COALESCE, NULLIF)
+        special_funcs_group = QGroupBox("Специальные функции")
+        special_funcs_group.setObjectName("specialFuncsGroup")
+        special_funcs_layout = QVBoxLayout()
+        special_funcs_group.setLayout(special_funcs_layout)
+        
+        # Кнопки для добавления специальных функций
+        special_funcs_buttons_layout = QHBoxLayout()
+        
+        self.add_case_btn = QPushButton("➕ CASE выражение")
+        self.add_case_btn.setObjectName("addCaseBtn")
+        self.add_case_btn.clicked.connect(self.add_case_expression)
+        
+        self.add_null_func_btn = QPushButton("➕ NULL функция")
+        self.add_null_func_btn.setObjectName("addNullFuncBtn")
+        self.add_null_func_btn.clicked.connect(self.add_null_function)
+        
+        special_funcs_buttons_layout.addWidget(self.add_case_btn)
+        special_funcs_buttons_layout.addWidget(self.add_null_func_btn)
+        special_funcs_layout.addLayout(special_funcs_buttons_layout)
+        
+        # Список специальных функций
+        self.special_functions = QListWidget()
+        self.special_functions.setObjectName("specialFunctions")
+        special_funcs_layout.addWidget(QLabel("Специальные функции:"))
+        special_funcs_layout.addWidget(self.special_functions)
+        
+        # Кнопки для удаления специальных функций
+        special_remove_buttons_layout = QHBoxLayout()
+        
+        self.remove_special_btn = QPushButton("⬅ Удалить")
+        self.remove_special_btn.setObjectName("removeSpecialBtn")
+        self.remove_special_btn.clicked.connect(self.remove_special_function)
+        
+        self.remove_all_special_btn = QPushButton("⬅⬅ Все")
+        self.remove_all_special_btn.setObjectName("removeAllSpecialBtn")
+        self.remove_all_special_btn.clicked.connect(self.remove_all_special_functions)
+        
+        special_remove_buttons_layout.addWidget(self.remove_special_btn)
+        special_remove_buttons_layout.addWidget(self.remove_all_special_btn)
+        special_funcs_layout.addLayout(special_remove_buttons_layout)
+        
+        group_tab_layout.addWidget(special_funcs_group)
+        
         # Группа HAVING
         having_group = QGroupBox("HAVING (Условия для групп)")
         having_group.setObjectName("havingGroup")
@@ -526,6 +574,7 @@ class AdvancedSelectDialog(QDialog):
             self.selected_columns.clear()
             self.group_columns.clear()
             self.agg_functions.clear()
+            self.special_functions.clear()  # Очищаем специальные функции
             
             # Очищаем новые списки
             self.available_order_columns.clear()
@@ -600,6 +649,14 @@ class AdvancedSelectDialog(QDialog):
                 alias = agg_text.split(" AS ")[-1].strip('"')
                 self.available_order_columns.addItem(alias)
         
+        # Добавляем специальные функции с их алиасами
+        for i in range(self.special_functions.count()):
+            special_text = self.special_functions.item(i).text()
+            # Извлекаем алиас из специальной функции (формат: "FUNCTION(...) AS alias")
+            if " AS " in special_text:
+                alias = special_text.split(" AS ")[-1].strip('"')
+                self.available_order_columns.addItem(alias)
+        
     def add_group_column(self):
         """Добавляет столбец для группировки"""
         selected_items = self.available_group_columns.selectedItems()
@@ -647,6 +704,42 @@ class AdvancedSelectDialog(QDialog):
     def remove_all_aggregate_functions(self):
         """Удаляет все агрегатные функции"""
         self.agg_functions.clear()
+        # Обновляем доступные столбцы для сортировки
+        self.update_available_order_columns()
+    
+    def add_case_expression(self):
+        """Добавляет CASE выражение"""
+        # Создаем диалог для создания CASE выражения
+        dialog = CaseExpressionDialog(self.selected_columns, self)
+        if dialog.exec() == QDialog.Accepted:
+            case_expr = dialog.get_case_expression()
+            if case_expr:
+                self.special_functions.addItem(case_expr)
+                # Обновляем доступные столбцы для сортировки
+                self.update_available_order_columns()
+    
+    def add_null_function(self):
+        """Добавляет функцию работы с NULL (COALESCE или NULLIF)"""
+        # Создаем диалог для выбора функции NULL
+        dialog = NullFunctionsDialog(self.selected_columns, self)
+        if dialog.exec() == QDialog.Accepted:
+            null_func = dialog.get_null_function()
+            if null_func:
+                self.special_functions.addItem(null_func)
+                # Обновляем доступные столбцы для сортировки
+                self.update_available_order_columns()
+    
+    def remove_special_function(self):
+        """Удаляет выбранную специальную функцию"""
+        selected_items = self.special_functions.selectedItems()
+        for item in selected_items:
+            self.special_functions.takeItem(self.special_functions.row(item))
+        # Обновляем доступные столбцы для сортировки
+        self.update_available_order_columns()
+    
+    def remove_all_special_functions(self):
+        """Удаляет все специальные функции"""
+        self.special_functions.clear()
         # Обновляем доступные столбцы для сортировки
         self.update_available_order_columns()
             
@@ -848,6 +941,11 @@ class AdvancedSelectDialog(QDialog):
             for i in range(self.agg_functions.count()):
                 agg_func = self.agg_functions.item(i).text()
                 select_parts.append(agg_func)
+            
+            # Добавляем специальные функции (CASE, COALESCE, NULLIF)
+            for i in range(self.special_functions.count()):
+                special_func = self.special_functions.item(i).text()
+                select_parts.append(special_func)
                 
             if not select_parts:
                 select_parts = ["*"]

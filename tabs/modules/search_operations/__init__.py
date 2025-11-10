@@ -4,9 +4,13 @@
 
 from .text_search_dialog import TextSearchDialog
 from .advanced_select_dialog import AdvancedSelectDialog, AggregateFunctionDialog
+from .case_expression_dialog import CaseExpressionDialog
+from .null_functions_dialog import NullFunctionsDialog
 
 __all__ = [
     'TextSearchDialog',
     'AdvancedSelectDialog',
-    'AggregateFunctionDialog'
+    'AggregateFunctionDialog',
+    'CaseExpressionDialog',
+    'NullFunctionsDialog'
 ]
