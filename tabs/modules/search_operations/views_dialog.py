@@ -282,6 +282,9 @@ class ViewsDialog(QDialog):
         """Валидирует SQL идентификатор (имя таблицы, представления и т.д.)"""
         if not name:
             return False
+        # SQL идентификаторы должны начинаться с буквы или подчеркивания
+        if not (name[0].isalpha() or name[0] == '_'):
+            return False
         # Разрешаем только буквы, цифры и подчеркивания
         return name.replace('_', '').isalnum() and len(name) <= 63
     

@@ -333,6 +333,9 @@ class CTEDialog(QDialog):
         """Валидирует SQL идентификатор"""
         if not name:
             return False
+        # SQL идентификаторы должны начинаться с буквы или подчеркивания
+        if not (name[0].isalpha() or name[0] == '_'):
+            return False
         return name.replace('_', '').isalnum() and len(name) <= 63
     
     def validate_where_clause(self, where_clause):
