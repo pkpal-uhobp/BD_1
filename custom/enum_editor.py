@@ -135,6 +135,7 @@ class EnumEditor(QWidget):
     
     def set_values(self, values):
         """Установить список значений."""
-        self.clear_all()
+        self.values_list.clear()
         for value in values:
             self.values_list.addItem(value)
+        self.valuesChanged.emit(self.get_values())
