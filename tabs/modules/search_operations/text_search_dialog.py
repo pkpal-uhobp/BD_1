@@ -342,7 +342,7 @@ class TextSearchDialog(QDialog):
                 return False
         
         # Если все проверки пройдены
-        self.set_field_success('search', "✅ Поисковый запрос корректен")
+        self.set_field_success('search', "Поисковый запрос корректен")
         return True
     
     def set_field_error(self, field_name, error_message):

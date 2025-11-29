@@ -56,7 +56,7 @@ class SortColumnWidget(QWidget):
         self.direction_combo.setPalette(palette)
         
         # Кнопка удаления
-        self.remove_btn = QPushButton("❌")
+        self.remove_btn = QPushButton("X")
         self.remove_btn.setObjectName("removeSortBtn")
         self.remove_btn.setMaximumWidth(30)
         self.remove_btn.setMaximumHeight(30)
@@ -263,11 +263,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для управления столбцами
         columns_buttons_layout = QHBoxLayout()
         
-        self.add_column_btn = QPushButton("➡ Добавить")
+        self.add_column_btn = QPushButton(">> Добавить")
         self.add_column_btn.setObjectName("addColumnBtn")
         self.add_column_btn.clicked.connect(self.add_selected_columns)
         
-        self.add_all_btn = QPushButton("➡➡ Все")
+        self.add_all_btn = QPushButton(">>> Все")
         self.add_all_btn.setObjectName("addAllBtn")
         self.add_all_btn.clicked.connect(self.add_all_columns)
         
@@ -285,11 +285,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для удаления столбцов
         remove_buttons_layout = QHBoxLayout()
         
-        self.remove_column_btn = QPushButton("⬅ Удалить")
+        self.remove_column_btn = QPushButton("<< Удалить")
         self.remove_column_btn.setObjectName("removeColumnBtn")
         self.remove_column_btn.clicked.connect(self.remove_selected_columns)
         
-        self.remove_all_btn = QPushButton("⬅⬅ Все")
+        self.remove_all_btn = QPushButton("<<< Все")
         self.remove_all_btn.setObjectName("removeAllBtn")
         self.remove_all_btn.clicked.connect(self.remove_all_columns)
         
@@ -319,7 +319,7 @@ class AdvancedSelectDialog(QDialog):
         where_layout.addWidget(self.where_input)
         
         # Кнопка добавления подзапроса
-        add_subquery_btn = QPushButton("➕ Добавить подзапрос (ANY/ALL/EXISTS)")
+        add_subquery_btn = QPushButton("+ Добавить подзапрос (ANY/ALL/EXISTS)")
         add_subquery_btn.setObjectName("addSubqueryBtn")
         add_subquery_btn.clicked.connect(self.add_subquery_filter)
         where_layout.addWidget(add_subquery_btn)
@@ -351,11 +351,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для добавления столбцов сортировки
         order_add_buttons_layout = QHBoxLayout()
         
-        self.add_order_btn = QPushButton("➡ Добавить")
+        self.add_order_btn = QPushButton(">> Добавить")
         self.add_order_btn.setObjectName("addOrderBtn")
         self.add_order_btn.clicked.connect(self.add_order_column)
         
-        self.add_all_order_btn = QPushButton("➡➡ Все")
+        self.add_all_order_btn = QPushButton(">>> Все")
         self.add_all_order_btn.setObjectName("addAllOrderBtn")
         self.add_all_order_btn.clicked.connect(self.add_all_order_columns)
         
@@ -400,11 +400,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для добавления столбцов группировки
         group_add_buttons_layout = QHBoxLayout()
         
-        self.add_group_btn = QPushButton("➡ Добавить")
+        self.add_group_btn = QPushButton(">> Добавить")
         self.add_group_btn.setObjectName("addGroupBtn")
         self.add_group_btn.clicked.connect(self.add_group_column)
         
-        self.add_all_group_btn = QPushButton("➡➡ Все")
+        self.add_all_group_btn = QPushButton(">>> Все")
         self.add_all_group_btn.setObjectName("addAllGroupBtn")
         self.add_all_group_btn.clicked.connect(self.add_all_group_columns)
         
@@ -422,11 +422,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для удаления столбцов группировки
         group_remove_buttons_layout = QHBoxLayout()
         
-        self.remove_group_btn = QPushButton("⬅ Удалить")
+        self.remove_group_btn = QPushButton("<< Удалить")
         self.remove_group_btn.setObjectName("removeGroupBtn")
         self.remove_group_btn.clicked.connect(self.remove_group_column)
         
-        self.remove_all_group_btn = QPushButton("⬅⬅ Все")
+        self.remove_all_group_btn = QPushButton("<<< Все")
         self.remove_all_group_btn.setObjectName("removeAllGroupBtn")
         self.remove_all_group_btn.clicked.connect(self.remove_all_group_columns)
         
@@ -462,11 +462,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для удаления агрегатных функций
         agg_remove_buttons_layout = QHBoxLayout()
         
-        self.remove_agg_btn = QPushButton("⬅ Удалить")
+        self.remove_agg_btn = QPushButton("<< Удалить")
         self.remove_agg_btn.setObjectName("removeAggBtn")
         self.remove_agg_btn.clicked.connect(self.remove_aggregate_function)
         
-        self.remove_all_agg_btn = QPushButton("⬅⬅ Все")
+        self.remove_all_agg_btn = QPushButton("<<< Все")
         self.remove_all_agg_btn.setObjectName("removeAllAggBtn")
         self.remove_all_agg_btn.clicked.connect(self.remove_all_aggregate_functions)
         
@@ -485,11 +485,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для добавления специальных функций
         special_funcs_buttons_layout = QHBoxLayout()
         
-        self.add_case_btn = QPushButton("➕ CASE выражение")
+        self.add_case_btn = QPushButton("+ CASE выражение")
         self.add_case_btn.setObjectName("addCaseBtn")
         self.add_case_btn.clicked.connect(self.add_case_expression)
         
-        self.add_null_func_btn = QPushButton("➕ NULL функция")
+        self.add_null_func_btn = QPushButton("+ NULL функция")
         self.add_null_func_btn.setObjectName("addNullFuncBtn")
         self.add_null_func_btn.clicked.connect(self.add_null_function)
         
@@ -506,11 +506,11 @@ class AdvancedSelectDialog(QDialog):
         # Кнопки для удаления специальных функций
         special_remove_buttons_layout = QHBoxLayout()
         
-        self.remove_special_btn = QPushButton("⬅ Удалить")
+        self.remove_special_btn = QPushButton("<< Удалить")
         self.remove_special_btn.setObjectName("removeSpecialBtn")
         self.remove_special_btn.clicked.connect(self.remove_special_function)
         
-        self.remove_all_special_btn = QPushButton("⬅⬅ Все")
+        self.remove_all_special_btn = QPushButton("<<< Все")
         self.remove_all_special_btn.setObjectName("removeAllSpecialBtn")
         self.remove_all_special_btn.clicked.connect(self.remove_all_special_functions)
         
@@ -1200,7 +1200,7 @@ class AdvancedSelectDialog(QDialog):
         
         for pattern in dangerous_patterns:
             if re.search(pattern, condition, re.IGNORECASE):
-                return False, "✕ Запрещенные SQL конструкции", ""
+                return False, "X Запрещенные SQL конструкции", ""
         
         # Проверяем на базовые SQL операторы
         allowed_operators = ['=', '!=', '<>', '<', '>', '<=', '>=', 'LIKE', 'ILIKE', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL']
@@ -1208,20 +1208,20 @@ class AdvancedSelectDialog(QDialog):
         
         # Простая проверка на корректность скобок
         if condition.count('(') != condition.count(')'):
-            return False, "✕ Несбалансированные скобки", ""
+            return False, "X Несбалансированные скобки", ""
             
         # Проверяем на пустые условия
         if condition in ['AND', 'OR', 'NOT']:
-            return False, "✕ Неполное условие", ""
+            return False, "X Неполное условие", ""
             
         # Проверяем на корректность строковых литералов
         if condition.count("'") % 2 != 0:
-            return False, "✕ Незакрытые кавычки", ""
+            return False, "X Незакрытые кавычки", ""
             
         # Проверяем на корректность LIKE с экранированием
         if 'LIKE' in condition.upper() or 'ILIKE' in condition.upper():
             if not re.search(r"LIKE\s+['\"].*['\"]", condition, re.IGNORECASE):
-                return False, "✕ LIKE должен содержать строковый литерал", ""
+                return False, "X LIKE должен содержать строковый литерал", ""
         
         # Если все проверки пройдены
         return True, "", "✓ Валидное SQL условие"

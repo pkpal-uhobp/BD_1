@@ -135,8 +135,8 @@ class MainWindow(QMainWindow):
         center_layout.setContentsMargins(15, 8, 15, 8)
         center_widget.setLayout(center_layout)
 
-        # === 📋 Выпадающая кнопка "Действия" ===
-        actions_button = QPushButton("Действия ▼")
+        # === Выпадающая кнопка "Действия" ===
+        actions_button = QPushButton("Действия")
         actions_menu = QMenu(actions_button)
 
         # Добавляем пункты меню
@@ -152,7 +152,7 @@ class MainWindow(QMainWindow):
         center_layout.addWidget(actions_button)
 
         # === Выпадающая кнопка "Поиск" ===
-        search_button = QPushButton("Поиск ▼")
+        search_button = QPushButton("Поиск")
         search_menu = QMenu(search_button)
 
         # Добавляем пункты меню поиска
@@ -167,7 +167,7 @@ class MainWindow(QMainWindow):
         search_button.setMenu(search_menu)
         center_layout.addWidget(search_button)
 
-        alter_menu_button = QPushButton("Структура ▼")
+        alter_menu_button = QPushButton("Структура")
         alter_menu_button.setMinimumHeight(45)
         alter_menu_button.setMinimumWidth(160)
         alter_menu_button.setCursor(Qt.PointingHandCursor)
@@ -237,11 +237,38 @@ class MainWindow(QMainWindow):
         types_button.setMinimumWidth(140)
         types_button.setCursor(Qt.PointingHandCursor)
         types_button.clicked.connect(self.open_custom_types)
+        types_button.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                            stop: 0 #0a0a0f, 
+                                            stop: 1 #1a1a2e);
+                border: 2px solid #64ffda60;
+                border-radius: 8px;
+                color: #f8f8f2;
+                font-size: 13px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 8px 12px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                            stop: 0 #1a1a2e,
+                                            stop: 1 #2a2a3a);
+                border: 2px solid #64ffda;
+                color: #64ffda;
+            }
+            QPushButton:pressed {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                            stop: 0 #3bc1a8, 
+                                            stop: 1 #00838f);
+                color: #0a0a0f;
+            }
+        """)
         center_layout.addWidget(types_button)
         
         toolbar.addWidget(center_widget)
 
-        # 🔹 Добавляем растягивающийся спейсер — он "заберёт" всё свободное пространство и отодвинет кнопку вправо
+        # Добавляем растягивающийся спейсер для правильного размещения кнопок
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         spacer_action = QWidgetAction(toolbar)
@@ -355,7 +382,7 @@ class MainWindow(QMainWindow):
         status_widget.setObjectName("statusWidget")
         status_layout = QHBoxLayout()
         status_widget.setLayout(status_layout)
-        status_icon = QLabel("🔗")
+        status_icon = QLabel("[*]")
         status_icon.setObjectName("statusIcon")
         status_text = QLabel("Подключено к базе данных")
         status_text.setObjectName("statusText")
@@ -1047,7 +1074,7 @@ class MainWindow(QMainWindow):
         label.setAlignment(Qt.AlignCenter)
         layout.addWidget(label)
 
-        info = QLabel("🔧 Эта функция пока не реализована.")
+        info = QLabel("Эта функция пока не реализована.")
         info.setWordWrap(True)
         layout.addWidget(info)
 

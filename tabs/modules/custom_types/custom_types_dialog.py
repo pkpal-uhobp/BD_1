@@ -42,7 +42,7 @@ class FieldWidget(QWidget):
         layout.addWidget(self.field_type_combo)
         
         # Кнопка удаления
-        self.remove_btn = QPushButton("❌")
+        self.remove_btn = QPushButton("X")
         self.remove_btn.setObjectName("removeFieldBtn")
         self.remove_btn.setMaximumWidth(30)
         self.remove_btn.setMaximumHeight(30)
@@ -79,14 +79,15 @@ class CustomTypesDialog(QDialog):
         self.setWindowTitle("Управление пользовательскими типами")
         self.setModal(True)
         self.setMinimumSize(900, 700)
+        self.resize(950, 750)
         
         # Устанавливаем темную палитру
         self.set_dark_palette()
         
         # Основной layout
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setSpacing(12)
         self.setLayout(main_layout)
         
         # Заголовок
@@ -111,7 +112,7 @@ class CustomTypesDialog(QDialog):
         composite_tab = self.create_composite_tab()
         tab_widget.addTab(composite_tab, "Создать составной тип")
         
-        main_layout.addWidget(tab_widget)
+        main_layout.addWidget(tab_widget, 1)
         
         # Кнопки
         buttons_layout = QHBoxLayout()
@@ -155,11 +156,11 @@ class CustomTypesDialog(QDialog):
         # Кнопки управления
         buttons_layout = QHBoxLayout()
         
-        refresh_btn = QPushButton("🔄 Обновить")
+        refresh_btn = QPushButton("Обновить")
         refresh_btn.setObjectName("refreshBtn")
         refresh_btn.clicked.connect(self.refresh_types_list)
         
-        delete_btn = QPushButton("🗑️ Удалить выбранный")
+        delete_btn = QPushButton("Удалить выбранный")
         delete_btn.setObjectName("deleteBtn")
         delete_btn.clicked.connect(self.delete_selected_type)
         
@@ -218,7 +219,7 @@ class CustomTypesDialog(QDialog):
         layout.addWidget(values_group)
         
         # Кнопка создания
-        create_btn = QPushButton("✅ Создать ENUM тип")
+        create_btn = QPushButton("Создать ENUM тип")
         create_btn.setObjectName("createEnumBtn")
         create_btn.clicked.connect(self.create_enum_type)
         layout.addWidget(create_btn)
@@ -253,7 +254,7 @@ class CustomTypesDialog(QDialog):
         fields_group.setLayout(fields_layout)
         
         # Кнопка добавления поля
-        add_field_btn = QPushButton("➕ Добавить поле")
+        add_field_btn = QPushButton("Добавить поле")
         add_field_btn.setObjectName("addFieldBtn")
         add_field_btn.clicked.connect(self.add_field_widget)
         fields_layout.addWidget(add_field_btn)
@@ -274,7 +275,7 @@ class CustomTypesDialog(QDialog):
         layout.addWidget(fields_group)
         
         # Кнопка создания
-        create_btn = QPushButton("✅ Создать составной тип")
+        create_btn = QPushButton("Создать составной тип")
         create_btn.setObjectName("createCompositeBtn")
         create_btn.clicked.connect(self.create_composite_type)
         layout.addWidget(create_btn)
@@ -334,7 +335,7 @@ class CustomTypesDialog(QDialog):
             
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message=f"Ошибка при обновлении списка типов: {e}",
                 timeout=5
             )
@@ -345,7 +346,7 @@ class CustomTypesDialog(QDialog):
             current_row = self.types_table.currentRow()
             if current_row < 0:
                 notification.notify(
-                    title="⚠️ Предупреждение",
+                    title="Предупреждение",
                     message="Выберите тип для удаления",
                     timeout=3
                 )
@@ -367,21 +368,21 @@ class CustomTypesDialog(QDialog):
                 
                 if success:
                     notification.notify(
-                        title="✅ Успех",
+                        title="Успех",
                         message=f"Тип '{type_name}' успешно удалён",
                         timeout=3
                     )
                     self.refresh_types_list()
                 else:
                     notification.notify(
-                        title="❌ Ошибка",
+                        title="Ошибка",
                         message=f"Ошибка удаления: {error}",
                         timeout=5
                     )
                     
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message=f"Ошибка при удалении типа: {e}",
                 timeout=5
             )
@@ -394,7 +395,7 @@ class CustomTypesDialog(QDialog):
             
             if not type_name:
                 notification.notify(
-                    title="⚠️ Предупреждение",
+                    title="Предупреждение",
                     message="Введите имя ENUM типа",
                     timeout=3
                 )
@@ -402,7 +403,7 @@ class CustomTypesDialog(QDialog):
             
             if not values_text:
                 notification.notify(
-                    title="⚠️ Предупреждение",
+                    title="Предупреждение",
                     message="Введите хотя бы одно значение",
                     timeout=3
                 )
@@ -413,7 +414,7 @@ class CustomTypesDialog(QDialog):
             
             if not values:
                 notification.notify(
-                    title="⚠️ Предупреждение",
+                    title="Предупреждение",
                     message="Введите хотя бы одно значение",
                     timeout=3
                 )
@@ -424,7 +425,7 @@ class CustomTypesDialog(QDialog):
             
             if success:
                 notification.notify(
-                    title="✅ Успех",
+                    title="Успех",
                     message=f"ENUM тип '{type_name}' успешно создан",
                     timeout=3
                 )
@@ -435,14 +436,14 @@ class CustomTypesDialog(QDialog):
                 self.refresh_types_list()
             else:
                 notification.notify(
-                    title="❌ Ошибка",
+                    title="Ошибка",
                     message=f"Ошибка создания: {error}",
                     timeout=5
                 )
                 
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message=f"Ошибка при создании ENUM типа: {e}",
                 timeout=5
             )
@@ -454,7 +455,7 @@ class CustomTypesDialog(QDialog):
             
             if not type_name:
                 notification.notify(
-                    title="⚠️ Предупреждение",
+                    title="Предупреждение",
                     message="Введите имя составного типа",
                     timeout=3
                 )
@@ -471,7 +472,7 @@ class CustomTypesDialog(QDialog):
             
             if not fields:
                 notification.notify(
-                    title="⚠️ Предупреждение",
+                    title="Предупреждение",
                     message="Добавьте хотя бы одно поле",
                     timeout=3
                 )
@@ -482,7 +483,7 @@ class CustomTypesDialog(QDialog):
             
             if success:
                 notification.notify(
-                    title="✅ Успех",
+                    title="Успех",
                     message=f"Составной тип '{type_name}' успешно создан",
                     timeout=3
                 )
@@ -499,14 +500,14 @@ class CustomTypesDialog(QDialog):
                 self.refresh_types_list()
             else:
                 notification.notify(
-                    title="❌ Ошибка",
+                    title="Ошибка",
                     message=f"Ошибка создания: {error}",
                     timeout=5
                 )
                 
         except Exception as e:
             notification.notify(
-                title="❌ Ошибка",
+                title="Ошибка",
                 message=f"Ошибка при создании составного типа: {e}",
                 timeout=5
             )

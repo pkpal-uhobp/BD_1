@@ -253,7 +253,7 @@ class ConstraintsBasicDialog(QDialog):
             self._clear_field_error('default')
             return True
         if self._has_dangerous_sql(text):
-            self._set_field_error('default', "✕ Недопустимы комментарии и ';'")
+            self._set_field_error('default', "X Недопустимы комментарии и ';'")
             return False
         self._set_field_success('default', "✓ Ок")
         return True
@@ -265,11 +265,11 @@ class ConstraintsBasicDialog(QDialog):
             self._clear_field_error('check')
             return True
         if self._has_dangerous_sql(text):
-            self._set_field_error('check', "✕ Недопустимы комментарии и ';'")
+            self._set_field_error('check', "X Недопустимы комментарии и ';'")
             return False
         # Простейшая проверка наличия оператора сравнения
         if not re.search(r"[<>=]", text):
-            self._set_field_error('check', "✕ Ожидается условие сравнения")
+            self._set_field_error('check', "X Ожидается условие сравнения")
             return False
         self._set_field_success('check', "✓ Ок")
         return True
