@@ -6,6 +6,7 @@ from PySide6.QtCore import QDate, QDateTime
 from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, String
 import re
 from custom.array_line_edit import ArrayLineEdit
+from custom.null_handler import NullHandlerWidget
 from plyer import notification
 from PySide6.QtGui import QFont, QPalette, QColor
 from PySide6.QtCore import Qt
@@ -642,6 +643,11 @@ class AddRecordDialog(QDialog):
     def load_table_fields(self, table_name: str):
         """Загружает и отображает поля для выбранной таблицы."""
         self.clear_fields()
+        
+        # Словарь для хранения NULL-обработчиков
+        if not hasattr(self, 'null_handlers'):
+            self.null_handlers = {}
+        self.null_handlers.clear()
 
         if table_name not in self.db_instance.tables:
             notification.notify(
@@ -666,6 +672,9 @@ class AddRecordDialog(QDialog):
 
             if hasattr(column.type, 'enums') and column.type.enums:
                 widget = QComboBox()
+                # Добавляем пустой вариант для nullable полей
+                if column.nullable:
+                    widget.addItem("-- не выбрано --", None)
                 widget.addItems(column.type.enums)
                 widget.setEditable(False)
                 placeholder = "Выберите значение"
@@ -708,6 +717,13 @@ class AddRecordDialog(QDialog):
             # Создаем строку с меткой ошибки
             field_row, error_label = self.create_field_row(f"{display_name}:", widget)
             self.fields_layout.addWidget(field_row)
+            
+            # Добавляем виджет обработки NULL для nullable полей
+            if column.nullable and not isinstance(widget, QCheckBox):
+                null_handler = NullHandlerWidget(display_name)
+                null_handler.valueChanged.connect(lambda val, dn=display_name: self._on_null_handler_changed(dn, val))
+                self.fields_layout.addWidget(null_handler)
+                self.null_handlers[display_name] = null_handler
 
             self.input_widgets[display_name] = widget
             self.error_labels[display_name] = error_label
@@ -728,6 +744,37 @@ class AddRecordDialog(QDialog):
                 widget.stateChanged.connect(lambda state, dn=display_name: self.validate_real_time(dn))
 
         self.fields_layout.addStretch()
+    
+    def _on_null_handler_changed(self, field_name, value):
+        """Обработчик изменения NULL-обработчика"""
+        if value.get('use_null_handling') and value.get('mode') == 'set_null':
+            # Если включен режим "Установить NULL", отключаем виджет ввода
+            if field_name in self.input_widgets:
+                self.input_widgets[field_name].setEnabled(False)
+                self.clear_field_error(field_name)
+        else:
+            # Иначе включаем виджет ввода
+            if field_name in self.input_widgets:
+                self.input_widgets[field_name].setEnabled(True)
+    
+    def _get_widget_value(self, widget):
+        """Получает значение из виджета"""
+        if isinstance(widget, QLineEdit):
+            return widget.text().strip()
+        elif isinstance(widget, QTextEdit):
+            return widget.toPlainText().strip()
+        elif isinstance(widget, QComboBox):
+            return widget.currentText()
+        elif isinstance(widget, QCheckBox):
+            return widget.isChecked()
+        elif isinstance(widget, QDateEdit):
+            return widget.date().toString("yyyy-MM-dd")
+        elif isinstance(widget, QDateTimeEdit):
+            return widget.dateTime().toString("yyyy-MM-dd HH:mm:ss")
+        elif hasattr(widget, 'getArray'):  # ArrayLineEdit
+            return widget.getArray()
+        return None
+
 
     def validate_real_time(self, field_name):
         """Валидация в реальном времени при изменении поля"""
@@ -832,6 +879,43 @@ class AddRecordDialog(QDialog):
             except AttributeError:
                 error_fields[display_name] = " Колонка не найдена в таблице"
                 continue
+            
+            # Проверяем, включена ли обработка NULL для этого поля
+            null_handler = self.null_handlers.get(display_name) if hasattr(self, 'null_handlers') else None
+            if null_handler and null_handler.is_null_handling_enabled():
+                null_value = null_handler.get_value()
+                if null_value.get('mode') == 'set_null':
+                    # Устанавливаем NULL напрямую
+                    data[col_name] = None
+                    continue
+                elif null_value.get('mode') == 'coalesce':
+                    # COALESCE будет применён позже при выборке, сейчас просто сохраняем значение
+                    pass
+                elif null_value.get('mode') == 'nullif':
+                    # NULLIF - если значение равно указанному, устанавливаем NULL
+                    nullif_val = null_value.get('value')
+                    widget_value = self._get_widget_value(widget)
+                    if widget_value is not None and nullif_val is not None:
+                        # Типо-зависимое сравнение
+                        try:
+                            if isinstance(column.type, Integer):
+                                if int(widget_value) == int(nullif_val):
+                                    data[col_name] = None
+                                    continue
+                            elif isinstance(column.type, Numeric):
+                                if float(widget_value) == float(nullif_val):
+                                    data[col_name] = None
+                                    continue
+                            else:
+                                # Строковое сравнение для других типов
+                                if str(widget_value).strip() == str(nullif_val).strip():
+                                    data[col_name] = None
+                                    continue
+                        except (ValueError, TypeError):
+                            # При ошибке конвертации используем строковое сравнение
+                            if str(widget_value).strip() == str(nullif_val).strip():
+                                data[col_name] = None
+                                continue
 
             # Используем встроенный валидатор
             is_valid, value, error_message, success_message = self.validate_field(

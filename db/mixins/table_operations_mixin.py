@@ -22,6 +22,11 @@ class TableOperationsMixin:
           1) Добавляем столбец без жёстких ограничений (всегда NULL, с DEFAULT если задан)
           2) Проставляем DEFAULT существующим строкам (UPDATE ... WHERE col IS NULL)
           3) По очереди добавляем CHECK/NOT NULL/UNIQUE/PRIMARY KEY/FOREIGN KEY
+          
+        Args:
+            table_name: Имя таблицы
+            column_name: Имя нового столбца
+            column_type: Тип столбца (SQLAlchemy type или строка для пользовательского типа)
         """
         if not self.is_connected():
             return False
@@ -33,13 +38,20 @@ class TableOperationsMixin:
                 self.logger.error(f" Таблица '{table_name}' не существует в БД")
                 return False
 
-            type_str = column_type.compile(dialect=self.engine.dialect)
-            # Определим, является ли тип целочисленным, чтобы уметь авто-заполнять PK
-            try:
-                from sqlalchemy import Integer as SAInt, SmallInteger as SASmallInt, BigInteger as SABigInt
-                is_integer_type = isinstance(column_type, (SAInt, SASmallInt, SABigInt))
-            except Exception:
+            # Если column_type - это строка, значит это пользовательский тип из БД
+            if isinstance(column_type, str):
+                type_str = column_type
                 is_integer_type = False
+                self.logger.info(f"Используется пользовательский тип: {type_str}")
+            else:
+                type_str = column_type.compile(dialect=self.engine.dialect)
+                # Определим, является ли тип целочисленным, чтобы уметь авто-заполнять PK
+                try:
+                    from sqlalchemy import Integer as SAInt, SmallInteger as SASmallInt, BigInteger as SABigInt
+                    is_integer_type = isinstance(column_type, (SAInt, SASmallInt, SABigInt))
+                except Exception:
+                    is_integer_type = False
+            
             default_val = kwargs.get("default")
 
             # 1) Добавляем столбец максимально мягко: допускаем NULL
