@@ -97,6 +97,9 @@ class AdvancedSelectDialog(QDialog):
     # Сигнал для передачи результатов в главное окно
     results_to_main_table = Signal(list)
     
+    # Константы для валидации
+    MAX_SIMILAR_TO_PATTERN_LENGTH = 500
+    
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
@@ -856,8 +859,8 @@ class AdvancedSelectDialog(QDialog):
         
         # Формируем условие SIMILAR TO
         operator = "NOT SIMILAR TO" if is_not else "SIMILAR TO"
-        # Экранируем одинарные кавычки в шаблоне
-        escaped_pattern = pattern.replace("'", "''")
+        # Экранируем опасные символы в шаблоне для безопасности SQL
+        escaped_pattern = self.escape_similar_to_pattern(pattern)
         condition = f'"{column_name}"::text {operator} \'{escaped_pattern}\''
         
         # Добавляем условие к WHERE
@@ -874,27 +877,75 @@ class AdvancedSelectDialog(QDialog):
         self.similar_to_pattern_input.clear()
         self.set_similar_to_success(f"Условие {operator} добавлено в WHERE")
     
+    def escape_similar_to_pattern(self, pattern):
+        """
+        Экранирует специальные символы в шаблоне SIMILAR TO для безопасности SQL.
+        Обрабатывает одинарные кавычки и обратные слэши.
+        """
+        # Экранируем обратные слэши (должны быть первыми, чтобы не экранировать вновь добавленные)
+        escaped = pattern.replace('\\', '\\\\')
+        # Экранируем одинарные кавычки
+        escaped = escaped.replace("'", "''")
+        return escaped
+    
     def validate_similar_to_pattern(self, pattern):
         """Валидирует шаблон SIMILAR TO"""
         if not pattern:
             return False, "Шаблон не может быть пустым"
         
-        # Проверяем на сбалансированные скобки
-        open_parens = pattern.count('(')
-        close_parens = pattern.count(')')
-        if open_parens != close_parens:
+        # Проверяем на слишком длинный шаблон
+        if len(pattern) > self.MAX_SIMILAR_TO_PATTERN_LENGTH:
+            return False, f"Шаблон слишком длинный (максимум {self.MAX_SIMILAR_TO_PATTERN_LENGTH} символов)"
+        
+        # Проверяем на сбалансированные скобки с учетом экранирования
+        if not self._check_balanced_brackets(pattern, '(', ')'):
             return False, "Несбалансированные круглые скобки"
         
-        open_brackets = pattern.count('[')
-        close_brackets = pattern.count(']')
-        if open_brackets != close_brackets:
+        if not self._check_balanced_brackets(pattern, '[', ']'):
             return False, "Несбалансированные квадратные скобки"
         
-        # Проверяем на слишком длинный шаблон
-        if len(pattern) > 500:
-            return False, "Шаблон слишком длинный (максимум 500 символов)"
+        # Проверяем на правильность квантификаторов
+        if not self._check_quantifiers(pattern):
+            return False, "Некорректный квантификатор (*, +, ? должны следовать за символом или группой)"
         
         return True, ""
+    
+    def _check_balanced_brackets(self, pattern, open_char, close_char):
+        """Проверяет сбалансированность скобок с учетом экранирования"""
+        count = 0
+        i = 0
+        while i < len(pattern):
+            # Пропускаем экранированные символы
+            if pattern[i] == '\\' and i + 1 < len(pattern):
+                i += 2
+                continue
+            if pattern[i] == open_char:
+                count += 1
+            elif pattern[i] == close_char:
+                count -= 1
+                if count < 0:
+                    return False
+            i += 1
+        return count == 0
+    
+    def _check_quantifiers(self, pattern):
+        """Проверяет правильность квантификаторов"""
+        i = 0
+        while i < len(pattern):
+            # Пропускаем экранированные символы
+            if pattern[i] == '\\' and i + 1 < len(pattern):
+                i += 2
+                continue
+            # Квантификаторы должны следовать за символом, группой или классом символов
+            if pattern[i] in '*+?' and i == 0:
+                return False
+            if pattern[i] in '*+?':
+                prev_char = pattern[i - 1]
+                # Проверяем, что перед квантификатором есть что-то допустимое
+                if prev_char in '|(':
+                    return False
+            i += 1
+        return True
     
     def set_similar_to_error(self, message):
         """Устанавливает ошибку для SIMILAR TO"""
