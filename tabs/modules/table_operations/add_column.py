@@ -247,39 +247,6 @@ class ConstraintsDialog(QDialog):
             #primaryButton { background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #64ffda, stop:1 #00bcd4); border:none; border-radius:10px; color:#0a0a0f; font-weight:bold; padding:12px 24px; }
             #primaryButton:hover { border:2px solid #64ffda; background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #50e3c2, stop:1 #00acc1); }
             #secondaryButton { background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #ff6b6b, stop:1 #ff5252); border:none; border-radius:10px; color:#0a0a0f; font-weight:bold; padding:12px 20px; }
-+            
-+            /* Валидация состояний */
-+            QLineEdit.error, QComboBox.error, QTextEdit.error, QSpinBox.error, QDoubleSpinBox.error {
-+                border: 2px solid #ff5555 !important;
-+                background: rgba(75, 25, 35, 0.8) !important;
-+            }
-+            
-+            QLineEdit.success, QComboBox.success, QTextEdit.success, QSpinBox.success, QDoubleSpinBox.success {
-+                border: 2px solid #50fa7b !important;
-+                background: rgba(25, 75, 35, 0.3) !important;
-+            }
-+            
-+            QLabel[class="error-label"] {
-+                color: #ff5555 !important;
-+                font-size: 11px;
-+                font-family: 'Consolas', 'Fira Code', monospace;
-+                padding: 2px 5px;
-+                background: rgba(255, 85, 85, 0.1);
-+                border-radius: 4px;
-+                margin-top: 2px;
-+                border-left: 3px solid #ff5555;
-+            }
-+            
-+            QLabel[class="success-label"] {
-+                color: #50fa7b !important;
-+                font-size: 11px;
-+                font-family: 'Consolas', 'Fira Code', monospace;
-+                padding: 2px 5px;
-+                background: rgba(80, 250, 123, 0.1);
-+                border-radius: 4px;
-+                margin-top: 2px;
-+                border-left: 3px solid #50fa7b;
-+            }
             
             /* Валидация состояний */
             QLineEdit.error, QComboBox.error, QTextEdit.error, QSpinBox.error, QDoubleSpinBox.error {
@@ -703,18 +670,18 @@ class AddColumnDialog(QDialog):
             #primaryButton { background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #64ffda, stop:1 #00bcd4); border:none; border-radius:10px; color:#0a0a0f; font-weight:bold; padding:12px 24px; }
             #primaryButton:hover { border:2px solid #64ffda; background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #50e3c2, stop:1 #00acc1); }
             #secondaryButton { background: qlineargradient(x1:0,y1:0,x2:1,y2:0, stop:0 #ff6b6b, stop:1 #ff5252); border:none; border-radius:10px; color:#0a0a0f; font-weight:bold; padding:12px 20px; }
-+            
-+            /* Стили для ArrayLineEdit и EnumEditor */
-+            ArrayLineEdit.error, EnumEditor.error {
-+                border: 2px solid #ff5555 !important;
-+                background: rgba(75, 25, 35, 0.8) !important;
-+            }
-+            
-+            ArrayLineEdit.success, EnumEditor.success {
-+                border: 2px solid #50fa7b !important;
-+                background: rgba(25, 75, 35, 0.3) !important;
-+            }
-+        """)
+            
+            /* Стили для ArrayLineEdit и EnumEditor */
+            ArrayLineEdit.error, EnumEditor.error {
+                border: 2px solid #ff5555 !important;
+                background: rgba(75, 25, 35, 0.8) !important;
+            }
+            
+            ArrayLineEdit.success, EnumEditor.success {
+                border: 2px solid #50fa7b !important;
+                background: rgba(25, 75, 35, 0.3) !important;
+            }
+        """)
 
     # --- Dynamic type UI ---
     def on_type_changed(self, text: str):
