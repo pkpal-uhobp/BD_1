@@ -491,6 +491,72 @@ class AdvancedSelectDialog(QDialog):
         
         group_tab_layout.addWidget(group_group)
         
+        # Группа расширенной группировки (ROLLUP, CUBE, GROUPING SETS)
+        advanced_group_group = QGroupBox("Расширенная группировка (ROLLUP, CUBE, GROUPING SETS)")
+        advanced_group_group.setObjectName("advancedGroupGroup")
+        advanced_group_layout = QVBoxLayout()
+        advanced_group_group.setLayout(advanced_group_layout)
+        
+        # Описание расширенной группировки
+        advanced_group_info = QLabel(
+            "Используйте расширенные средства группировки для построения\n"
+            "многомерных агрегированных отчетов.\n"
+            "• ROLLUP - создает промежуточные итоги по иерархии столбцов\n"
+            "• CUBE - создает все возможные комбинации группировок\n"
+            "• GROUPING SETS - позволяет задать произвольные наборы группировок"
+        )
+        advanced_group_info.setObjectName("advancedGroupInfoLabel")
+        advanced_group_info.setWordWrap(True)
+        advanced_group_layout.addWidget(advanced_group_info)
+        
+        # Выбор типа расширенной группировки
+        grouping_type_layout = QHBoxLayout()
+        grouping_type_layout.addWidget(QLabel("Тип группировки:"))
+        
+        self.grouping_type_combo = QComboBox()
+        self.grouping_type_combo.setObjectName("groupingTypeCombo")
+        self.grouping_type_combo.addItems(["Обычная GROUP BY", "ROLLUP", "CUBE", "GROUPING SETS"])
+        self.grouping_type_combo.setCurrentIndex(0)
+        self.grouping_type_combo.currentTextChanged.connect(self.on_grouping_type_changed)
+        grouping_type_layout.addWidget(self.grouping_type_combo)
+        grouping_type_layout.addStretch()
+        advanced_group_layout.addLayout(grouping_type_layout)
+        
+        # Контейнер для GROUPING SETS (видим только когда выбран этот тип)
+        self.grouping_sets_container = QWidget()
+        self.grouping_sets_container.setObjectName("groupingSetsContainer")
+        grouping_sets_layout = QVBoxLayout()
+        self.grouping_sets_container.setLayout(grouping_sets_layout)
+        
+        # Кнопка добавления набора для GROUPING SETS
+        add_grouping_set_btn = QPushButton("+ Добавить набор группировки")
+        add_grouping_set_btn.setObjectName("addGroupingSetBtn")
+        add_grouping_set_btn.clicked.connect(self.add_grouping_set)
+        grouping_sets_layout.addWidget(add_grouping_set_btn)
+        
+        # Список наборов GROUPING SETS
+        self.grouping_sets_list = QListWidget()
+        self.grouping_sets_list.setObjectName("groupingSetsList")
+        grouping_sets_layout.addWidget(QLabel("Наборы группировки:"))
+        grouping_sets_layout.addWidget(self.grouping_sets_list)
+        
+        # Кнопки для управления наборами
+        grouping_sets_buttons_layout = QHBoxLayout()
+        remove_grouping_set_btn = QPushButton("<< Удалить набор")
+        remove_grouping_set_btn.setObjectName("removeGroupingSetBtn")
+        remove_grouping_set_btn.clicked.connect(self.remove_grouping_set)
+        clear_grouping_sets_btn = QPushButton("<<< Очистить все")
+        clear_grouping_sets_btn.setObjectName("clearGroupingSetsBtn")
+        clear_grouping_sets_btn.clicked.connect(self.clear_grouping_sets)
+        grouping_sets_buttons_layout.addWidget(remove_grouping_set_btn)
+        grouping_sets_buttons_layout.addWidget(clear_grouping_sets_btn)
+        grouping_sets_layout.addLayout(grouping_sets_buttons_layout)
+        
+        self.grouping_sets_container.setVisible(False)
+        advanced_group_layout.addWidget(self.grouping_sets_container)
+        
+        group_tab_layout.addWidget(advanced_group_group)
+        
         # Группа агрегатных функций - переделаем в стиле 1-й вкладки
         agg_group = QGroupBox("Агрегатные функции")
         agg_group.setObjectName("aggGroup")
@@ -751,6 +817,33 @@ class AdvancedSelectDialog(QDialog):
     def remove_all_group_columns(self):
         """Удаляет все столбцы из группировки"""
         self.group_columns.clear()
+    
+    def on_grouping_type_changed(self, grouping_type):
+        """Обработчик изменения типа группировки"""
+        # Показываем/скрываем контейнер для GROUPING SETS
+        if grouping_type == "GROUPING SETS":
+            self.grouping_sets_container.setVisible(True)
+        else:
+            self.grouping_sets_container.setVisible(False)
+    
+    def add_grouping_set(self):
+        """Добавляет новый набор группировки для GROUPING SETS"""
+        # Создаем диалог для выбора столбцов набора
+        dialog = GroupingSetDialog(self.available_group_columns, self)
+        if dialog.exec() == QDialog.Accepted:
+            grouping_set = dialog.get_grouping_set()
+            if grouping_set:
+                self.grouping_sets_list.addItem(grouping_set)
+    
+    def remove_grouping_set(self):
+        """Удаляет выбранный набор группировки"""
+        selected_items = self.grouping_sets_list.selectedItems()
+        for item in selected_items:
+            self.grouping_sets_list.takeItem(self.grouping_sets_list.row(item))
+    
+    def clear_grouping_sets(self):
+        """Очищает все наборы группировки"""
+        self.grouping_sets_list.clear()
             
     def add_aggregate_function(self):
         """Добавляет агрегатную функцию"""
@@ -1197,13 +1290,33 @@ class AdvancedSelectDialog(QDialog):
             if where_condition:
                 where_clause = f"WHERE {where_condition}"
                 
-            # GROUP BY часть
+            # GROUP BY часть (с поддержкой ROLLUP, CUBE, GROUPING SETS)
             group_clause = ""
             group_columns = []
             for i in range(self.group_columns.count()):
                 group_columns.append(f'"{self.group_columns.item(i).text()}"')
+            
             if group_columns:
-                group_clause = f"GROUP BY {', '.join(group_columns)}"
+                grouping_type = self.grouping_type_combo.currentText()
+                
+                if grouping_type == "ROLLUP":
+                    group_clause = f"GROUP BY ROLLUP({', '.join(group_columns)})"
+                elif grouping_type == "CUBE":
+                    group_clause = f"GROUP BY CUBE({', '.join(group_columns)})"
+                elif grouping_type == "GROUPING SETS":
+                    # Для GROUPING SETS используем наборы из списка
+                    grouping_sets = []
+                    for i in range(self.grouping_sets_list.count()):
+                        set_text = self.grouping_sets_list.item(i).text()
+                        grouping_sets.append(f"({set_text})")
+                    if grouping_sets:
+                        group_clause = f"GROUP BY GROUPING SETS({', '.join(grouping_sets)})"
+                    else:
+                        # Если наборы не заданы, используем обычный GROUP BY
+                        group_clause = f"GROUP BY {', '.join(group_columns)}"
+                else:
+                    # Обычная GROUP BY
+                    group_clause = f"GROUP BY {', '.join(group_columns)}"
                 
             # HAVING часть
             having_clause = ""
@@ -1363,6 +1476,14 @@ class AdvancedSelectDialog(QDialog):
         
         # Очищаем виджеты сортировки
         self.clear_all_sort_widgets()
+        
+        # Очищаем расширенную группировку
+        self.grouping_type_combo.setCurrentIndex(0)
+        self.grouping_sets_list.clear()
+        self.grouping_sets_container.setVisible(False)
+        
+        # Очищаем специальные функции
+        self.special_functions.clear()
         
         # Очищаем результаты
         self.last_query_results = []
@@ -1939,7 +2060,8 @@ class AdvancedSelectDialog(QDialog):
             /* Кнопки сортировки и группировки */
             #addOrderBtn, #addAllOrderBtn,
             #addGroupBtn, #removeGroupBtn, #addAllGroupBtn, #removeAllGroupBtn,
-            #addAggBtn, #removeAggBtn, #removeAllAggBtn {
+            #addAggBtn, #removeAggBtn, #removeAllAggBtn,
+            #addGroupingSetBtn, #removeGroupingSetBtn, #clearGroupingSetsBtn {
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                           stop: 0 #6272a4, 
                                           stop: 1 #44475a);
@@ -1955,11 +2077,62 @@ class AdvancedSelectDialog(QDialog):
             
             #addOrderBtn:hover, #addAllOrderBtn:hover,
             #addGroupBtn:hover, #removeGroupBtn:hover, #addAllGroupBtn:hover, #removeAllGroupBtn:hover,
-            #addAggBtn:hover, #removeAggBtn:hover, #removeAllAggBtn:hover {
+            #addAggBtn:hover, #removeAggBtn:hover, #removeAllAggBtn:hover,
+            #addGroupingSetBtn:hover, #removeGroupingSetBtn:hover, #clearGroupingSetsBtn:hover {
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                           stop: 0 #64ffda, 
                                           stop: 1 #50e3c2);
                 color: #0a0a0f;
+            }
+            
+            /* Расширенная группировка */
+            #advancedGroupGroup {
+                border: 2px solid #ffd700;
+            }
+            
+            #advancedGroupInfoLabel {
+                color: #ffd700;
+                font-size: 11px;
+                font-weight: normal;
+                font-style: italic;
+                background: rgba(255, 215, 0, 0.1);
+                border-radius: 6px;
+                padding: 8px 10px;
+                border-left: 3px solid #ffd700;
+                margin: 5px 0;
+            }
+            
+            #groupingTypeCombo {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #ffd700;
+                border-radius: 6px;
+                padding: 8px;
+                font-size: 13px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                color: #ffd700;
+                min-width: 150px;
+            }
+            
+            #groupingTypeCombo:focus {
+                border: 2px solid #64ffda;
+            }
+            
+            #groupingSetsContainer {
+                background: rgba(15, 15, 25, 0.5);
+                border: 1px solid #44475a;
+                border-radius: 6px;
+                padding: 10px;
+                margin-top: 5px;
+            }
+            
+            #groupingSetsList {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #44475a;
+                border-radius: 6px;
+                padding: 5px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                color: #f8f8f2;
+                max-height: 100px;
             }
             
             /* Контейнер для виджетов сортировки */
@@ -2509,6 +2682,147 @@ class AggregateFunctionDialog(QDialog):
                 padding: 12px 16px;
                 min-width: 100px;
                 min-height: 20px;
+            }
+            
+            QPushButton:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #6272a4, 
+                                          stop: 1 #44475a);
+                border: 2px solid #64ffda;
+                color: #64ffda;
+            }
+        """)
+
+
+class GroupingSetDialog(QDialog):
+    """Диалог для создания набора группировки для GROUPING SETS"""
+    
+    def __init__(self, available_columns, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Добавить набор группировки")
+        self.setModal(True)
+        self.setMinimumSize(400, 350)
+        
+        # Устанавливаем темную палитру
+        self.set_dark_palette()
+        
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        
+        # Описание
+        info_label = QLabel("Выберите столбцы для набора группировки.\n"
+                           "Каждый набор определяет одну комбинацию столбцов для группировки.")
+        info_label.setWordWrap(True)
+        layout.addWidget(info_label)
+        
+        # Список доступных столбцов
+        layout.addWidget(QLabel("Столбцы для набора:"))
+        self.columns_list = QListWidget()
+        self.columns_list.setSelectionMode(QListWidget.MultiSelection)
+        
+        # Копируем столбцы из переданного списка
+        for i in range(available_columns.count()):
+            self.columns_list.addItem(available_columns.item(i).text())
+        
+        layout.addWidget(self.columns_list)
+        
+        # Кнопки выбора
+        select_buttons_layout = QHBoxLayout()
+        select_all_btn = QPushButton("Выбрать все")
+        select_all_btn.clicked.connect(self.columns_list.selectAll)
+        clear_selection_btn = QPushButton("Снять выбор")
+        clear_selection_btn.clicked.connect(self.columns_list.clearSelection)
+        select_buttons_layout.addWidget(select_all_btn)
+        select_buttons_layout.addWidget(clear_selection_btn)
+        layout.addLayout(select_buttons_layout)
+        
+        # Кнопки OK/Cancel
+        buttons_layout = QHBoxLayout()
+        
+        ok_button = QPushButton("OK")
+        ok_button.clicked.connect(self.accept)
+        
+        cancel_button = QPushButton("Отмена")
+        cancel_button.clicked.connect(self.reject)
+        
+        buttons_layout.addWidget(ok_button)
+        buttons_layout.addWidget(cancel_button)
+        layout.addLayout(buttons_layout)
+        
+        self.apply_styles()
+        
+    def set_dark_palette(self):
+        """Устанавливает тёмную цветовую палитру"""
+        dark_palette = QPalette()
+        dark_palette.setColor(QPalette.Window, QColor(18, 18, 24))
+        dark_palette.setColor(QPalette.WindowText, QColor(240, 240, 240))
+        dark_palette.setColor(QPalette.Base, QColor(25, 25, 35))
+        dark_palette.setColor(QPalette.AlternateBase, QColor(35, 35, 45))
+        dark_palette.setColor(QPalette.Text, QColor(240, 240, 240))
+        dark_palette.setColor(QPalette.Button, QColor(40, 40, 50))
+        dark_palette.setColor(QPalette.ButtonText, QColor(240, 240, 240))
+        dark_palette.setColor(QPalette.Highlight, QColor(64, 255, 218))
+        dark_palette.setColor(QPalette.HighlightedText, QColor(18, 18, 24))
+        self.setPalette(dark_palette)
+        
+    def get_grouping_set(self):
+        """Возвращает строку с выбранными столбцами для GROUPING SET"""
+        selected_items = self.columns_list.selectedItems()
+        if not selected_items:
+            return None
+        
+        columns = [f'"{item.text()}"' for item in selected_items]
+        return ", ".join(columns)
+        
+    def apply_styles(self):
+        """Применяет стили"""
+        self.setStyleSheet("""
+            QDialog {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
+                                          stop: 0 #0a0a0f, 
+                                          stop: 1 #1a1a2e);
+                border: 2px solid #44475a;
+                border-radius: 10px;
+            }
+            
+            QLabel {
+                color: #ffffff;
+                font-size: 13px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+            }
+            
+            QListWidget {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #44475a;
+                border-radius: 6px;
+                padding: 5px;
+                font-size: 13px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                color: #f8f8f2;
+            }
+            
+            QListWidget::item {
+                padding: 5px;
+                border-bottom: 1px solid #44475a40;
+            }
+            
+            QListWidget::item:selected {
+                background-color: #64ffda40;
+                color: #64ffda;
+            }
+            
+            QPushButton {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #44475a, 
+                                          stop: 1 #2a2a3a);
+                border: 2px solid #6272a4;
+                border-radius: 6px;
+                color: #f8f8f2;
+                font-size: 12px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 8px 12px;
+                min-width: 80px;
             }
             
             QPushButton:hover {

@@ -586,3 +586,35 @@ class SearchMixin:
         except Exception as e:
             self.logger.error(f"Ошибка выполнения JOIN: {self.format_db_error(e)}")
             return []
+
+    def execute_ddl(self, sql_query: str) -> bool:
+        """
+        Выполняет DDL (Data Definition Language) запрос.
+        Используется для CREATE, DROP, ALTER и других DDL операций.
+        
+        Args:
+            sql_query: SQL DDL запрос для выполнения
+            
+        Returns:
+            True если запрос выполнен успешно, False иначе
+        """
+        if not self.is_connected():
+            self.logger.error("Нет подключения к базе данных")
+            return False
+            
+        try:
+            self.logger.info(f"Выполняется DDL запрос: {sql_query[:200]}...")
+            
+            with self.engine.begin() as conn:
+                conn.execute(text(sql_query))
+                
+            self.logger.info("DDL запрос выполнен успешно")
+            
+            # Обновляем метаданные после DDL операции
+            self._refresh_metadata()
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Ошибка выполнения DDL запроса: {self.format_db_error(e)}")
+            return False
