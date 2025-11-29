@@ -51,7 +51,7 @@ class CustomTypesMixin:
                 conn.execute(text(sql))
                 conn.commit()
             
-            self.logger.info(f"✅ ENUM тип '{type_name}' успешно создан")
+            self.logger.info(f"ENUM тип '{type_name}' успешно создан")
             return True, None
             
         except Exception as e:
@@ -104,7 +104,7 @@ class CustomTypesMixin:
                 conn.execute(text(sql))
                 conn.commit()
             
-            self.logger.info(f"✅ Составной тип '{type_name}' успешно создан")
+            self.logger.info(f"Составной тип '{type_name}' успешно создан")
             return True, None
             
         except Exception as e:
@@ -262,7 +262,7 @@ class CustomTypesMixin:
                 conn.execute(text(sql))
                 conn.commit()
             
-            self.logger.info(f"✅ Тип '{type_name}' успешно удалён")
+            self.logger.info(f"Тип '{type_name}' успешно удалён")
             return True, None
             
         except Exception as e:
@@ -301,7 +301,7 @@ class CustomTypesMixin:
                 conn.execute(text(sql))
                 conn.commit()
             
-            self.logger.info(f"✅ Значение '{value}' добавлено в тип '{type_name}'")
+            self.logger.info(f"Значение '{value}' добавлено в тип '{type_name}'")
             return True, None
             
         except Exception as e:

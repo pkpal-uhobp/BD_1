@@ -436,7 +436,7 @@ class ConstraintsMixin:
 
                     action = "DROP NOT NULL" if nullable else "SET NOT NULL"
                     sql = f'ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" {action};'
-                    self.logger.info(f"🔧 {action} для столбца '{table_name}.{column_name}'")
+                    self.logger.info(f"{action} для столбца '{table_name}.{column_name}'")
                     conn.execute(text(sql))
 
                 # Изменение DEFAULT
@@ -450,14 +450,14 @@ class ConstraintsMixin:
                             default_sql = str(default)
                         sql = f'ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" SET DEFAULT {default_sql};'
                     
-                    self.logger.info(f"🔧 Изменение DEFAULT для столбца '{table_name}.{column_name}'")
+                    self.logger.info(f"Изменение DEFAULT для столбца '{table_name}.{column_name}'")
                     conn.execute(text(sql))
 
                 # Добавление CHECK ограничения
                 if check_condition:
                     constraint_name = f'chk_{table_name}_{column_name}'
                     sql = f'ALTER TABLE "{table_name}" ADD CONSTRAINT "{constraint_name}" CHECK ({check_condition});'
-                    self.logger.info(f"🔧 Добавление CHECK ограничения для столбца '{table_name}.{column_name}'")
+                    self.logger.info(f"Добавление CHECK ограничения для столбца '{table_name}.{column_name}'")
                     conn.execute(text(sql))
 
             self._refresh_metadata()

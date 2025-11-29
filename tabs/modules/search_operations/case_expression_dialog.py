@@ -36,7 +36,7 @@ class WhenClauseWidget(QWidget):
         layout.addWidget(self.then_input)
         
         # Кнопка удаления
-        self.remove_btn = QPushButton("❌")
+        self.remove_btn = QPushButton("X")
         self.remove_btn.setObjectName("removeWhenBtn")
         self.remove_btn.setMaximumWidth(30)
         self.remove_btn.setMaximumHeight(30)
@@ -72,16 +72,32 @@ class CaseExpressionDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Конструктор CASE выражения")
         self.setModal(True)
-        self.setMinimumSize(700, 500)
+        self.setMinimumSize(750, 600)
+        self.resize(800, 650)
         
         # Устанавливаем темную палитру
         self.set_dark_palette()
         
-        # Основной layout
+        # Главный layout диалога
+        dialog_layout = QVBoxLayout()
+        dialog_layout.setContentsMargins(10, 10, 10, 10)
+        dialog_layout.setSpacing(10)
+        self.setLayout(dialog_layout)
+        
+        # Создаем скролл-область для основного контента
+        main_scroll = QScrollArea()
+        main_scroll.setObjectName("mainScrollArea")
+        main_scroll.setWidgetResizable(True)
+        main_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        main_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        # Создаем контент-виджет
+        content_widget = QWidget()
+        content_widget.setObjectName("contentWidget")
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setSpacing(15)
-        self.setLayout(main_layout)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setSpacing(12)
+        content_widget.setLayout(main_layout)
         
         # Заголовок
         header_label = QLabel("КОНСТРУКТОР CASE ВЫРАЖЕНИЯ")
@@ -103,7 +119,7 @@ class CaseExpressionDialog(QDialog):
         when_group.setLayout(when_layout)
         
         # Кнопка добавления WHEN
-        add_when_btn = QPushButton("➕ Добавить WHEN условие")
+        add_when_btn = QPushButton("+ Добавить WHEN условие")
         add_when_btn.setObjectName("addWhenBtn")
         add_when_btn.clicked.connect(self.add_when_clause)
         when_layout.addWidget(add_when_btn)
@@ -119,7 +135,8 @@ class CaseExpressionDialog(QDialog):
         when_scroll = QScrollArea()
         when_scroll.setWidgetResizable(True)
         when_scroll.setWidget(self.when_widgets_container)
-        when_scroll.setMinimumHeight(200)
+        when_scroll.setMinimumHeight(180)
+        when_scroll.setMaximumHeight(250)
         when_layout.addWidget(when_scroll)
         
         main_layout.addWidget(when_group)
@@ -164,7 +181,11 @@ class CaseExpressionDialog(QDialog):
         
         main_layout.addWidget(preview_group)
         
-        # Кнопки
+        # Устанавливаем контент в скролл-область
+        main_scroll.setWidget(content_widget)
+        dialog_layout.addWidget(main_scroll, 1)
+        
+        # Кнопки (вне скролл-области)
         buttons_layout = QHBoxLayout()
         
         ok_button = QPushButton("OK")
@@ -177,7 +198,7 @@ class CaseExpressionDialog(QDialog):
         
         buttons_layout.addWidget(ok_button)
         buttons_layout.addWidget(cancel_button)
-        main_layout.addLayout(buttons_layout)
+        dialog_layout.addLayout(buttons_layout)
         
         # Добавляем первый WHEN по умолчанию
         self.add_when_clause()
@@ -378,5 +399,37 @@ class CaseExpressionDialog(QDialog):
                 border: 2px solid #44475a;
                 border-radius: 8px;
                 background: rgba(15, 15, 25, 0.5);
+            }
+            
+            #mainScrollArea {
+                border: none;
+                background: transparent;
+            }
+            
+            #contentWidget {
+                background: transparent;
+            }
+            
+            /* Скроллбары */
+            QScrollBar:vertical {
+                border: none;
+                background: #1a1a2e;
+                width: 12px;
+                margin: 0px;
+                border-radius: 6px;
+            }
+            
+            QScrollBar::handle:vertical {
+                background: #64ffda;
+                border-radius: 6px;
+                min-height: 25px;
+            }
+            
+            QScrollBar::handle:vertical:hover {
+                background: #50e3c2;
+            }
+            
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
             }
         """)

@@ -18,15 +18,31 @@ class SubqueryFilterDialog(QDialog):
         self.setWindowTitle("Фильтры с подзапросами")
         self.setModal(True)
         self.setMinimumSize(800, 700)
+        self.resize(850, 750)
         
         # Устанавливаем темную палитру
         self.set_dark_palette()
         
-        # Основной layout
+        # Главный layout диалога
+        dialog_layout = QVBoxLayout()
+        dialog_layout.setContentsMargins(10, 10, 10, 10)
+        dialog_layout.setSpacing(10)
+        self.setLayout(dialog_layout)
+        
+        # Создаем скролл-область
+        scroll_area = QScrollArea()
+        scroll_area.setObjectName("mainScrollArea")
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        # Создаем контент-виджет для скролл-области
+        content_widget = QWidget()
+        content_widget.setObjectName("contentWidget")
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setSpacing(15)
-        self.setLayout(main_layout)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setSpacing(12)
+        content_widget.setLayout(main_layout)
         
         # Заголовок
         header_label = QLabel("ФИЛЬТРЫ С ПОДЗАПРОСАМИ")
@@ -146,7 +162,11 @@ class SubqueryFilterDialog(QDialog):
         
         main_layout.addWidget(preview_group)
         
-        # Кнопки
+        # Устанавливаем контент-виджет в скролл-область
+        scroll_area.setWidget(content_widget)
+        dialog_layout.addWidget(scroll_area, 1)
+        
+        # Кнопки (вне скролл-области)
         buttons_layout = QHBoxLayout()
         
         ok_button = QPushButton("OK")
@@ -159,7 +179,7 @@ class SubqueryFilterDialog(QDialog):
         
         buttons_layout.addWidget(ok_button)
         buttons_layout.addWidget(cancel_button)
-        main_layout.addLayout(buttons_layout)
+        dialog_layout.addLayout(buttons_layout)
         
         # Подключаем обновление предпросмотра
         self.main_column_combo.currentTextChanged.connect(self.update_preview)
@@ -443,5 +463,38 @@ class SubqueryFilterDialog(QDialog):
                 font-size: 12px;
                 font-family: 'Consolas', 'Fira Code', monospace;
                 color: #64ffda;
+            }
+            
+            /* Скролл-область */
+            #mainScrollArea {
+                border: none;
+                background: transparent;
+            }
+            
+            #contentWidget {
+                background: transparent;
+            }
+            
+            /* Скроллбары */
+            QScrollBar:vertical {
+                border: none;
+                background: #1a1a2e;
+                width: 12px;
+                margin: 0px;
+                border-radius: 6px;
+            }
+            
+            QScrollBar::handle:vertical {
+                background: #64ffda;
+                border-radius: 6px;
+                min-height: 25px;
+            }
+            
+            QScrollBar::handle:vertical:hover {
+                background: #50e3c2;
+            }
+            
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
             }
         """)

@@ -172,7 +172,7 @@ class MetadataMixin:
             return []
         try:
             tables = inspect(self.engine).get_table_names()
-            self.logger.info(f"📋 Таблицы в БД ({len(tables)}): {tables}")
+            self.logger.info(f"Таблицы в БД ({len(tables)}): {tables}")
             return tables
         except Exception as e:
             self.logger.error(f" Ошибка при получении списка таблиц: {self.format_db_error(e)}")

@@ -66,7 +66,7 @@ class DBConnectionWindow(QMainWindow):
         title_layout = QHBoxLayout()
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_container.setLayout(title_layout)
-        db_icon = QLabel("🕮")
+        db_icon = QLabel("[DB]")
         db_icon.setFont(QFont("Arial", 28, QFont.Bold))
         db_icon.setAlignment(Qt.AlignCenter)
         db_icon.setStyleSheet("color: #64ffda;")

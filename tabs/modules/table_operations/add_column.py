@@ -391,9 +391,9 @@ class ConstraintsDialog(QDialog):
             self.clear_field_error('default')
             return True
         if self._has_dangerous_sql(text):
-            self.set_field_error('default', "✕ Недопустимы комментарии и ';'")
+            self.set_field_error('default', "X Недопустимы комментарии и ';'")
             return False
-        self.set_field_success('default', "✓ Ок")
+        self.set_field_success('default', "OK Ок")
         return True
 
     def _validate_check(self):
@@ -402,14 +402,14 @@ class ConstraintsDialog(QDialog):
             self.clear_field_error('check')
             return True
         if self._has_dangerous_sql(text):
-            self.set_field_error('check', "✕ Недопустимы комментарии и ';'")
+            self.set_field_error('check', "X Недопустимы комментарии и ';'")
             return False
         # Простейшая проверка наличия оператора сравнения
         import re as _re
         if not _re.search(r"[<>=]", text):
-            self.set_field_error('check', "✕ Ожидается условие сравнения")
+            self.set_field_error('check', "X Ожидается условие сравнения")
             return False
-        self.set_field_success('check', "✓ Ок")
+        self.set_field_success('check', "OK Ок")
         return True
 
     def _on_accept(self):
@@ -428,7 +428,7 @@ class AddColumnDialog(QDialog):
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
-        self.setWindowTitle("➕ ДОБАВЛЕНИЕ СТОЛБЦА")
+        self.setWindowTitle("ДОБАВЛЕНИЕ СТОЛБЦА")
         self.setModal(True)
         self.resize(600, 500)  # Уменьшенный размер
         self._set_dark_palette()
@@ -947,9 +947,9 @@ class AddColumnDialog(QDialog):
         name = self.name_edit.text().strip()
         ok, msg = self.validate_column_name(name)
         if ok:
-            self.set_field_success('name', "✓ Валидное имя столбца")
+            self.set_field_success('name', "OK Валидное имя столбца")
         else:
-            self.set_field_error('name', f"✕ {msg}")
+            self.set_field_error('name', f"X {msg}")
     
     def _validate_type_live(self):
         """Валидация типа данных в реальном времени"""
@@ -964,24 +964,24 @@ class AddColumnDialog(QDialog):
         if type_text in valid_types:
             # Дополнительные проверки для специфичных типов
             if type_text == "ARRAY":
-                self.set_field_success('type', "✓ Массив - укажите тип элементов")
+                self.set_field_success('type', "OK Массив - укажите тип элементов")
             elif type_text == "ENUM":
-                self.set_field_success('type', "✓ Перечисление - укажите значения")
+                self.set_field_success('type', "OK Перечисление - укажите значения")
             elif type_text == "Numeric(10, 2)":
-                self.set_field_success('type', "✓ Число с точностью (10,2)")
+                self.set_field_success('type', "OK Число с точностью (10,2)")
             elif type_text == "String(255)":
-                self.set_field_success('type', "✓ Строка до 255 символов")
+                self.set_field_success('type', "OK Строка до 255 символов")
             else:
-                self.set_field_success('type', f"✓ {type_text}")
+                self.set_field_success('type', f"OK {type_text}")
         else:
-            self.set_field_error('type', "✕ Выберите валидный тип данных")
+            self.set_field_error('type', "X Выберите валидный тип данных")
     
     def _validate_array_values(self):
         """Валидация значений ARRAY"""
         try:
             values = self.array_values.getArray()
             if not values:
-                self.set_field_success('array_values', "✓ Пустой массив (допустимо)")
+                self.set_field_success('array_values', "OK Пустой массив (допустимо)")
                 return True
             
             # Проверяем тип элементов
@@ -991,27 +991,27 @@ class AddColumnDialog(QDialog):
             for i, item in enumerate(values):
                 if item_type == "Integer":
                     if not str(item).isdigit() and not (str(item).startswith('-') and str(item)[1:].isdigit()):
-                        self.set_field_error('array_values', f"✕ Элемент {i+1} должен быть целым числом")
+                        self.set_field_error('array_values', f"X Элемент {i+1} должен быть целым числом")
                         return False
                     validated_items.append(int(item))
                 elif item_type == "Numeric(10, 2)":
                     try:
                         float(item)
                     except ValueError:
-                        self.set_field_error('array_values', f"✕ Элемент {i+1} должен быть числом")
+                        self.set_field_error('array_values', f"X Элемент {i+1} должен быть числом")
                         return False
                     validated_items.append(float(item))
                 else:  # String
                     if len(str(item)) > 255:
-                        self.set_field_error('array_values', f"✕ Элемент {i+1} слишком длинный (макс. 255 символов)")
+                        self.set_field_error('array_values', f"X Элемент {i+1} слишком длинный (макс. 255 символов)")
                         return False
                     validated_items.append(str(item))
             
-            self.set_field_success('array_values', f"✓ {len(validated_items)} элементов")
+            self.set_field_success('array_values', f"OK {len(validated_items)} элементов")
             return True
             
         except Exception as e:
-            self.set_field_error('array_values', f"✕ Ошибка валидации: {str(e)}")
+            self.set_field_error('array_values', f"X Ошибка валидации: {str(e)}")
             return False
     
     def _validate_enum_values(self):
@@ -1019,26 +1019,26 @@ class AddColumnDialog(QDialog):
         try:
             values = self.enum_editor.get_values()
             if not values:
-                self.set_field_error('enum_values', "✕ ENUM должен содержать хотя бы одно значение")
+                self.set_field_error('enum_values', "X ENUM должен содержать хотя бы одно значение")
                 return False
             
             # Проверяем на дубликаты
             if len(values) != len(set(values)):
-                self.set_field_error('enum_values', "✕ ENUM не может содержать дубликаты")
+                self.set_field_error('enum_values', "X ENUM не может содержать дубликаты")
                 return False
             
             # Проверяем длину значений
             for i, value in enumerate(values):
                 if len(str(value)) > 255:
-                    self.set_field_error('enum_values', f"✕ Значение {i+1} слишком длинное (макс. 255 символов)")
+                    self.set_field_error('enum_values', f"X Значение {i+1} слишком длинное (макс. 255 символов)")
                     return False
                 if not str(value).strip():
-                    self.set_field_error('enum_values', f"✕ Значение {i+1} не может быть пустым")
+                    self.set_field_error('enum_values', f"X Значение {i+1} не может быть пустым")
                     return False
             
-            self.set_field_success('enum_values', f"✓ {len(values)} значений")
+            self.set_field_success('enum_values', f"OK {len(values)} значений")
             return True
             
         except Exception as e:
-            self.set_field_error('enum_values', f"✕ Ошибка валидации: {str(e)}")
+            self.set_field_error('enum_values', f"X Ошибка валидации: {str(e)}")
             return False

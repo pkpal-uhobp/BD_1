@@ -95,7 +95,7 @@ class TableOperationsMixin:
                         f'SELECT COUNT(*) FROM "{table_name}" WHERE "{column_name}" IS NULL'
                     )).scalar() or 0
                     if null_cnt > 0 and is_integer_type:
-                        self.logger.info("🔧 Авто-заполнение значений для нового PK целочисленного типа")
+                        self.logger.info("Авто-заполнение значений для нового PK целочисленного типа")
                         fill_sql = (
                             f'UPDATE "{table_name}" t SET "{column_name}" = s.rn '
                             f'FROM (SELECT ctid, ROW_NUMBER() OVER () AS rn FROM "{table_name}") s '
@@ -284,7 +284,7 @@ class TableOperationsMixin:
 
             # --- Выполнение ---
             sql = f'ALTER TABLE "{old_table_name}" RENAME TO "{new_table_name}";'
-            self.logger.info(f"🔧 Переименование таблицы: '{old_table_name}' → '{new_table_name}'")
+            self.logger.info(f"Переименование таблицы: '{old_table_name}' → '{new_table_name}'")
             self.logger.debug(f"SQL → {sql}")
 
             with self.engine.begin() as conn:
@@ -467,7 +467,7 @@ class TableOperationsMixin:
                 # =====================================================
                 # 🚀 Выполнение изменения
                 # =====================================================
-                self.logger.info(f"🔧 Изменение типа: '{table_name}.{column_name}' → '{new_type}'")
+                self.logger.info(f"Изменение типа: '{table_name}.{column_name}' → '{new_type}'")
                 self.logger.debug(f"SQL: {alter_sql}")
                 conn.execute(text(alter_sql))
 
@@ -511,7 +511,7 @@ class TableOperationsMixin:
             # Выполняем изменение
             action = "DROP NOT NULL" if nullable else "SET NOT NULL"
             sql = f'ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" {action};'
-            self.logger.info(f"🔧 {action} для столбца '{table_name}.{column_name}'")
+            self.logger.info(f"{action} для столбца '{table_name}.{column_name}'")
             self.logger.debug(f"SQL → {sql}")
 
             with self.engine.begin() as conn:
@@ -551,7 +551,7 @@ class TableOperationsMixin:
                     default_str = str(default_value)
                 sql = f'ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" SET DEFAULT {default_str};'
 
-            self.logger.info(f"🔧 Установка DEFAULT для столбца '{table_name}.{column_name}'")
+            self.logger.info(f"Установка DEFAULT для столбца '{table_name}.{column_name}'")
             self.logger.debug(f"SQL → {sql}")
 
             with self.engine.begin() as conn:
