@@ -197,6 +197,12 @@ class SearchMixin:
             elif search_type == "NOT_ILIKE":
                 # НЕ ILIKE (нечувствительный к регистру)
                 sql_query = f'SELECT * FROM "{table_name}" WHERE "{column_name}"::text NOT ILIKE \'{escaped_query}\''
+            elif search_type == "SIMILAR_TO":
+                # SIMILAR TO (SQL регулярные выражения)
+                sql_query = f'SELECT * FROM "{table_name}" WHERE "{column_name}"::text SIMILAR TO \'{escaped_query}\''
+            elif search_type == "NOT_SIMILAR_TO":
+                # NOT SIMILAR TO (отрицание SQL регулярных выражений)
+                sql_query = f'SELECT * FROM "{table_name}" WHERE "{column_name}"::text NOT SIMILAR TO \'{escaped_query}\''
             elif search_type == "REGEX":
                 # Регулярное выражение (чувствительный к регистру)
                 sql_query = f'SELECT * FROM "{table_name}" WHERE "{column_name}"::text ~ \'{escaped_query}\''
