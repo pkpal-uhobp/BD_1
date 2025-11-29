@@ -97,6 +97,9 @@ class AdvancedSelectDialog(QDialog):
     # Сигнал для передачи результатов в главное окно
     results_to_main_table = Signal(list)
     
+    # Константы для валидации
+    MAX_SIMILAR_TO_PATTERN_LENGTH = 500
+    
     def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
@@ -332,6 +335,58 @@ class AdvancedSelectDialog(QDialog):
         where_layout.addWidget(self.where_error_label)
         
         filter_layout.addWidget(where_group)
+        
+        # Группа SIMILAR TO (Регулярные выражения)
+        similar_to_group = QGroupBox("SIMILAR TO (Поиск по шаблону)")
+        similar_to_group.setObjectName("similarToGroup")
+        similar_to_layout = QVBoxLayout()
+        similar_to_group.setLayout(similar_to_layout)
+        
+        # Описание функциональности
+        similar_to_info = QLabel("Используйте SIMILAR TO для поиска строк по шаблонам SQL.\n"
+                                  "Поддерживаемые символы: % (любые символы), _ (один символ),\n"
+                                  "| (или), * (0+ повторений), + (1+ повторений), [abc] (символ из набора)")
+        similar_to_info.setObjectName("similarToInfoLabel")
+        similar_to_info.setWordWrap(True)
+        similar_to_layout.addWidget(similar_to_info)
+        
+        # Форма для SIMILAR TO
+        similar_to_form_layout = QFormLayout()
+        
+        # Выбор столбца
+        self.similar_to_column_combo = QComboBox()
+        self.similar_to_column_combo.setObjectName("similarToColumnCombo")
+        self.similar_to_column_combo.setEditable(False)
+        similar_to_form_layout.addRow("Столбец:", self.similar_to_column_combo)
+        
+        # Поле ввода шаблона
+        self.similar_to_pattern_input = QLineEdit()
+        self.similar_to_pattern_input.setObjectName("similarToPatternInput")
+        self.similar_to_pattern_input.setPlaceholderText("Например: %(a|b)% или %[0-9]{3}%")
+        similar_to_form_layout.addRow("Шаблон:", self.similar_to_pattern_input)
+        
+        similar_to_layout.addLayout(similar_to_form_layout)
+        
+        # Чекбокс для отрицания (NOT SIMILAR TO)
+        self.not_similar_to_check = QCheckBox("NOT SIMILAR TO (отрицание)")
+        self.not_similar_to_check.setObjectName("notSimilarToCheck")
+        self.not_similar_to_check.setChecked(False)
+        similar_to_layout.addWidget(self.not_similar_to_check)
+        
+        # Кнопка добавления условия в WHERE
+        add_similar_to_btn = QPushButton("+ Добавить условие SIMILAR TO в WHERE")
+        add_similar_to_btn.setObjectName("addSimilarToBtn")
+        add_similar_to_btn.clicked.connect(self.add_similar_to_condition)
+        similar_to_layout.addWidget(add_similar_to_btn)
+        
+        # Метка для отображения ошибок/успеха
+        self.similar_to_error_label = QLabel()
+        self.similar_to_error_label.setObjectName("similarToErrorLabel")
+        self.similar_to_error_label.setWordWrap(True)
+        self.similar_to_error_label.hide()
+        similar_to_layout.addWidget(self.similar_to_error_label)
+        
+        filter_layout.addWidget(similar_to_group)
         
         # Группа ORDER BY - новый интерфейс с индивидуальным направлением
         order_group = QGroupBox("ORDER BY (Сортировка)")
@@ -587,12 +642,20 @@ class AdvancedSelectDialog(QDialog):
             self.available_order_columns.clear()
             self.available_group_columns.clear()
             
+            # Очищаем SIMILAR TO комбобокс
+            self.similar_to_column_combo.clear()
+            self.similar_to_pattern_input.clear()
+            self.not_similar_to_check.setChecked(False)
+            
             # Очищаем виджеты сортировки
             self.clear_all_sort_widgets()
             
             # Заполняем доступные столбцы
             self.available_columns.addItems(columns)
             self.available_group_columns.addItems(columns)
+            
+            # Заполняем SIMILAR TO комбобокс
+            self.similar_to_column_combo.addItems(columns)
             
             # Для сортировки используем выбранные столбцы (которые могут иметь алиасы)
             # Пока что используем базовые столбцы, но обновим их при изменении выбранных столбцов
@@ -772,6 +835,149 @@ class AdvancedSelectDialog(QDialog):
                 
                 self.where_input.setText(new_where)
                 self.show_info("Условие с подзапросом добавлено в WHERE")
+    
+    def add_similar_to_condition(self):
+        """Добавляет условие SIMILAR TO в WHERE"""
+        column_name = self.similar_to_column_combo.currentText()
+        pattern = self.similar_to_pattern_input.text().strip()
+        is_not = self.not_similar_to_check.isChecked()
+        
+        # Валидация
+        if not column_name:
+            self.set_similar_to_error("Выберите столбец для поиска")
+            return
+        
+        if not pattern:
+            self.set_similar_to_error("Введите шаблон для поиска")
+            return
+        
+        # Валидация шаблона SIMILAR TO
+        is_valid, error_msg = self.validate_similar_to_pattern(pattern)
+        if not is_valid:
+            self.set_similar_to_error(error_msg)
+            return
+        
+        # Формируем условие SIMILAR TO
+        operator = "NOT SIMILAR TO" if is_not else "SIMILAR TO"
+        # Экранируем опасные символы в шаблоне для безопасности SQL
+        escaped_pattern = self.escape_similar_to_pattern(pattern)
+        condition = f'"{column_name}"::text {operator} \'{escaped_pattern}\''
+        
+        # Добавляем условие к WHERE
+        current_where = self.where_input.text().strip()
+        if current_where:
+            # Если уже есть условие, добавляем через AND
+            new_where = f"{current_where} AND {condition}"
+        else:
+            new_where = condition
+        
+        self.where_input.setText(new_where)
+        
+        # Очищаем поля и показываем успех
+        self.similar_to_pattern_input.clear()
+        self.set_similar_to_success(f"Условие {operator} добавлено в WHERE")
+    
+    def escape_similar_to_pattern(self, pattern):
+        """
+        Экранирует специальные символы в шаблоне SIMILAR TO для безопасности SQL.
+        Обрабатывает одинарные кавычки и обратные слэши.
+        """
+        # Экранируем обратные слэши (должны быть первыми, чтобы не экранировать вновь добавленные)
+        escaped = pattern.replace('\\', '\\\\')
+        # Экранируем одинарные кавычки
+        escaped = escaped.replace("'", "''")
+        return escaped
+    
+    def validate_similar_to_pattern(self, pattern):
+        """Валидирует шаблон SIMILAR TO"""
+        if not pattern:
+            return False, "Шаблон не может быть пустым"
+        
+        # Проверяем на слишком длинный шаблон
+        if len(pattern) > self.MAX_SIMILAR_TO_PATTERN_LENGTH:
+            return False, f"Шаблон слишком длинный (максимум {self.MAX_SIMILAR_TO_PATTERN_LENGTH} символов)"
+        
+        # Проверяем на сбалансированные скобки с учетом экранирования
+        if not self._check_balanced_brackets(pattern, '(', ')'):
+            return False, "Несбалансированные круглые скобки"
+        
+        if not self._check_balanced_brackets(pattern, '[', ']'):
+            return False, "Несбалансированные квадратные скобки"
+        
+        # Проверяем на правильность квантификаторов
+        if not self._check_quantifiers(pattern):
+            return False, "Некорректный квантификатор (*, +, ? должны следовать за символом или группой)"
+        
+        return True, ""
+    
+    def _check_balanced_brackets(self, pattern, open_char, close_char):
+        """Проверяет сбалансированность скобок с учетом экранирования"""
+        count = 0
+        i = 0
+        while i < len(pattern):
+            # Пропускаем экранированные символы
+            if pattern[i] == '\\' and i + 1 < len(pattern):
+                i += 2
+                continue
+            if pattern[i] == open_char:
+                count += 1
+            elif pattern[i] == close_char:
+                count -= 1
+                if count < 0:
+                    return False
+            i += 1
+        return count == 0
+    
+    def _check_quantifiers(self, pattern):
+        """Проверяет правильность квантификаторов"""
+        i = 0
+        while i < len(pattern):
+            # Пропускаем экранированные символы
+            if pattern[i] == '\\' and i + 1 < len(pattern):
+                i += 2
+                continue
+            # Квантификаторы должны следовать за символом, группой или классом символов
+            if pattern[i] in '*+?' and i == 0:
+                return False
+            if pattern[i] in '*+?':
+                prev_char = pattern[i - 1]
+                # Проверяем, что перед квантификатором есть что-то допустимое
+                if prev_char in '|(':
+                    return False
+            i += 1
+        return True
+    
+    def set_similar_to_error(self, message):
+        """Устанавливает ошибку для SIMILAR TO"""
+        self.similar_to_error_label.setText(f"❌ {message}")
+        self.similar_to_error_label.setStyleSheet("""
+            QLabel {
+                color: #ff5555;
+                font-size: 12px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 5px;
+                background: rgba(255, 85, 85, 0.1);
+                border-radius: 4px;
+                border-left: 3px solid #ff5555;
+            }
+        """)
+        self.similar_to_error_label.show()
+    
+    def set_similar_to_success(self, message):
+        """Устанавливает успех для SIMILAR TO"""
+        self.similar_to_error_label.setText(f"✅ {message}")
+        self.similar_to_error_label.setStyleSheet("""
+            QLabel {
+                color: #50fa7b;
+                font-size: 12px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 5px;
+                background: rgba(80, 250, 123, 0.1);
+                border-radius: 4px;
+                border-left: 3px solid #50fa7b;
+            }
+        """)
+        self.similar_to_error_label.show()
             
     def add_order_column(self):
         """Добавляет столбец для сортировки"""
@@ -1146,6 +1352,11 @@ class AdvancedSelectDialog(QDialog):
         self.clear_where_error()
         self.clear_having_error()
         
+        # Очищаем SIMILAR TO поля
+        self.similar_to_pattern_input.clear()
+        self.not_similar_to_check.setChecked(False)
+        self.similar_to_error_label.hide()
+        
         # Очищаем новые списки
         self.available_order_columns.clear()
         self.available_group_columns.clear()
@@ -1408,6 +1619,107 @@ class AdvancedSelectDialog(QDialog):
                 font-size: 13px;
                 font-weight: bold;
                 font-family: 'Consolas', 'Fira Code', monospace;
+            }
+            
+            /* SIMILAR TO информационная метка */
+            #similarToInfoLabel {
+                color: #64ffda;
+                font-size: 12px;
+                font-weight: normal;
+                font-style: italic;
+                background: rgba(100, 255, 218, 0.1);
+                border-radius: 6px;
+                padding: 10px 12px;
+                border-left: 4px solid #64ffda;
+                margin: 5px 0;
+            }
+            
+            /* SIMILAR TO группа */
+            #similarToGroup {
+                font-size: 14px;
+                font-weight: bold;
+                color: #64ffda;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                border: 2px solid #44475a;
+                border-radius: 8px;
+                margin: 10px 0;
+                padding: 15px;
+            }
+            
+            /* SIMILAR TO комбобокс */
+            #similarToColumnCombo {
+                background: rgba(25, 25, 35, 0.9);
+                border: 2px solid #44475a;
+                border-radius: 6px;
+                padding: 8px;
+                font-size: 13px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                color: #ffffff;
+                min-height: 25px;
+            }
+            
+            #similarToColumnCombo:focus {
+                border: 2px solid #64ffda;
+                background: rgba(35, 35, 45, 0.9);
+            }
+            
+            /* SIMILAR TO поле ввода шаблона */
+            #similarToPatternInput {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #44475a;
+                border-radius: 6px;
+                padding: 10px;
+                font-size: 13px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                color: #f8f8f2;
+                min-height: 20px;
+            }
+            
+            #similarToPatternInput:focus {
+                border: 2px solid #64ffda;
+                background: rgba(35, 35, 45, 0.9);
+            }
+            
+            /* NOT SIMILAR TO чекбокс */
+            #notSimilarToCheck {
+                color: #f8f8f2;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                font-size: 13px;
+                margin: 10px 0;
+            }
+            
+            #notSimilarToCheck::indicator {
+                width: 18px;
+                height: 18px;
+                border: 2px solid #44475a;
+                border-radius: 3px;
+                background: rgba(15, 15, 25, 0.8);
+            }
+            
+            #notSimilarToCheck::indicator:checked {
+                background: #64ffda;
+                border: 2px solid #64ffda;
+            }
+            
+            /* Кнопка добавления SIMILAR TO */
+            #addSimilarToBtn {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #6272a4, 
+                                          stop: 1 #44475a);
+                border: 2px solid #64ffda;
+                border-radius: 6px;
+                color: #64ffda;
+                font-size: 12px;
+                font-weight: bold;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                padding: 8px 12px;
+            }
+            
+            #addSimilarToBtn:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #64ffda, 
+                                          stop: 1 #50e3c2);
+                color: #0a0a0f;
             }
             
             /* Выпадающие списки */
