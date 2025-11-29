@@ -277,6 +277,39 @@ class ViewsDialog(QDialog):
     def remove_all_view_columns(self):
         """Удаляет все столбцы"""
         self.selected_view_columns.clear()
+    
+    def validate_identifier(self, name):
+        """Валидирует SQL идентификатор (имя таблицы, представления и т.д.)"""
+        if not name:
+            return False
+        # Разрешаем только буквы, цифры и подчеркивания
+        return name.replace('_', '').isalnum() and len(name) <= 63
+    
+    def validate_where_clause(self, where_clause):
+        """Базовая валидация WHERE условия для защиты от SQL инъекций"""
+        if not where_clause:
+            return True, ""
+        
+        # Запрещенные ключевые слова
+        dangerous_patterns = [
+            'DROP', 'DELETE', 'INSERT', 'UPDATE', 'CREATE', 'ALTER', 'TRUNCATE',
+            'EXEC', 'EXECUTE', '--', '/*', '*/', ';'
+        ]
+        
+        upper_clause = where_clause.upper()
+        for pattern in dangerous_patterns:
+            if pattern in upper_clause:
+                return False, f"Запрещенное ключевое слово: {pattern}"
+        
+        # Проверяем сбалансированность скобок
+        if where_clause.count('(') != where_clause.count(')'):
+            return False, "Несбалансированные скобки"
+        
+        # Проверяем сбалансированность кавычек
+        if where_clause.count("'") % 2 != 0:
+            return False, "Незакрытые кавычки"
+        
+        return True, ""
         
     def create_view(self):
         """Создает новое представление"""
@@ -287,26 +320,41 @@ class ViewsDialog(QDialog):
                 return
                 
             # Валидация имени представления
-            if not view_name.replace('_', '').isalnum():
-                self.show_error("Имя представления может содержать только буквы, цифры и подчеркивания")
+            if not self.validate_identifier(view_name):
+                self.show_error("Имя представления может содержать только буквы, цифры и подчеркивания (макс. 63 символа)")
                 return
                 
             table_name = self.base_table_combo.currentText()
             if not table_name:
                 self.show_error("Выберите базовую таблицу")
                 return
+            
+            # Валидируем имя таблицы (должно быть из списка существующих таблиц)
+            available_tables = self.db_instance.get_tables()
+            if table_name not in available_tables:
+                self.show_error("Выбранная таблица не существует")
+                return
                 
-            # Собираем столбцы
+            # Собираем столбцы (столбцы из списка, предварительно валидированы)
             columns = []
             for i in range(self.selected_view_columns.count()):
-                columns.append(f'"{self.selected_view_columns.item(i).text()}"')
-                
+                col_name = self.selected_view_columns.item(i).text()
+                # Столбцы берутся из таблицы, но дополнительно проверяем
+                if self.validate_identifier(col_name):
+                    columns.append(f'"{col_name}"')
+                    
             if not columns:
                 columns = ["*"]
                 
             # Формируем SQL запрос
             select_clause = ", ".join(columns)
             where_clause = self.view_where_input.text().strip()
+            
+            # Валидируем WHERE условие
+            is_valid, error_msg = self.validate_where_clause(where_clause)
+            if not is_valid:
+                self.show_error(f"Ошибка в WHERE условии: {error_msg}")
+                return
             
             sql = f'CREATE VIEW "{view_name}" AS SELECT {select_clause} FROM "{table_name}"'
             if where_clause:
@@ -356,9 +404,18 @@ class ViewsDialog(QDialog):
         try:
             view_name = item.text()
             
-            # Получаем определение представления
+            # Валидируем имя представления
+            if not self.validate_identifier(view_name):
+                self.view_definition_text.setPlainText("Ошибка: некорректное имя представления")
+                return
+            
+            # Используем безопасный способ получения определения через регулярную переменную
+            # pg_get_viewdef принимает имя представления безопасно
             sql = f"""
-                SELECT pg_get_viewdef('{view_name}'::regclass, true) as definition
+                SELECT pg_get_viewdef(c.oid, true) as definition
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE c.relkind = 'v' AND n.nspname = 'public' AND c.relname = '{view_name.replace("'", "''")}'
             """
             
             results = self.db_instance.execute_custom_query(sql)
@@ -381,6 +438,11 @@ class ViewsDialog(QDialog):
                 return
                 
             view_name = selected_item.text()
+            
+            # Валидируем имя представления
+            if not self.validate_identifier(view_name):
+                self.show_error("Некорректное имя представления")
+                return
             
             # Получаем данные из представления
             sql = f'SELECT * FROM "{view_name}" LIMIT 100'
@@ -419,6 +481,11 @@ class ViewsDialog(QDialog):
                 return
                 
             view_name = selected_item.text()
+            
+            # Валидируем имя представления
+            if not self.validate_identifier(view_name):
+                self.show_error("Некорректное имя представления")
+                return
             
             # Подтверждение удаления
             reply = QMessageBox.question(

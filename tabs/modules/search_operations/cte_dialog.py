@@ -328,6 +328,35 @@ class CTEDialog(QDialog):
     def remove_all_main_columns(self):
         """Удаляет все столбцы из основного запроса"""
         self.main_selected_columns.clear()
+    
+    def validate_identifier(self, name):
+        """Валидирует SQL идентификатор"""
+        if not name:
+            return False
+        return name.replace('_', '').isalnum() and len(name) <= 63
+    
+    def validate_where_clause(self, where_clause):
+        """Базовая валидация WHERE условия для защиты от SQL инъекций"""
+        if not where_clause:
+            return True, ""
+        
+        dangerous_patterns = [
+            'DROP', 'DELETE', 'INSERT', 'UPDATE', 'CREATE', 'ALTER', 'TRUNCATE',
+            'EXEC', 'EXECUTE', '--', '/*', '*/', ';'
+        ]
+        
+        upper_clause = where_clause.upper()
+        for pattern in dangerous_patterns:
+            if pattern in upper_clause:
+                return False, f"Запрещенное ключевое слово: {pattern}"
+        
+        if where_clause.count('(') != where_clause.count(')'):
+            return False, "Несбалансированные скобки"
+        
+        if where_clause.count("'") % 2 != 0:
+            return False, "Незакрытые кавычки"
+        
+        return True, ""
         
     def build_sql_query(self):
         """Строит полный SQL запрос с CTE"""
@@ -346,16 +375,26 @@ class CTEDialog(QDialog):
                 
             # Определяем источник
             if source.startswith("Таблица: "):
-                from_clause = f'"{source.replace("Таблица: ", "")}"'
+                table_name = source.replace("Таблица: ", "")
+                if not self.validate_identifier(table_name):
+                    self.show_error("Некорректное имя таблицы")
+                    return None
+                from_clause = f'"{table_name}"'
             elif source.startswith("CTE: "):
-                from_clause = f'"{source.replace("CTE: ", "")}"'
+                cte_name = source.replace("CTE: ", "")
+                if not self.validate_identifier(cte_name):
+                    self.show_error("Некорректное имя CTE")
+                    return None
+                from_clause = f'"{cte_name}"'
             else:
                 return None
                 
             # Собираем столбцы
             columns = []
             for i in range(self.main_selected_columns.count()):
-                columns.append(f'"{self.main_selected_columns.item(i).text()}"')
+                col_name = self.main_selected_columns.item(i).text()
+                if self.validate_identifier(col_name):
+                    columns.append(f'"{col_name}"')
             if not columns:
                 columns = ["*"]
                 
@@ -364,14 +403,18 @@ class CTEDialog(QDialog):
             # Формируем основной SELECT
             main_query = f"SELECT {select_clause} FROM {from_clause}"
             
-            # Добавляем WHERE
+            # Добавляем WHERE с валидацией
             where = self.main_where_input.text().strip()
             if where:
+                is_valid, error_msg = self.validate_where_clause(where)
+                if not is_valid:
+                    self.show_error(f"Ошибка в WHERE: {error_msg}")
+                    return None
                 main_query += f" WHERE {where}"
                 
             # Добавляем ORDER BY
             order_col = self.main_order_combo.currentText().strip()
-            if order_col:
+            if order_col and self.validate_identifier(order_col):
                 direction = self.main_order_direction.currentText()
                 main_query += f' ORDER BY "{order_col}" {direction}'
                 
@@ -881,6 +924,13 @@ class CTEBlockWidget(QWidget):
         
         where = self.where_input.text().strip()
         if where:
+            # Базовая валидация WHERE
+            dangerous_patterns = ['DROP', 'DELETE', 'INSERT', 'UPDATE', 'CREATE', 'ALTER', 'TRUNCATE',
+                                  'EXEC', 'EXECUTE', '--', '/*', '*/', ';']
+            upper_where = where.upper()
+            for pattern in dangerous_patterns:
+                if pattern in upper_where:
+                    return None  # Не добавляем опасный WHERE
             sql += f" WHERE {where}"
             
         sql += ")"

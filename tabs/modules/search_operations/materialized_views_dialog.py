@@ -336,6 +336,39 @@ class MaterializedViewsDialog(QDialog):
         selected_items = self.matview_aggregates.selectedItems()
         for item in selected_items:
             self.matview_aggregates.takeItem(self.matview_aggregates.row(item))
+    
+    def validate_identifier(self, name):
+        """Валидирует SQL идентификатор (имя таблицы, представления и т.д.)"""
+        if not name:
+            return False
+        # Разрешаем только буквы, цифры и подчеркивания
+        return name.replace('_', '').isalnum() and len(name) <= 63
+    
+    def validate_where_clause(self, where_clause):
+        """Базовая валидация WHERE условия для защиты от SQL инъекций"""
+        if not where_clause:
+            return True, ""
+        
+        # Запрещенные ключевые слова
+        dangerous_patterns = [
+            'DROP', 'DELETE', 'INSERT', 'UPDATE', 'CREATE', 'ALTER', 'TRUNCATE',
+            'EXEC', 'EXECUTE', '--', '/*', '*/', ';'
+        ]
+        
+        upper_clause = where_clause.upper()
+        for pattern in dangerous_patterns:
+            if pattern in upper_clause:
+                return False, f"Запрещенное ключевое слово: {pattern}"
+        
+        # Проверяем сбалансированность скобок
+        if where_clause.count('(') != where_clause.count(')'):
+            return False, "Несбалансированные скобки"
+        
+        # Проверяем сбалансированность кавычек
+        if where_clause.count("'") % 2 != 0:
+            return False, "Незакрытые кавычки"
+        
+        return True, ""
             
     def create_matview(self):
         """Создает материализованное представление"""
@@ -345,19 +378,27 @@ class MaterializedViewsDialog(QDialog):
                 self.show_error("Введите имя материализованного представления")
                 return
                 
-            if not mv_name.replace('_', '').isalnum():
-                self.show_error("Имя может содержать только буквы, цифры и подчеркивания")
+            if not self.validate_identifier(mv_name):
+                self.show_error("Имя может содержать только буквы, цифры и подчеркивания (макс. 63 символа)")
                 return
                 
             table_name = self.matview_table_combo.currentText()
             if not table_name:
                 self.show_error("Выберите базовую таблицу")
                 return
+            
+            # Валидируем имя таблицы
+            available_tables = self.db_instance.get_tables()
+            if table_name not in available_tables:
+                self.show_error("Выбранная таблица не существует")
+                return
                 
             # Собираем столбцы
             columns = []
             for i in range(self.selected_matview_columns.count()):
-                columns.append(f'"{self.selected_matview_columns.item(i).text()}"')
+                col_name = self.selected_matview_columns.item(i).text()
+                if self.validate_identifier(col_name):
+                    columns.append(f'"{col_name}"')
                 
             # Добавляем агрегатные функции
             for i in range(self.matview_aggregates.count()):
@@ -369,11 +410,19 @@ class MaterializedViewsDialog(QDialog):
             # Собираем GROUP BY
             groupby_cols = []
             for item in self.matview_groupby_list.selectedItems():
-                groupby_cols.append(f'"{item.text()}"')
+                col_name = item.text()
+                if self.validate_identifier(col_name):
+                    groupby_cols.append(f'"{col_name}"')
                 
             # Формируем SQL
             select_clause = ", ".join(columns)
             where_clause = self.matview_where_input.text().strip()
+            
+            # Валидируем WHERE условие
+            is_valid, error_msg = self.validate_where_clause(where_clause)
+            if not is_valid:
+                self.show_error(f"Ошибка в WHERE условии: {error_msg}")
+                return
             
             sql = f'CREATE MATERIALIZED VIEW "{mv_name}" AS SELECT {select_clause} FROM "{table_name}"'
             if where_clause:
@@ -425,10 +474,17 @@ class MaterializedViewsDialog(QDialog):
         try:
             mv_name = item.text()
             
+            # Валидируем имя
+            if not self.validate_identifier(mv_name):
+                self.matview_definition_text.setPlainText("Ошибка: некорректное имя")
+                return
+            
+            # Используем безопасное экранирование
+            safe_name = mv_name.replace("'", "''")
             sql = f"""
                 SELECT definition 
                 FROM pg_matviews 
-                WHERE matviewname = '{mv_name}'
+                WHERE schemaname = 'public' AND matviewname = '{safe_name}'
             """
             
             results = self.db_instance.execute_custom_query(sql)
@@ -451,6 +507,11 @@ class MaterializedViewsDialog(QDialog):
                 return
                 
             mv_name = selected_item.text()
+            
+            # Валидируем имя
+            if not self.validate_identifier(mv_name):
+                self.show_error("Некорректное имя представления")
+                return
             
             sql = f'SELECT * FROM "{mv_name}" LIMIT 100'
             results = self.db_instance.execute_custom_query(sql)
@@ -488,6 +549,11 @@ class MaterializedViewsDialog(QDialog):
                 
             mv_name = selected_item.text()
             
+            # Валидируем имя
+            if not self.validate_identifier(mv_name):
+                self.show_error("Некорректное имя представления")
+                return
+            
             sql = f'REFRESH MATERIALIZED VIEW "{mv_name}"'
             success = self.db_instance.execute_ddl(sql)
             
@@ -509,6 +575,11 @@ class MaterializedViewsDialog(QDialog):
                 return
                 
             mv_name = selected_item.text()
+            
+            # Валидируем имя
+            if not self.validate_identifier(mv_name):
+                self.show_error("Некорректное имя представления")
+                return
             
             reply = QMessageBox.question(
                 self,

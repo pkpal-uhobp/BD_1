@@ -2060,7 +2060,8 @@ class AdvancedSelectDialog(QDialog):
             /* Кнопки сортировки и группировки */
             #addOrderBtn, #addAllOrderBtn,
             #addGroupBtn, #removeGroupBtn, #addAllGroupBtn, #removeAllGroupBtn,
-            #addAggBtn, #removeAggBtn, #removeAllAggBtn {
+            #addAggBtn, #removeAggBtn, #removeAllAggBtn,
+            #addGroupingSetBtn, #removeGroupingSetBtn, #clearGroupingSetsBtn {
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                           stop: 0 #6272a4, 
                                           stop: 1 #44475a);
@@ -2076,11 +2077,62 @@ class AdvancedSelectDialog(QDialog):
             
             #addOrderBtn:hover, #addAllOrderBtn:hover,
             #addGroupBtn:hover, #removeGroupBtn:hover, #addAllGroupBtn:hover, #removeAllGroupBtn:hover,
-            #addAggBtn:hover, #removeAggBtn:hover, #removeAllAggBtn:hover {
+            #addAggBtn:hover, #removeAggBtn:hover, #removeAllAggBtn:hover,
+            #addGroupingSetBtn:hover, #removeGroupingSetBtn:hover, #clearGroupingSetsBtn:hover {
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                           stop: 0 #64ffda, 
                                           stop: 1 #50e3c2);
                 color: #0a0a0f;
+            }
+            
+            /* Расширенная группировка */
+            #advancedGroupGroup {
+                border: 2px solid #ffd700;
+            }
+            
+            #advancedGroupInfoLabel {
+                color: #ffd700;
+                font-size: 11px;
+                font-weight: normal;
+                font-style: italic;
+                background: rgba(255, 215, 0, 0.1);
+                border-radius: 6px;
+                padding: 8px 10px;
+                border-left: 3px solid #ffd700;
+                margin: 5px 0;
+            }
+            
+            #groupingTypeCombo {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #ffd700;
+                border-radius: 6px;
+                padding: 8px;
+                font-size: 13px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                color: #ffd700;
+                min-width: 150px;
+            }
+            
+            #groupingTypeCombo:focus {
+                border: 2px solid #64ffda;
+            }
+            
+            #groupingSetsContainer {
+                background: rgba(15, 15, 25, 0.5);
+                border: 1px solid #44475a;
+                border-radius: 6px;
+                padding: 10px;
+                margin-top: 5px;
+            }
+            
+            #groupingSetsList {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #44475a;
+                border-radius: 6px;
+                padding: 5px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+                color: #f8f8f2;
+                max-height: 100px;
             }
             
             /* Контейнер для виджетов сортировки */
