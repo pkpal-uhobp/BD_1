@@ -87,8 +87,24 @@ class MaterializedViewsDialog(QDialog):
     def create_matview_tab(self):
         """Создает вкладку для создания материализованного представления"""
         tab = QWidget()
+        tab_outer_layout = QVBoxLayout()
+        tab_outer_layout.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(tab_outer_layout)
+        
+        # Scroll area для содержимого вкладки
+        scroll_area = QScrollArea()
+        scroll_area.setObjectName("matviewCreateScrollArea")
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        scroll_content = QWidget()
         layout = QVBoxLayout()
-        tab.setLayout(layout)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(15)
+        scroll_content.setLayout(layout)
+        scroll_area.setWidget(scroll_content)
+        tab_outer_layout.addWidget(scroll_area)
         
         # Группа настроек
         settings_group = QGroupBox("Настройки материализованного представления")
@@ -203,8 +219,24 @@ class MaterializedViewsDialog(QDialog):
     def manage_matviews_tab(self):
         """Создает вкладку для управления материализованными представлениями"""
         tab = QWidget()
+        tab_outer_layout = QVBoxLayout()
+        tab_outer_layout.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(tab_outer_layout)
+        
+        # Scroll area для содержимого вкладки
+        scroll_area = QScrollArea()
+        scroll_area.setObjectName("matviewManageScrollArea")
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        scroll_content = QWidget()
         layout = QVBoxLayout()
-        tab.setLayout(layout)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(15)
+        scroll_content.setLayout(layout)
+        scroll_area.setWidget(scroll_content)
+        tab_outer_layout.addWidget(scroll_area)
         
         # Группа списка
         list_group = QGroupBox("Существующие материализованные представления")
@@ -677,15 +709,25 @@ class MaterializedViewsDialog(QDialog):
                 font-family: 'Consolas', 'Fira Code', monospace;
                 border: 2px solid #44475a;
                 border-radius: 8px;
-                margin-top: 8px;
-                padding: 8px;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                padding: 15px;
+                padding-top: 25px;
             }
             
             QGroupBox::title {
                 subcontrol-origin: margin;
+                subcontrol-position: top left;
                 left: 10px;
-                padding: 0 5px;
+                top: 5px;
+                padding: 0 8px;
                 background: rgba(10, 10, 15, 0.9);
+            }
+            
+            /* Scroll areas */
+            #matviewCreateScrollArea, #matviewManageScrollArea {
+                border: none;
+                background: transparent;
             }
             
             QLabel {

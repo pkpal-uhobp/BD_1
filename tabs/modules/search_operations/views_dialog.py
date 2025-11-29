@@ -78,8 +78,24 @@ class ViewsDialog(QDialog):
     def create_view_tab(self):
         """Создает вкладку для создания нового представления"""
         tab = QWidget()
+        tab_outer_layout = QVBoxLayout()
+        tab_outer_layout.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(tab_outer_layout)
+        
+        # Scroll area для содержимого вкладки
+        scroll_area = QScrollArea()
+        scroll_area.setObjectName("viewCreateScrollArea")
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        scroll_content = QWidget()
         layout = QVBoxLayout()
-        tab.setLayout(layout)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(15)
+        scroll_content.setLayout(layout)
+        scroll_area.setWidget(scroll_content)
+        tab_outer_layout.addWidget(scroll_area)
         
         # Группа настроек представления
         settings_group = QGroupBox("Настройки представления")
@@ -162,8 +178,24 @@ class ViewsDialog(QDialog):
     def manage_views_tab(self):
         """Создает вкладку для управления существующими представлениями"""
         tab = QWidget()
+        tab_outer_layout = QVBoxLayout()
+        tab_outer_layout.setContentsMargins(0, 0, 0, 0)
+        tab.setLayout(tab_outer_layout)
+        
+        # Scroll area для содержимого вкладки
+        scroll_area = QScrollArea()
+        scroll_area.setObjectName("viewManageScrollArea")
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        scroll_content = QWidget()
         layout = QVBoxLayout()
-        tab.setLayout(layout)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(15)
+        scroll_content.setLayout(layout)
+        scroll_area.setWidget(scroll_content)
+        tab_outer_layout.addWidget(scroll_area)
         
         # Группа списка представлений
         views_list_group = QGroupBox("Существующие представления")
@@ -574,15 +606,25 @@ class ViewsDialog(QDialog):
                 font-family: 'Consolas', 'Fira Code', monospace;
                 border: 2px solid #44475a;
                 border-radius: 8px;
-                margin-top: 10px;
-                padding: 10px;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                padding: 15px;
+                padding-top: 25px;
             }
             
             QGroupBox::title {
                 subcontrol-origin: margin;
+                subcontrol-position: top left;
                 left: 10px;
-                padding: 0 5px;
+                top: 5px;
+                padding: 0 8px;
                 background: rgba(10, 10, 15, 0.9);
+            }
+            
+            /* Scroll areas */
+            #viewCreateScrollArea, #viewManageScrollArea {
+                border: none;
+                background: transparent;
             }
             
             QLabel {
