@@ -88,6 +88,8 @@ class TextSearchDialog(QDialog):
         self.search_type_combo.setObjectName("searchTypeCombo")
         self.search_type_combo.addItems([
             "LIKE - Шаблонный поиск (универсальный)",
+            "SIMILAR TO - SQL регулярные выражения",
+            "NOT SIMILAR TO - НЕ соответствует SQL регулярному выражению",
             "~ - POSIX регулярное выражение (чувствительное к регистру)",
             "~* - POSIX регулярное выражение (нечувствительное к регистру)",
             "!~ - НЕ соответствует POSIX регулярному выражению (чувствительное к регистру)",
@@ -301,6 +303,14 @@ class TextSearchDialog(QDialog):
             self.case_sensitive_check.setVisible(True)
         else:
             self.case_sensitive_check.setVisible(False)
+        
+        # Обновляем placeholder в зависимости от типа поиска
+        if "SIMILAR TO" in search_type:
+            self.search_input.setPlaceholderText("Например: %(a|b)% или %[0-9]{3}%")
+        elif "LIKE" in search_type:
+            self.search_input.setPlaceholderText("Введите текст для поиска...")
+        else:
+            self.search_input.setPlaceholderText("Введите регулярное выражение...")
             
     def _validate_search_query(self):
         """Валидация поискового запроса в реальном времени"""
@@ -459,7 +469,11 @@ class TextSearchDialog(QDialog):
     
     def extract_search_type_code(self, search_type_full):
         """Извлекает код типа поиска из полного описания"""
-        if "LIKE" in search_type_full:
+        if "NOT SIMILAR TO" in search_type_full:
+            return "NOT_SIMILAR_TO"
+        elif "SIMILAR TO" in search_type_full:
+            return "SIMILAR_TO"
+        elif "LIKE" in search_type_full:
             return "LIKE"
         elif "!~*" in search_type_full:
             return "NOT_IREGEX"

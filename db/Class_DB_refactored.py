@@ -16,7 +16,8 @@ from .mixins import (
     TableOperationsMixin,
     ConstraintsMixin,
     SearchMixin,
-    StringOperationsMixin
+    StringOperationsMixin,
+    CustomTypesMixin
 )
 
 
@@ -27,7 +28,8 @@ class DB(
     TableOperationsMixin,
     ConstraintsMixin,
     SearchMixin,
-    StringOperationsMixin
+    StringOperationsMixin,
+    CustomTypesMixin
 ):
     """
     Основной класс для работы с базой данных PostgreSQL.
@@ -40,6 +42,7 @@ class DB(
     - ConstraintsMixin: работа с ограничениями
     - SearchMixin: поиск и фильтрация
     - StringOperationsMixin: строковые операции
+    - CustomTypesMixin: работа с пользовательскими типами
     """
     
     def __init__(self,

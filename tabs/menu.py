@@ -10,6 +10,7 @@ from datetime import date
 from plyer import notification
 from tabs.modules.data_operations import AddRecordDialog, DeleteRecordDialog, EditRecordDialog, ShowTableDialog
 from tabs.modules.table_operations import AddColumnDialog
+from tabs.modules.custom_types import CustomTypesDialog
 
 
 class MainWindow(QMainWindow):
@@ -228,6 +229,16 @@ class MainWindow(QMainWindow):
 
         alter_menu_button.setMenu(alter_menu)
         center_layout.addWidget(alter_menu_button)
+        
+        # === Кнопка "Типы данных" ===
+        types_button = QPushButton("Типы данных")
+        types_button.setObjectName("typesButton")
+        types_button.setMinimumHeight(45)
+        types_button.setMinimumWidth(140)
+        types_button.setCursor(Qt.PointingHandCursor)
+        types_button.clicked.connect(self.open_custom_types)
+        center_layout.addWidget(types_button)
+        
         toolbar.addWidget(center_widget)
 
         # 🔹 Добавляем растягивающийся спейсер — он "заберёт" всё свободное пространство и отодвинет кнопку вправо
@@ -767,6 +778,19 @@ class MainWindow(QMainWindow):
             
         from tabs.modules.string_operations import StringFunctionsDialog
         dialog = StringFunctionsDialog(self.db_instance, parent=self)
+        dialog.exec()
+    
+    def open_custom_types(self):
+        """Открывает диалоговое окно управления пользовательскими типами"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="Ошибка подключения",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+        
+        dialog = CustomTypesDialog(self.db_instance, parent=self)
         dialog.exec()
         
     def display_advanced_select_results(self, results):

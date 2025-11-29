@@ -237,7 +237,7 @@ class SearchMixin:
             table_name: Имя таблицы
             column_name: Имя столбца для поиска
             search_query: Поисковый запрос
-            search_type: Тип поиска (LIKE, ~, ~*, !~, !~*)
+            search_type: Тип поиска (LIKE, SIMILAR_TO, NOT_SIMILAR_TO, ~, ~*, !~, !~*)
             case_sensitive: Учитывать ли регистр (только для LIKE)
             
         Returns:
@@ -265,7 +265,17 @@ class SearchMixin:
             # Используем COALESCE для обработки NULL значений
             column_as_text = f'COALESCE(CAST("{column_name}" AS TEXT), \'\')'
             
-            if "LIKE" in search_type:
+            if search_type == "SIMILAR_TO":
+                # SIMILAR TO поиск (SQL standard regex)
+                where_clause = f'{column_as_text} SIMILAR TO :search_query'
+                escaped_query = search_query
+                
+            elif search_type == "NOT_SIMILAR_TO":
+                # NOT SIMILAR TO поиск
+                where_clause = f'{column_as_text} NOT SIMILAR TO :search_query'
+                escaped_query = search_query
+                
+            elif "LIKE" in search_type:
                 # LIKE поиск
                 if case_sensitive:
                     # Чувствительный к регистру
