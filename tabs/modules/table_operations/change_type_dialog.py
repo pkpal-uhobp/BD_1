@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette, QColor
 from .add_column import ConstraintsDialog
+import logging
 
 
 class ChangeTypeDialog(QDialog):
@@ -17,8 +18,21 @@ class ChangeTypeDialog(QDialog):
         self.setModal(True)
         self.setFixedSize(600, 600)
         self._set_dark_palette()
+        self._setup_logging()
         self._init_ui()
         self._apply_styles()
+    
+    def _setup_logging(self):
+        """Настройка логирования в db/db_app.log"""
+        self.logger = logging.getLogger('ChangeTypeDialog')
+        self.logger.setLevel(logging.INFO)
+        
+        # Проверяем, есть ли уже обработчик
+        if not self.logger.handlers:
+            handler = logging.FileHandler('db/db_app.log', encoding='utf-8')
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
 
     def _set_dark_palette(self):
         pal = QPalette()
@@ -78,6 +92,10 @@ class ChangeTypeDialog(QDialog):
             "String(255)", "TEXT", "INTEGER", "SMALLINT", "BIGINT", "NUMERIC(10,2)", "DATE", "BOOLEAN",
             "ARRAY", "ENUM"
         ])
+        
+        # Добавляем пользовательские типы из базы данных
+        self._load_custom_types_to_combo()
+        
         self.type_combo.currentTextChanged.connect(self._on_type_changed)
 
         # Доп. параметры для ARRAY/ENUM
@@ -120,6 +138,35 @@ class ChangeTypeDialog(QDialog):
         if not table_name:
             return
         self.column_combo.addItems(self.db_instance.get_column_names(table_name) or [])
+    
+    def _load_custom_types_to_combo(self):
+        """Загружает пользовательские типы из базы данных в комбобокс"""
+        try:
+            if not self.db_instance or not self.db_instance.is_connected():
+                return
+            
+            custom_types = self.db_instance.get_custom_types()
+            if custom_types:
+                # Добавляем разделитель
+                self.type_combo.insertSeparator(self.type_combo.count())
+                
+                # Добавляем категорию для пользовательских типов
+                for type_info in custom_types:
+                    type_name = type_info['type_name']
+                    type_kind = type_info['type_kind']
+                    
+                    if type_kind == 'enum':
+                        display_text = f"[ENUM] {type_name}"
+                    elif type_kind == 'composite':
+                        display_text = f"[Составной] {type_name}"
+                    else:
+                        display_text = f"[Пользов.] {type_name}"
+                    
+                    self.type_combo.addItem(display_text, type_name)
+                    
+                self.logger.info(f"Загружено {len(custom_types)} пользовательских типов в выпадающий список")
+        except Exception as e:
+            self.logger.warning(f"Не удалось загрузить пользовательские типы: {e}")
 
     def _on_type_changed(self, text: str):
         """Изменяет видимость дополнительных полей при выборе ARRAY или ENUM."""
@@ -130,10 +177,15 @@ class ChangeTypeDialog(QDialog):
         self.array_base_combo.setVisible(is_array)
         self.array_label.setVisible(is_array)
         # Для ENUM ничего не показываем
+    
     def _on_ok(self):
         table = self.table_combo.currentText().strip()
         column = self.column_combo.currentText().strip()
         sel = self.type_combo.currentText().strip()
+        
+        # Проверяем, является ли это пользовательским типом из базы данных
+        is_custom_type = sel.startswith("[ENUM]") or sel.startswith("[Составной]") or sel.startswith("[Пользов.]")
+        custom_type_name = self.type_combo.currentData() if is_custom_type else None
 
         # Проверяем, является ли исходный столбец массивом
         source_is_array = False
@@ -150,7 +202,11 @@ class ChangeTypeDialog(QDialog):
             pass
 
         # Сформируем фактический тип SQL
-        if sel == "ARRAY":
+        if is_custom_type and custom_type_name:
+            # Используем пользовательский тип из базы данных
+            new_type = custom_type_name
+            self.logger.info(f"Используется пользовательский тип: {custom_type_name}")
+        elif sel == "ARRAY":
             base = self.array_base_combo.currentText().strip() or "TEXT"
             base_sql = "VARCHAR(255)" if base == "String(255)" else base
             new_type = f"{base_sql}[]"
