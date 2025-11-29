@@ -1224,7 +1224,7 @@ class AdvancedSelectDialog(QDialog):
                 return False, "X LIKE должен содержать строковый литерал", ""
         
         # Если все проверки пройдены
-        return True, "", "✓ Валидное SQL условие"
+        return True, "", "OK Валидное SQL условие"
         
     def set_where_error(self, message):
         """Устанавливает ошибку для поля WHERE"""

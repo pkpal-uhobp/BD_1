@@ -393,7 +393,7 @@ class ConstraintsDialog(QDialog):
         if self._has_dangerous_sql(text):
             self.set_field_error('default', "X Недопустимы комментарии и ';'")
             return False
-        self.set_field_success('default', "✓ Ок")
+        self.set_field_success('default', "OK Ок")
         return True
 
     def _validate_check(self):
@@ -409,7 +409,7 @@ class ConstraintsDialog(QDialog):
         if not _re.search(r"[<>=]", text):
             self.set_field_error('check', "X Ожидается условие сравнения")
             return False
-        self.set_field_success('check', "✓ Ок")
+        self.set_field_success('check', "OK Ок")
         return True
 
     def _on_accept(self):
@@ -947,7 +947,7 @@ class AddColumnDialog(QDialog):
         name = self.name_edit.text().strip()
         ok, msg = self.validate_column_name(name)
         if ok:
-            self.set_field_success('name', "✓ Валидное имя столбца")
+            self.set_field_success('name', "OK Валидное имя столбца")
         else:
             self.set_field_error('name', f"X {msg}")
     
@@ -964,15 +964,15 @@ class AddColumnDialog(QDialog):
         if type_text in valid_types:
             # Дополнительные проверки для специфичных типов
             if type_text == "ARRAY":
-                self.set_field_success('type', "✓ Массив - укажите тип элементов")
+                self.set_field_success('type', "OK Массив - укажите тип элементов")
             elif type_text == "ENUM":
-                self.set_field_success('type', "✓ Перечисление - укажите значения")
+                self.set_field_success('type', "OK Перечисление - укажите значения")
             elif type_text == "Numeric(10, 2)":
-                self.set_field_success('type', "✓ Число с точностью (10,2)")
+                self.set_field_success('type', "OK Число с точностью (10,2)")
             elif type_text == "String(255)":
-                self.set_field_success('type', "✓ Строка до 255 символов")
+                self.set_field_success('type', "OK Строка до 255 символов")
             else:
-                self.set_field_success('type', f"✓ {type_text}")
+                self.set_field_success('type', f"OK {type_text}")
         else:
             self.set_field_error('type', "X Выберите валидный тип данных")
     
@@ -981,7 +981,7 @@ class AddColumnDialog(QDialog):
         try:
             values = self.array_values.getArray()
             if not values:
-                self.set_field_success('array_values', "✓ Пустой массив (допустимо)")
+                self.set_field_success('array_values', "OK Пустой массив (допустимо)")
                 return True
             
             # Проверяем тип элементов
@@ -1007,7 +1007,7 @@ class AddColumnDialog(QDialog):
                         return False
                     validated_items.append(str(item))
             
-            self.set_field_success('array_values', f"✓ {len(validated_items)} элементов")
+            self.set_field_success('array_values', f"OK {len(validated_items)} элементов")
             return True
             
         except Exception as e:
@@ -1036,7 +1036,7 @@ class AddColumnDialog(QDialog):
                     self.set_field_error('enum_values', f"X Значение {i+1} не может быть пустым")
                     return False
             
-            self.set_field_success('enum_values', f"✓ {len(values)} значений")
+            self.set_field_success('enum_values', f"OK {len(values)} значений")
             return True
             
         except Exception as e:

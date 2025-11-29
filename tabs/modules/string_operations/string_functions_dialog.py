@@ -650,7 +650,7 @@ class StringFunctionsDialog(QDialog):
         if len(text) > 32:
             self._set_input_state(self.trim_chars_input, self.trim_chars_error, False, "X Слишком длинная строка (до 32 символов)")
             return
-        self._set_input_state(self.trim_chars_input, self.trim_chars_error, True, f"✓ {len(text)} симв.")
+        self._set_input_state(self.trim_chars_input, self.trim_chars_error, True, f"OK {len(text)} симв.")
 
     def validate_pad_char(self):
         text = self.pad_char_input.text()
@@ -663,7 +663,7 @@ class StringFunctionsDialog(QDialog):
         if self._has_dangerous_sql(text):
             self._set_input_state(self.pad_char_input, self.pad_char_error, False, "X Недопустимый символ")
             return
-        self._set_input_state(self.pad_char_input, self.pad_char_error, True, "✓ Ок")
+        self._set_input_state(self.pad_char_input, self.pad_char_error, True, "OK Ок")
 
     def validate_concat_string(self):
         text = self.concat_input.text()
@@ -676,7 +676,7 @@ class StringFunctionsDialog(QDialog):
             self._set_input_state(self.concat_input, self.concat_error, False, "X Слишком длинная строка (до 255 символов)")
             return
         # Пустая строка допустима для CONCAT
-        msg = f"✓ {len(text)} симв." if text else ""
+        msg = f"OK {len(text)} симв." if text else ""
         self._set_input_state(self.concat_input, self.concat_error, True, msg)
         
     def execute_function(self):
