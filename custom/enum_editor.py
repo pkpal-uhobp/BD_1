@@ -2,12 +2,15 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, 
     QListWidget, QLabel
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPalette, QColor
 
 
 class EnumEditor(QWidget):
     """Виджет для редактирования ENUM значений, похожий на ArrayLineEdit."""
+    
+    # Сигнал, испускаемый при изменении списка значений
+    valuesChanged = Signal(list)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -112,16 +115,19 @@ class EnumEditor(QWidget):
         if value and value not in self.get_values():
             self.values_list.addItem(value)
             self.input_edit.clear()
+            self.valuesChanged.emit(self.get_values())
     
     def remove_selected(self):
         """Удалить выбранное значение."""
         current_row = self.values_list.currentRow()
         if current_row >= 0:
             self.values_list.takeItem(current_row)
+            self.valuesChanged.emit(self.get_values())
     
     def clear_all(self):
         """Очистить все значения."""
         self.values_list.clear()
+        self.valuesChanged.emit(self.get_values())
     
     def get_values(self):
         """Получить список всех значений."""
