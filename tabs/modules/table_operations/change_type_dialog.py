@@ -184,8 +184,9 @@ class ChangeTypeDialog(QDialog):
         sel = self.type_combo.currentText().strip()
         
         # Проверяем, является ли это пользовательским типом из базы данных
-        is_custom_type = sel.startswith("[ENUM]") or sel.startswith("[Составной]") or sel.startswith("[Пользов.]")
-        custom_type_name = self.type_combo.currentData() if is_custom_type else None
+        # Пользовательские типы имеют связанные данные (currentData), в отличие от встроенных типов
+        custom_type_name = self.type_combo.currentData()
+        is_custom_type = custom_type_name is not None
 
         # Проверяем, является ли исходный столбец массивом
         source_is_array = False
