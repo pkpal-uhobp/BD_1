@@ -1,14 +1,13 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox,
-    QDateEdit, QPushButton, QScrollArea, QWidget, QLineEdit, QCheckBox)
+    QDateEdit, QPushButton, QScrollArea, QWidget, QLineEdit)
 from PySide6.QtCore import QDate
 from sqlalchemy import Enum as SQLEnum, ARRAY, Boolean, Date, Numeric, Integer, String
 from plyer import notification
 from PySide6.QtGui import QFont, QPalette, QColor
 from PySide6.QtCore import Qt
 from custom.array_line_edit import ArrayLineEdit
-from custom.null_handler import NullHandlerWidget
 
 class DeleteRecordDialog(QDialog):
     """Модальное окно для удаления записей из выбранной таблицы."""

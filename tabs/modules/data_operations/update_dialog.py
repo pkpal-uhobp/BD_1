@@ -1311,9 +1311,27 @@ class EditRecordDialog(QDialog):
                     # NULLIF - если значение равно указанному, устанавливаем NULL
                     nullif_val = null_value.get('value')
                     widget_value = self._get_widget_value(widget)
-                    if widget_value is not None and str(widget_value) == str(nullif_val):
-                        new_values[col_name] = None
-                        continue
+                    if widget_value is not None and nullif_val is not None:
+                        # Типо-зависимое сравнение
+                        try:
+                            if isinstance(column.type, Integer):
+                                if int(widget_value) == int(nullif_val):
+                                    new_values[col_name] = None
+                                    continue
+                            elif isinstance(column.type, Numeric):
+                                if float(widget_value) == float(nullif_val):
+                                    new_values[col_name] = None
+                                    continue
+                            else:
+                                # Строковое сравнение для других типов
+                                if str(widget_value).strip() == str(nullif_val).strip():
+                                    new_values[col_name] = None
+                                    continue
+                        except (ValueError, TypeError):
+                            # При ошибке конвертации используем строковое сравнение
+                            if str(widget_value).strip() == str(nullif_val).strip():
+                                new_values[col_name] = None
+                                continue
 
             try:
                 if isinstance(widget, QComboBox) and isinstance(column.type, SQLEnum):

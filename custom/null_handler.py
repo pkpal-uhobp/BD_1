@@ -287,6 +287,11 @@ class NullHandlerWidget(QWidget):
         if not self._use_null_handling:
             return None, {}
         
+        # Санитизация имени столбца для предотвращения SQL-инъекций
+        import re
+        if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', column_name):
+            return None, {}
+        
         mode = self._null_handling_mode
         
         if mode == "set_null":
