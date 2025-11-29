@@ -159,6 +159,7 @@ class MainWindow(QMainWindow):
         search_menu.addAction("Поиск по тексту", lambda: self.open_text_search())
         search_menu.addAction("Расширенный SELECT", lambda: self.open_advanced_select())
         search_menu.addAction("Строковые функции", lambda: self.open_string_functions())
+        search_menu.addAction("CTE (WITH-запросы)", lambda: self.open_cte_dialog())
 
         # Применяем стиль
         self.style_dropdown_button(search_button, search_menu)
@@ -166,6 +167,21 @@ class MainWindow(QMainWindow):
         # Назначаем меню кнопке
         search_button.setMenu(search_menu)
         center_layout.addWidget(search_button)
+
+        # === Выпадающая кнопка "Представления" ===
+        views_button = QPushButton("Представления")
+        views_menu = QMenu(views_button)
+
+        # Добавляем пункты меню представлений
+        views_menu.addAction("Обычные VIEW", lambda: self.open_views_dialog())
+        views_menu.addAction("Материализованные VIEW", lambda: self.open_materialized_views_dialog())
+
+        # Применяем стиль
+        self.style_dropdown_button(views_button, views_menu)
+
+        # Назначаем меню кнопке
+        views_button.setMenu(views_menu)
+        center_layout.addWidget(views_button)
 
         alter_menu_button = QPushButton("Структура")
         alter_menu_button.setMinimumHeight(45)
@@ -805,6 +821,49 @@ class MainWindow(QMainWindow):
             
         from tabs.modules.string_operations import StringFunctionsDialog
         dialog = StringFunctionsDialog(self.db_instance, parent=self)
+        dialog.exec()
+    
+    def open_views_dialog(self):
+        """Открывает диалоговое окно управления представлениями (VIEW)"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="Ошибка подключения",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+            
+        from tabs.modules.search_operations import ViewsDialog
+        dialog = ViewsDialog(self.db_instance, parent=self)
+        dialog.exec()
+    
+    def open_materialized_views_dialog(self):
+        """Открывает диалоговое окно управления материализованными представлениями"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="Ошибка подключения",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+            
+        from tabs.modules.search_operations import MaterializedViewsDialog
+        dialog = MaterializedViewsDialog(self.db_instance, parent=self)
+        dialog.exec()
+    
+    def open_cte_dialog(self):
+        """Открывает диалоговое окно конструктора CTE (WITH-запросы)"""
+        if not self.db_instance or not self.db_instance.is_connected():
+            notification.notify(
+                title="Ошибка подключения",
+                message="Нет подключения к базе данных!",
+                timeout=3
+            )
+            return
+            
+        from tabs.modules.search_operations import CTEDialog
+        dialog = CTEDialog(self.db_instance, parent=self)
+        dialog.results_to_main_table.connect(self.display_advanced_select_results)
         dialog.exec()
     
     def open_custom_types(self):
