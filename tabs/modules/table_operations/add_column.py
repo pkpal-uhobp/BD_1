@@ -514,10 +514,16 @@ class AddColumnDialog(QDialog):
         
         self.type_combo = QComboBox()
         self.type_combo.setObjectName("fieldCombo")
-        self.type_combo.addItems([
+        # Базовые типы данных
+        base_types = [
             "String(255)", "Text", "Integer", "SmallInteger", "BigInteger",
             "Numeric(10, 2)", "Boolean", "Date", "ARRAY", "ENUM"
-        ])
+        ]
+        self.type_combo.addItems(base_types)
+        
+        # Добавляем пользовательские типы из базы данных
+        self._load_custom_types_to_combo()
+        
         self.type_combo.currentTextChanged.connect(self.on_type_changed)
         type_layout.addWidget(self.type_combo)
         
@@ -637,6 +643,35 @@ class AddColumnDialog(QDialog):
             return False, f"Таблица '{name}' не существует"
         
         return True, ""
+    
+    def _load_custom_types_to_combo(self):
+        """Загружает пользовательские типы из базы данных в комбобокс"""
+        try:
+            if not self.db_instance or not self.db_instance.is_connected():
+                return
+            
+            custom_types = self.db_instance.get_custom_types()
+            if custom_types:
+                # Добавляем разделитель
+                self.type_combo.insertSeparator(self.type_combo.count())
+                
+                # Добавляем категорию для пользовательских типов
+                for type_info in custom_types:
+                    type_name = type_info['type_name']
+                    type_kind = type_info['type_kind']
+                    
+                    if type_kind == 'enum':
+                        display_text = f"[ENUM] {type_name}"
+                    elif type_kind == 'composite':
+                        display_text = f"[Составной] {type_name}"
+                    else:
+                        display_text = f"[Пользов.] {type_name}"
+                    
+                    self.type_combo.addItem(display_text, type_name)
+                    
+                self.logger.info(f"Загружено {len(custom_types)} пользовательских типов в выпадающий список")
+        except Exception as e:
+            self.logger.warning(f"Не удалось загрузить пользовательские типы: {e}")
 
     def _set_dark_palette(self):
         dark_palette = QPalette()
@@ -741,6 +776,10 @@ class AddColumnDialog(QDialog):
         column_name = self.name_edit.text().strip()
         dtype = self.type_combo.currentText()
         
+        # Проверяем, является ли это пользовательским типом из базы данных
+        is_custom_type = dtype.startswith("[ENUM]") or dtype.startswith("[Составной]") or dtype.startswith("[Пользов.]")
+        custom_type_name = self.type_combo.currentData() if is_custom_type else None
+        
         # Валидация всех полей
         self._validate_name_live()
         self._validate_type_live()
@@ -783,7 +822,12 @@ class AddColumnDialog(QDialog):
         }
         
         try:
-            if dtype == "ARRAY":
+            if is_custom_type and custom_type_name:
+                # Используем пользовательский тип из базы данных
+                # Передаём имя типа как строку - SQLAlchemy сам его найдёт
+                column_type = custom_type_name
+                self.logger.info(f"Используется пользовательский тип: {custom_type_name}")
+            elif dtype == "ARRAY":
                 base = base_map.get(self.array_item_combo.currentText(), String(255))
                 column_type = SA_ARRAY(base)
             elif dtype == "ENUM":
@@ -961,6 +1005,9 @@ class AddColumnDialog(QDialog):
             "Numeric(10, 2)", "Boolean", "Date", "ARRAY", "ENUM"
         ]
         
+        # Проверяем пользовательские типы
+        is_custom_type = type_text.startswith("[ENUM]") or type_text.startswith("[Составной]") or type_text.startswith("[Пользов.]")
+        
         if type_text in valid_types:
             # Дополнительные проверки для специфичных типов
             if type_text == "ARRAY":
@@ -973,6 +1020,15 @@ class AddColumnDialog(QDialog):
                 self.set_field_success('type', "OK Строка до 255 символов")
             else:
                 self.set_field_success('type', f"OK {type_text}")
+        elif is_custom_type:
+            # Пользовательский тип из базы данных
+            custom_type_name = self.type_combo.currentData()
+            if type_text.startswith("[ENUM]"):
+                self.set_field_success('type', f"OK ENUM тип: {custom_type_name}")
+            elif type_text.startswith("[Составной]"):
+                self.set_field_success('type', f"OK Составной тип: {custom_type_name}")
+            else:
+                self.set_field_success('type', f"OK Пользовательский тип: {custom_type_name}")
         else:
             self.set_field_error('type', "X Выберите валидный тип данных")
     
