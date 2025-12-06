@@ -221,6 +221,8 @@ class AdvancedSelectDialog(QDialog):
         # Вкладка "Основные настройки"
         basic_tab = QWidget()
         basic_layout = QVBoxLayout()
+        basic_layout.setContentsMargins(10, 10, 10, 10)
+        basic_layout.setSpacing(15)
         basic_tab.setLayout(basic_layout)
         
         # Группа выбора таблицы
@@ -307,8 +309,25 @@ class AdvancedSelectDialog(QDialog):
         
         # Вкладка "Фильтрация и сортировка"
         filter_tab = QWidget()
+        filter_tab_outer_layout = QVBoxLayout()
+        filter_tab_outer_layout.setContentsMargins(0, 0, 0, 0)
+        filter_tab.setLayout(filter_tab_outer_layout)
+        
+        # Scroll area для содержимого вкладки
+        filter_scroll_area = QScrollArea()
+        filter_scroll_area.setObjectName("filterScrollArea")
+        filter_scroll_area.setWidgetResizable(True)
+        filter_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        filter_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        # Контейнер внутри scroll area
+        filter_scroll_content = QWidget()
         filter_layout = QVBoxLayout()
-        filter_tab.setLayout(filter_layout)
+        filter_layout.setContentsMargins(10, 10, 10, 10)
+        filter_layout.setSpacing(15)
+        filter_scroll_content.setLayout(filter_layout)
+        filter_scroll_area.setWidget(filter_scroll_content)
+        filter_tab_outer_layout.addWidget(filter_scroll_area)
         
         # Группа WHERE
         where_group = QGroupBox("WHERE (Условия фильтрации)")
@@ -434,8 +453,25 @@ class AdvancedSelectDialog(QDialog):
         
         # Вкладка "Группировка и агрегаты"
         group_tab = QWidget()
+        group_tab_outer_layout = QVBoxLayout()
+        group_tab_outer_layout.setContentsMargins(0, 0, 0, 0)
+        group_tab.setLayout(group_tab_outer_layout)
+        
+        # Scroll area для содержимого вкладки
+        group_scroll_area = QScrollArea()
+        group_scroll_area.setObjectName("groupScrollArea")
+        group_scroll_area.setWidgetResizable(True)
+        group_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        group_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        # Контейнер внутри scroll area
+        group_scroll_content = QWidget()
         group_tab_layout = QVBoxLayout()
-        group_tab.setLayout(group_tab_layout)
+        group_tab_layout.setContentsMargins(10, 10, 10, 10)
+        group_tab_layout.setSpacing(15)
+        group_scroll_content.setLayout(group_tab_layout)
+        group_scroll_area.setWidget(group_scroll_content)
+        group_tab_outer_layout.addWidget(group_scroll_area)
         
         # Группа GROUP BY - переделаем в стиле 1-й вкладки
         group_group = QGroupBox("GROUP BY (Группировка)")
@@ -1723,14 +1759,18 @@ class AdvancedSelectDialog(QDialog):
                 font-family: 'Consolas', 'Fira Code', monospace;
                 border: 2px solid #44475a;
                 border-radius: 8px;
-                margin: 10px 0;
-                padding: 10px;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                padding: 15px;
+                padding-top: 25px;
             }
             
             QGroupBox::title {
                 subcontrol-origin: margin;
+                subcontrol-position: top left;
                 left: 10px;
-                padding: 0 5px 0 5px;
+                top: 5px;
+                padding: 0 8px 0 8px;
                 background: rgba(10, 10, 15, 0.9);
             }
             
@@ -2393,6 +2433,16 @@ class AdvancedSelectDialog(QDialog):
             
             /* Контент-виджет */
             #contentWidget {
+                background: transparent;
+            }
+            
+            /* Скроллы для вкладок фильтрации и группировки */
+            #filterScrollArea, #groupScrollArea {
+                border: none;
+                background: transparent;
+            }
+            
+            #filterScrollArea QWidget, #groupScrollArea QWidget {
                 background: transparent;
             }
             

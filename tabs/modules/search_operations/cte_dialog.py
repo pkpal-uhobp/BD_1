@@ -542,14 +542,18 @@ class CTEDialog(QDialog):
                 font-family: 'Consolas', 'Fira Code', monospace;
                 border: 2px solid #44475a;
                 border-radius: 8px;
-                margin-top: 10px;
-                padding: 10px;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                padding: 15px;
+                padding-top: 25px;
             }
             
             QGroupBox::title {
                 subcontrol-origin: margin;
+                subcontrol-position: top left;
                 left: 10px;
-                padding: 0 5px;
+                top: 5px;
+                padding: 0 8px;
                 background: rgba(10, 10, 15, 0.9);
             }
             
