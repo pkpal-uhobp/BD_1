@@ -1,534 +1,625 @@
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QComboBox, QListWidget, QGroupBox, QTabWidget, QWidget,
-    QSpinBox, QLineEdit, QTextEdit, QTableWidget, QTableWidgetItem,
-    QMessageBox, QFormLayout, QCheckBox, QSplitter, QHeaderView
+    QComboBox, QFormLayout, QWidget, QGroupBox, QListWidget, 
+    QListWidgetItem, QSpinBox, QCheckBox, QScrollArea
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPalette, QColor
-
+from plyer import notification
 
 class WindowFunctionDialog(QDialog):
-    """Диалог для работы с оконными функциями (RANK, LAG, LEAD)"""
+    """Диалог для работы с оконными функциями"""
     
-    def __init__(self, db_instance, table_name, parent=None):
+    def __init__(self, db_instance, parent=None):
         super().__init__(parent)
         self.db_instance = db_instance
-        self.table_name = table_name
-        self.columns = []
-        self.current_results = []
-        
         self.setWindowTitle("Оконные функции")
         self.setModal(True)
-        self.setMinimumSize(1000, 700)
+        self.setMinimumSize(900, 700)
+        self.resize(1000, 800)
         
+        # Устанавливаем темную палитру
         self.set_dark_palette()
-        self.load_table_columns()
-        self.init_ui()
+        
+        # Основной layout
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(15)
+        self.setLayout(main_layout)
+        
+        # Переменные для хранения результатов
+        self.window_function_expression = ""
+        
+        # Создаем интерфейс
+        self.setup_ui()
+        self.apply_styles()
         
     def set_dark_palette(self):
-        """Устанавливает темную цветовую палитру"""
-        palette = QPalette()
-        palette.setColor(QPalette.Window, QColor(18, 18, 24))
-        palette.setColor(QPalette.WindowText, QColor(240, 240, 240))
-        palette.setColor(QPalette.Base, QColor(25, 25, 35))
-        palette.setColor(QPalette.Text, QColor(240, 240, 240))
-        palette.setColor(QPalette.Button, QColor(40, 40, 50))
-        palette.setColor(QPalette.ButtonText, QColor(240, 240, 240))
-        palette.setColor(QPalette.Highlight, QColor(64, 255, 218))
-        palette.setColor(QPalette.HighlightedText, QColor(18, 18, 24))
-        self.setPalette(palette)
+        """Устанавливает тёмную цветовую палитру"""
+        dark_palette = QPalette()
+        dark_palette.setColor(QPalette.Window, QColor(18, 18, 24))
+        dark_palette.setColor(QPalette.WindowText, QColor(240, 240, 240))
+        dark_palette.setColor(QPalette.Base, QColor(25, 25, 35))
+        dark_palette.setColor(QPalette.AlternateBase, QColor(35, 35, 45))
+        dark_palette.setColor(QPalette.ToolTipBase, QColor(64, 255, 218))
+        dark_palette.setColor(QPalette.ToolTipText, QColor(18, 18, 24))
+        dark_palette.setColor(QPalette.Text, QColor(240, 240, 240))
+        dark_palette.setColor(QPalette.Button, QColor(40, 40, 50))
+        dark_palette.setColor(QPalette.ButtonText, QColor(240, 240, 240))
+        dark_palette.setColor(QPalette.BrightText, QColor(64, 255, 218))
+        dark_palette.setColor(QPalette.Highlight, QColor(64, 255, 218))
+        dark_palette.setColor(QPalette.HighlightedText, QColor(18, 18, 24))
+        self.setPalette(dark_palette)
         
-    def load_table_columns(self):
-        """Загружает столбцы выбранной таблицы"""
-        try:
-            if self.db_instance and hasattr(self.db_instance, 'get_table_columns'):
-                self.columns = self.db_instance.get_table_columns(self.table_name)
-            elif self.db_instance and hasattr(self.db_instance, 'connection'):
-                cursor = self.db_instance.connection.cursor()
-                cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{self.table_name}'")
-                self.columns = [row[0] for row in cursor.fetchall()]
-        except Exception as e:
-            self.columns = []
-            QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить столбцы: {e}")
-            
-    def init_ui(self):
-        """Инициализирует пользовательский интерфейс"""
-        layout = QVBoxLayout(self)
-        
+    def setup_ui(self):
+        """Создает пользовательский интерфейс"""
         # Заголовок
-        header = QLabel("ОКОННЫЕ ФУНКЦИИ")
-        header.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px;")
-        header.setAlignment(Qt.AlignCenter)
-        layout.addWidget(header)
+        header_label = QLabel("ОКОННЫЕ ФУНКЦИИ")
+        header_label.setObjectName("headerLabel")
+        header_label.setAlignment(Qt.AlignCenter)
+        self.layout().addWidget(header_label)
         
-        # Создаем сплиттер для разделения настроек и результатов
-        splitter = QSplitter(Qt.Vertical)
+        # Создаем скроллируемую область
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setObjectName("scrollArea")
         
-        # Верхняя часть - вкладки с функциями
-        tab_widget = QTabWidget()
+        # Контейнер для содержимого
+        content_widget = QWidget()
+        content_layout = QVBoxLayout()
+        content_widget.setLayout(content_layout)
         
-        # Вкладка RANK
-        self.rank_tab = self.create_rank_tab()
-        tab_widget.addTab(self.rank_tab, "RANK")
+        # Группа выбора таблицы
+        table_group = QGroupBox("Выбор таблицы")
+        table_group.setObjectName("groupBox")
+        table_layout = QFormLayout()
+        table_group.setLayout(table_layout)
         
-        # Вкладка LAG
-        self.lag_tab = self.create_lag_tab()
-        tab_widget.addTab(self.lag_tab, "LAG")
+        self.table_combo = QComboBox()
+        self.table_combo.setObjectName("comboBox")
+        self.table_combo.setMinimumHeight(35)
+        self.table_combo.currentTextChanged.connect(self.load_table_columns)
+        table_layout.addRow("Таблица:", self.table_combo)
         
-        # Вкладка LEAD
-        self.lead_tab = self.create_lead_tab()
-        tab_widget.addTab(self.lead_tab, "LEAD")
+        content_layout.addWidget(table_group)
         
-        splitter.addWidget(tab_widget)
+        # Группа выбора оконной функции
+        function_group = QGroupBox("Оконная функция")
+        function_group.setObjectName("groupBox")
+        function_layout = QVBoxLayout()
+        function_group.setLayout(function_layout)
         
-        # Нижняя часть - результаты
-        results_widget = self.create_results_panel()
-        splitter.addWidget(results_widget)
+        # Тип функции
+        type_layout = QFormLayout()
+        self.function_type_combo = QComboBox()
+        self.function_type_combo.setObjectName("comboBox")
+        self.function_type_combo.setMinimumHeight(35)
+        self.function_type_combo.addItems([
+            "ROW_NUMBER - Порядковый номер строки",
+            "RANK - Ранг с пропусками",
+            "DENSE_RANK - Ранг без пропусков",
+            "NTILE - Разбиение на группы",
+            "LAG - Значение из предыдущей строки",
+            "LEAD - Значение из следующей строки",
+            "FIRST_VALUE - Первое значение в окне",
+            "LAST_VALUE - Последнее значение в окне",
+            "NTH_VALUE - N-ое значение в окне"
+        ])
+        self.function_type_combo.currentTextChanged.connect(self.on_function_type_changed)
+        type_layout.addRow("Функция:", self.function_type_combo)
+        function_layout.addLayout(type_layout)
         
-        splitter.setSizes([350, 350])
-        layout.addWidget(splitter)
+        # Контейнер для параметров функции
+        self.params_widget = QWidget()
+        self.params_layout = QVBoxLayout()
+        self.params_widget.setLayout(self.params_layout)
+        function_layout.addWidget(self.params_widget)
+        
+        content_layout.addWidget(function_group)
+        
+        # Группа PARTITION BY
+        partition_group = QGroupBox("PARTITION BY (Разбиение на окна)")
+        partition_group.setObjectName("groupBox")
+        partition_layout = QVBoxLayout()
+        partition_group.setLayout(partition_layout)
+        
+        partition_info = QLabel("Столбцы для разбиения данных на группы")
+        partition_info.setWordWrap(True)
+        partition_layout.addWidget(partition_info)
+        
+        # Доступные столбцы для PARTITION BY
+        self.available_partition_columns = QListWidget()
+        self.available_partition_columns.setObjectName("listWidget")
+        self.available_partition_columns.setSelectionMode(QListWidget.MultiSelection)
+        partition_layout.addWidget(QLabel("Доступные столбцы:"))
+        partition_layout.addWidget(self.available_partition_columns)
         
         # Кнопки управления
-        button_layout = QHBoxLayout()
+        partition_buttons = QHBoxLayout()
+        add_partition_btn = QPushButton(">> Добавить")
+        add_partition_btn.setObjectName("addButton")
+        add_partition_btn.clicked.connect(self.add_partition_columns)
+        partition_buttons.addWidget(add_partition_btn)
+        partition_layout.addLayout(partition_buttons)
         
-        self.execute_btn = QPushButton("Выполнить")
-        self.execute_btn.setStyleSheet("background-color: #64ffda; color: #000; padding: 10px; font-weight: bold;")
-        self.execute_btn.clicked.connect(self.execute_window_function)
+        # Выбранные столбцы PARTITION BY
+        self.partition_columns = QListWidget()
+        self.partition_columns.setObjectName("listWidget")
+        partition_layout.addWidget(QLabel("Столбцы разбиения:"))
+        partition_layout.addWidget(self.partition_columns)
         
-        self.copy_sql_btn = QPushButton("Копировать SQL")
-        self.copy_sql_btn.clicked.connect(self.copy_sql_to_clipboard)
+        # Кнопки удаления
+        remove_partition_buttons = QHBoxLayout()
+        remove_partition_btn = QPushButton("<< Удалить")
+        remove_partition_btn.setObjectName("removeButton")
+        remove_partition_btn.clicked.connect(self.remove_partition_columns)
+        remove_partition_buttons.addWidget(remove_partition_btn)
+        partition_layout.addLayout(remove_partition_buttons)
         
-        self.close_btn = QPushButton("Закрыть")
-        self.close_btn.clicked.connect(self.accept)
+        content_layout.addWidget(partition_group)
         
-        button_layout.addWidget(self.execute_btn)
-        button_layout.addWidget(self.copy_sql_btn)
-        button_layout.addStretch()
-        button_layout.addWidget(self.close_btn)
-        
-        layout.addLayout(button_layout)
-        
-    def create_rank_tab(self):
-        """Создает вкладку для функции RANK"""
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        
-        # Описание
-        desc = QLabel("Функция RANK() присваивает ранг каждой строке в разделе набора результатов.")
-        desc.setWordWrap(True)
-        desc.setStyleSheet("padding: 10px; background-color: rgba(64, 255, 218, 0.1); border-radius: 5px;")
-        layout.addWidget(desc)
-        
-        # ORDER BY
-        order_group = QGroupBox("ORDER BY (обязательно)")
+        # Группа ORDER BY
+        order_group = QGroupBox("ORDER BY (Сортировка в окне)")
+        order_group.setObjectName("groupBox")
         order_layout = QVBoxLayout()
-        
-        order_label = QLabel("Столбец для сортировки:")
-        self.rank_order_combo = QComboBox()
-        self.rank_order_combo.addItems(self.columns)
-        self.rank_order_combo.currentTextChanged.connect(self.update_rank_preview)
-        
-        direction_label = QLabel("Направление сортировки:")
-        self.rank_direction_combo = QComboBox()
-        self.rank_direction_combo.addItems(["ASC", "DESC"])
-        self.rank_direction_combo.currentTextChanged.connect(self.update_rank_preview)
-        
-        order_layout.addWidget(order_label)
-        order_layout.addWidget(self.rank_order_combo)
-        order_layout.addWidget(direction_label)
-        order_layout.addWidget(self.rank_direction_combo)
         order_group.setLayout(order_layout)
-        layout.addWidget(order_group)
         
-        # PARTITION BY
-        partition_group = QGroupBox("PARTITION BY (необязательно)")
-        partition_layout = QVBoxLayout()
-        
-        self.rank_use_partition = QCheckBox("Использовать разбиение")
-        self.rank_use_partition.stateChanged.connect(self.update_rank_preview)
-        
-        partition_label = QLabel("Столбец для разбиения:")
-        self.rank_partition_combo = QComboBox()
-        self.rank_partition_combo.addItems(self.columns)
-        self.rank_partition_combo.currentTextChanged.connect(self.update_rank_preview)
-        self.rank_partition_combo.setEnabled(False)
-        
-        self.rank_use_partition.stateChanged.connect(
-            lambda state: self.rank_partition_combo.setEnabled(state == Qt.Checked)
-        )
-        
-        partition_layout.addWidget(self.rank_use_partition)
-        partition_layout.addWidget(partition_label)
-        partition_layout.addWidget(self.rank_partition_combo)
-        partition_group.setLayout(partition_layout)
-        layout.addWidget(partition_group)
-        
-        # Предпросмотр SQL
-        preview_group = QGroupBox("Предпросмотр SQL")
-        preview_layout = QVBoxLayout()
-        self.rank_preview = QTextEdit()
-        self.rank_preview.setReadOnly(True)
-        self.rank_preview.setMaximumHeight(100)
-        preview_layout.addWidget(self.rank_preview)
-        preview_group.setLayout(preview_layout)
-        layout.addWidget(preview_group)
-        
-        layout.addStretch()
-        
-        # Инициализация предпросмотра
-        self.update_rank_preview()
-        
-        return widget
-        
-    def create_lag_tab(self):
-        """Создает вкладку для функции LAG"""
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        
-        # Описание
-        desc = QLabel("Функция LAG() предоставляет доступ к строке с заданным физическим смещением, которая ПРЕДШЕСТВУЕТ текущей строке.")
-        desc.setWordWrap(True)
-        desc.setStyleSheet("padding: 10px; background-color: rgba(64, 255, 218, 0.1); border-radius: 5px;")
-        layout.addWidget(desc)
-        
-        # Параметры
-        params_group = QGroupBox("Параметры функции")
-        params_layout = QFormLayout()
-        
-        # Столбец
-        self.lag_column_combo = QComboBox()
-        self.lag_column_combo.addItems(self.columns)
-        self.lag_column_combo.currentTextChanged.connect(self.update_lag_preview)
-        params_layout.addRow("Столбец:", self.lag_column_combo)
-        
-        # Смещение
-        self.lag_offset_spin = QSpinBox()
-        self.lag_offset_spin.setMinimum(1)
-        self.lag_offset_spin.setMaximum(100)
-        self.lag_offset_spin.setValue(1)
-        self.lag_offset_spin.valueChanged.connect(self.update_lag_preview)
-        params_layout.addRow("Смещение:", self.lag_offset_spin)
-        
-        # Значение по умолчанию
-        self.lag_default_input = QLineEdit()
-        self.lag_default_input.setPlaceholderText("NULL (если не указано)")
-        self.lag_default_input.textChanged.connect(self.update_lag_preview)
-        params_layout.addRow("Значение по умолчанию:", self.lag_default_input)
-        
-        params_group.setLayout(params_layout)
-        layout.addWidget(params_group)
-        
-        # ORDER BY
-        order_group = QGroupBox("ORDER BY (обязательно)")
-        order_layout = QVBoxLayout()
-        
-        self.lag_order_combo = QComboBox()
-        self.lag_order_combo.addItems(self.columns)
-        self.lag_order_combo.currentTextChanged.connect(self.update_lag_preview)
-        
-        self.lag_direction_combo = QComboBox()
-        self.lag_direction_combo.addItems(["ASC", "DESC"])
-        self.lag_direction_combo.currentTextChanged.connect(self.update_lag_preview)
-        
-        order_layout.addWidget(QLabel("Столбец для сортировки:"))
-        order_layout.addWidget(self.lag_order_combo)
-        order_layout.addWidget(QLabel("Направление:"))
-        order_layout.addWidget(self.lag_direction_combo)
-        order_group.setLayout(order_layout)
-        layout.addWidget(order_group)
-        
-        # PARTITION BY
-        partition_group = QGroupBox("PARTITION BY (необязательно)")
-        partition_layout = QVBoxLayout()
-        
-        self.lag_use_partition = QCheckBox("Использовать разбиение")
-        self.lag_use_partition.stateChanged.connect(self.update_lag_preview)
-        
-        self.lag_partition_combo = QComboBox()
-        self.lag_partition_combo.addItems(self.columns)
-        self.lag_partition_combo.currentTextChanged.connect(self.update_lag_preview)
-        self.lag_partition_combo.setEnabled(False)
-        
-        self.lag_use_partition.stateChanged.connect(
-            lambda state: self.lag_partition_combo.setEnabled(state == Qt.Checked)
-        )
-        
-        partition_layout.addWidget(self.lag_use_partition)
-        partition_layout.addWidget(QLabel("Столбец для разбиения:"))
-        partition_layout.addWidget(self.lag_partition_combo)
-        partition_group.setLayout(partition_layout)
-        layout.addWidget(partition_group)
-        
-        # Предпросмотр SQL
-        preview_group = QGroupBox("Предпросмотр SQL")
-        preview_layout = QVBoxLayout()
-        self.lag_preview = QTextEdit()
-        self.lag_preview.setReadOnly(True)
-        self.lag_preview.setMaximumHeight(100)
-        preview_layout.addWidget(self.lag_preview)
-        preview_group.setLayout(preview_layout)
-        layout.addWidget(preview_group)
-        
-        layout.addStretch()
-        
-        # Инициализация предпросмотра
-        self.update_lag_preview()
-        
-        return widget
-        
-    def create_lead_tab(self):
-        """Создает вкладку для функции LEAD"""
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        
-        # Описание
-        desc = QLabel("Функция LEAD() предоставляет доступ к строке с заданным физическим смещением, которая СЛЕДУЕТ ЗА текущей строкой.")
-        desc.setWordWrap(True)
-        desc.setStyleSheet("padding: 10px; background-color: rgba(64, 255, 218, 0.1); border-radius: 5px;")
-        layout.addWidget(desc)
-        
-        # Параметры
-        params_group = QGroupBox("Параметры функции")
-        params_layout = QFormLayout()
-        
-        # Столбец
-        self.lead_column_combo = QComboBox()
-        self.lead_column_combo.addItems(self.columns)
-        self.lead_column_combo.currentTextChanged.connect(self.update_lead_preview)
-        params_layout.addRow("Столбец:", self.lead_column_combo)
-        
-        # Смещение
-        self.lead_offset_spin = QSpinBox()
-        self.lead_offset_spin.setMinimum(1)
-        self.lead_offset_spin.setMaximum(100)
-        self.lead_offset_spin.setValue(1)
-        self.lead_offset_spin.valueChanged.connect(self.update_lead_preview)
-        params_layout.addRow("Смещение:", self.lead_offset_spin)
-        
-        # Значение по умолчанию
-        self.lead_default_input = QLineEdit()
-        self.lead_default_input.setPlaceholderText("NULL (если не указано)")
-        self.lead_default_input.textChanged.connect(self.update_lead_preview)
-        params_layout.addRow("Значение по умолчанию:", self.lead_default_input)
-        
-        params_group.setLayout(params_layout)
-        layout.addWidget(params_group)
-        
-        # ORDER BY
-        order_group = QGroupBox("ORDER BY (обязательно)")
-        order_layout = QVBoxLayout()
-        
-        self.lead_order_combo = QComboBox()
-        self.lead_order_combo.addItems(self.columns)
-        self.lead_order_combo.currentTextChanged.connect(self.update_lead_preview)
-        
-        self.lead_direction_combo = QComboBox()
-        self.lead_direction_combo.addItems(["ASC", "DESC"])
-        self.lead_direction_combo.currentTextChanged.connect(self.update_lead_preview)
-        
-        order_layout.addWidget(QLabel("Столбец для сортировки:"))
-        order_layout.addWidget(self.lead_order_combo)
-        order_layout.addWidget(QLabel("Направление:"))
-        order_layout.addWidget(self.lead_direction_combo)
-        order_group.setLayout(order_layout)
-        layout.addWidget(order_group)
-        
-        # PARTITION BY
-        partition_group = QGroupBox("PARTITION BY (необязательно)")
-        partition_layout = QVBoxLayout()
-        
-        self.lead_use_partition = QCheckBox("Использовать разбиение")
-        self.lead_use_partition.stateChanged.connect(self.update_lead_preview)
-        
-        self.lead_partition_combo = QComboBox()
-        self.lead_partition_combo.addItems(self.columns)
-        self.lead_partition_combo.currentTextChanged.connect(self.update_lead_preview)
-        self.lead_partition_combo.setEnabled(False)
-        
-        self.lead_use_partition.stateChanged.connect(
-            lambda state: self.lead_partition_combo.setEnabled(state == Qt.Checked)
-        )
-        
-        partition_layout.addWidget(self.lead_use_partition)
-        partition_layout.addWidget(QLabel("Столбец для разбиения:"))
-        partition_layout.addWidget(self.lead_partition_combo)
-        partition_group.setLayout(partition_layout)
-        layout.addWidget(partition_group)
-        
-        # Предпросмотр SQL
-        preview_group = QGroupBox("Предпросмотр SQL")
-        preview_layout = QVBoxLayout()
-        self.lead_preview = QTextEdit()
-        self.lead_preview.setReadOnly(True)
-        self.lead_preview.setMaximumHeight(100)
-        preview_layout.addWidget(self.lead_preview)
-        preview_group.setLayout(preview_layout)
-        layout.addWidget(preview_group)
-        
-        layout.addStretch()
-        
-        # Инициализация предпросмотра
-        self.update_lead_preview()
-        
-        return widget
-        
-    def create_results_panel(self):
-        """Создает панель результатов"""
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        
-        results_label = QLabel("Результаты выполнения:")
-        results_label.setStyleSheet("font-weight: bold; font-size: 14px;")
-        layout.addWidget(results_label)
-        
-        self.results_table = QTableWidget()
-        self.results_table.setAlternatingRowColors(True)
-        self.results_table.setSortingEnabled(True)
-        self.results_table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.results_table.horizontalHeader().setStretchLastSection(True)
-        self.results_table.setEditTriggers(QTableWidget.NoEditTriggers)
-        layout.addWidget(self.results_table)
-        
-        self.results_info = QLabel("Выполните запрос для отображения результатов")
-        self.results_info.setAlignment(Qt.AlignCenter)
-        self.results_info.setStyleSheet("color: #888; font-style: italic;")
-        layout.addWidget(self.results_info)
-        
-        return widget
-        
-    def update_rank_preview(self):
-        """Обновляет предпросмотр SQL для RANK"""
-        sql = self.build_rank_sql()
-        self.rank_preview.setPlainText(sql)
-        
-    def update_lag_preview(self):
-        """Обновляет предпросмотр SQL для LAG"""
-        sql = self.build_lag_sql()
-        self.lag_preview.setPlainText(sql)
-        
-    def update_lead_preview(self):
-        """Обновляет предпросмотр SQL для LEAD"""
-        sql = self.build_lead_sql()
-        self.lead_preview.setPlainText(sql)
-        
-    def build_rank_sql(self):
-        """Строит SQL запрос для RANK"""
-        order_col = self.rank_order_combo.currentText()
-        direction = self.rank_direction_combo.currentText()
-        
-        partition_clause = ""
-        if self.rank_use_partition.isChecked():
-            partition_col = self.rank_partition_combo.currentText()
-            partition_clause = f" PARTITION BY {partition_col}"
-            
-        sql = f"""SELECT *,
-       RANK() OVER ({partition_clause} ORDER BY {order_col} {direction}) AS rank
-FROM {self.table_name}"""
-        
-        return sql
-        
-    def build_lag_sql(self):
-        """Строит SQL запрос для LAG"""
-        column = self.lag_column_combo.currentText()
-        offset = self.lag_offset_spin.value()
-        default = self.lag_default_input.text().strip()
-        order_col = self.lag_order_combo.currentText()
-        direction = self.lag_direction_combo.currentText()
-        
-        default_value = f", '{default}'" if default else ""
-        
-        partition_clause = ""
-        if self.lag_use_partition.isChecked():
-            partition_col = self.lag_partition_combo.currentText()
-            partition_clause = f" PARTITION BY {partition_col}"
-            
-        sql = f"""SELECT *,
-       LAG({column}, {offset}{default_value}) OVER ({partition_clause} ORDER BY {order_col} {direction}) AS lag_value
-FROM {self.table_name}"""
-        
-        return sql
-        
-    def build_lead_sql(self):
-        """Строит SQL запрос для LEAD"""
-        column = self.lead_column_combo.currentText()
-        offset = self.lead_offset_spin.value()
-        default = self.lead_default_input.text().strip()
-        order_col = self.lead_order_combo.currentText()
-        direction = self.lead_direction_combo.currentText()
-        
-        default_value = f", '{default}'" if default else ""
-        
-        partition_clause = ""
-        if self.lead_use_partition.isChecked():
-            partition_col = self.lead_partition_combo.currentText()
-            partition_clause = f" PARTITION BY {partition_col}"
-            
-        sql = f"""SELECT *,
-       LEAD({column}, {offset}{default_value}) OVER ({partition_clause} ORDER BY {order_col} {direction}) AS lead_value
-FROM {self.table_name}"""
-        
-        return sql
-        
-    def get_window_function_sql(self):
-        """Возвращает SQL для текущей выбранной функции"""
-        current_tab_index = self.findChild(QTabWidget).currentIndex()
-        
-        if current_tab_index == 0:  # RANK
-            return self.build_rank_sql()
-        elif current_tab_index == 1:  # LAG
-            return self.build_lag_sql()
-        elif current_tab_index == 2:  # LEAD
-            return self.build_lead_sql()
-            
-        return ""
-        
-    def execute_window_function(self):
-        """Выполняет оконную функцию и отображает результаты"""
-        sql = self.get_window_function_sql()
-        
-        if not sql:
-            QMessageBox.warning(self, "Ошибка", "Не удалось сформировать SQL запрос")
+        order_info = QLabel("Столбцы для сортировки строк внутри окна")
+        order_info.setWordWrap(True)
+        order_layout.addWidget(order_info)
+        
+        # Доступные столбцы для ORDER BY
+        self.available_order_columns = QListWidget()
+        self.available_order_columns.setObjectName("listWidget")
+        self.available_order_columns.setSelectionMode(QListWidget.MultiSelection)
+        order_layout.addWidget(QLabel("Доступные столбцы:"))
+        order_layout.addWidget(self.available_order_columns)
+        
+        # Кнопки управления
+        order_buttons = QHBoxLayout()
+        add_order_btn = QPushButton(">> Добавить")
+        add_order_btn.setObjectName("addButton")
+        add_order_btn.clicked.connect(self.add_order_columns)
+        order_buttons.addWidget(add_order_btn)
+        order_layout.addLayout(order_buttons)
+        
+        # Выбранные столбцы ORDER BY
+        self.order_columns = QListWidget()
+        self.order_columns.setObjectName("listWidget")
+        order_layout.addWidget(QLabel("Столбцы сортировки:"))
+        order_layout.addWidget(self.order_columns)
+        
+        # Кнопки удаления
+        remove_order_buttons = QHBoxLayout()
+        remove_order_btn = QPushButton("<< Удалить")
+        remove_order_btn.setObjectName("removeButton")
+        remove_order_btn.clicked.connect(self.remove_order_columns)
+        remove_order_buttons.addWidget(remove_order_btn)
+        order_layout.addLayout(remove_order_buttons)
+        
+        content_layout.addWidget(order_group)
+        
+        # Устанавливаем содержимое в скролл-область
+        scroll_area.setWidget(content_widget)
+        self.layout().addWidget(scroll_area)
+        
+        # Кнопки управления
+        buttons_layout = QHBoxLayout()
+        
+        self.ok_button = QPushButton("OK")
+        self.ok_button.setObjectName("okButton")
+        self.ok_button.clicked.connect(self.accept_dialog)
+        
+        self.cancel_button = QPushButton("Отмена")
+        self.cancel_button.setObjectName("cancelButton")
+        self.cancel_button.clicked.connect(self.reject)
+        
+        buttons_layout.addStretch()
+        buttons_layout.addWidget(self.ok_button)
+        buttons_layout.addWidget(self.cancel_button)
+        
+        self.layout().addLayout(buttons_layout)
+        
+        # Загружаем начальные данные
+        self.load_tables()
+        
+    def load_tables(self):
+        """Загружает список таблиц"""
+        if not self.db_instance or not self.db_instance.is_connected():
             return
-            
+        
         try:
-            cursor = self.db_instance.connection.cursor()
-            cursor.execute(sql)
-            results = cursor.fetchall()
-            columns = [desc[0] for desc in cursor.description]
+            tables = self.db_instance.get_tables()
+            self.table_combo.clear()
+            self.table_combo.addItems(tables)
+        except Exception as e:
+            notification.notify(
+                title="Ошибка",
+                message=f"Не удалось загрузить таблицы: {str(e)}",
+                timeout=3
+            )
+    
+    def load_table_columns(self, table_name):
+        """Загружает столбцы выбранной таблицы"""
+        if not table_name:
+            return
+        
+        try:
+            columns = self.db_instance.get_table_columns(table_name)
             
-            self.display_results(results, columns)
+            # Очищаем списки
+            self.available_partition_columns.clear()
+            self.partition_columns.clear()
+            self.available_order_columns.clear()
+            self.order_columns.clear()
             
-            self.results_info.setText(f"Найдено записей: {len(results)}")
-            self.results_info.setStyleSheet("color: #64ffda; font-weight: bold;")
+            # Заполняем доступные столбцы
+            self.available_partition_columns.addItems(columns)
+            self.available_order_columns.addItems(columns)
             
         except Exception as e:
-            QMessageBox.critical(self, "Ошибка выполнения", f"Ошибка при выполнении запроса:\n{str(e)}")
-            self.results_info.setText(f"Ошибка: {str(e)}")
-            self.results_info.setStyleSheet("color: #ff5555;")
+            notification.notify(
+                title="Ошибка",
+                message=f"Не удалось загрузить столбцы: {str(e)}",
+                timeout=3
+            )
+    
+    def on_function_type_changed(self, function_text):
+        """Обработчик изменения типа функции"""
+        # Очищаем параметры
+        self.clear_params()
+        
+        # Создаем параметры для выбранной функции
+        function_name = function_text.split(' - ')[0]
+        
+        if function_name == "NTILE":
+            self.create_ntile_params()
+        elif function_name in ["LAG", "LEAD"]:
+            self.create_lag_lead_params()
+        elif function_name == "NTH_VALUE":
+            self.create_nth_value_params()
+    
+    def clear_params(self):
+        """Очищает параметры функции"""
+        while self.params_layout.count():
+            item = self.params_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+    
+    def create_ntile_params(self):
+        """Создает параметры для NTILE"""
+        label = QLabel("Количество групп:")
+        label.setObjectName("paramLabel")
+        
+        self.ntile_spin = QSpinBox()
+        self.ntile_spin.setObjectName("spinBox")
+        self.ntile_spin.setMinimum(1)
+        self.ntile_spin.setMaximum(1000)
+        self.ntile_spin.setValue(4)
+        
+        self.params_layout.addWidget(label)
+        self.params_layout.addWidget(self.ntile_spin)
+    
+    def create_lag_lead_params(self):
+        """Создает параметры для LAG/LEAD"""
+        # Столбец
+        column_label = QLabel("Столбец:")
+        column_label.setObjectName("paramLabel")
+        
+        self.lag_lead_column = QComboBox()
+        self.lag_lead_column.setObjectName("comboBox")
+        # Заполним столбцами при выборе таблицы
+        if self.table_combo.currentText():
+            columns = self.db_instance.get_table_columns(self.table_combo.currentText())
+            self.lag_lead_column.addItems(columns)
+        
+        self.params_layout.addWidget(column_label)
+        self.params_layout.addWidget(self.lag_lead_column)
+        
+        # Смещение
+        offset_label = QLabel("Смещение (строк):")
+        offset_label.setObjectName("paramLabel")
+        
+        self.offset_spin = QSpinBox()
+        self.offset_spin.setObjectName("spinBox")
+        self.offset_spin.setMinimum(1)
+        self.offset_spin.setMaximum(1000)
+        self.offset_spin.setValue(1)
+        
+        self.params_layout.addWidget(offset_label)
+        self.params_layout.addWidget(self.offset_spin)
+    
+    def create_nth_value_params(self):
+        """Создает параметры для NTH_VALUE"""
+        # Столбец
+        column_label = QLabel("Столбец:")
+        column_label.setObjectName("paramLabel")
+        
+        self.nth_column = QComboBox()
+        self.nth_column.setObjectName("comboBox")
+        # Заполним столбцами при выборе таблицы
+        if self.table_combo.currentText():
+            columns = self.db_instance.get_table_columns(self.table_combo.currentText())
+            self.nth_column.addItems(columns)
+        
+        self.params_layout.addWidget(column_label)
+        self.params_layout.addWidget(self.nth_column)
+        
+        # Позиция
+        position_label = QLabel("Позиция (N):")
+        position_label.setObjectName("paramLabel")
+        
+        self.position_spin = QSpinBox()
+        self.position_spin.setObjectName("spinBox")
+        self.position_spin.setMinimum(1)
+        self.position_spin.setMaximum(1000)
+        self.position_spin.setValue(1)
+        
+        self.params_layout.addWidget(position_label)
+        self.params_layout.addWidget(self.position_spin)
+    
+    def add_partition_columns(self):
+        """Добавляет столбцы в PARTITION BY"""
+        selected = self.available_partition_columns.selectedItems()
+        for item in selected:
+            if not self.partition_columns.findItems(item.text(), Qt.MatchExactly):
+                self.partition_columns.addItem(item.text())
+    
+    def remove_partition_columns(self):
+        """Удаляет столбцы из PARTITION BY"""
+        selected = self.partition_columns.selectedItems()
+        for item in selected:
+            self.partition_columns.takeItem(self.partition_columns.row(item))
+    
+    def add_order_columns(self):
+        """Добавляет столбцы в ORDER BY"""
+        selected = self.available_order_columns.selectedItems()
+        for item in selected:
+            if not self.order_columns.findItems(item.text(), Qt.MatchExactly):
+                self.order_columns.addItem(item.text())
+    
+    def remove_order_columns(self):
+        """Удаляет столбцы из ORDER BY"""
+        selected = self.order_columns.selectedItems()
+        for item in selected:
+            self.order_columns.takeItem(self.order_columns.row(item))
+    
+    def accept_dialog(self):
+        """Принимает диалог и формирует выражение оконной функции"""
+        function_text = self.function_type_combo.currentText()
+        function_name = function_text.split(' - ')[0]
+        
+        # Формируем выражение функции
+        if function_name in ["ROW_NUMBER", "RANK", "DENSE_RANK"]:
+            func_expr = f"{function_name}()"
+        elif function_name == "NTILE":
+            n = getattr(self, 'ntile_spin', None)
+            if n:
+                func_expr = f"NTILE({n.value()})"
+            else:
+                func_expr = "NTILE(4)"
+        elif function_name in ["LAG", "LEAD"]:
+            col = getattr(self, 'lag_lead_column', None)
+            offset = getattr(self, 'offset_spin', None)
+            if col and offset:
+                func_expr = f'{function_name}("{col.currentText()}", {offset.value()})'
+            else:
+                notification.notify(
+                    title="Ошибка",
+                    message="Укажите столбец для LAG/LEAD",
+                    timeout=3
+                )
+                return
+        elif function_name in ["FIRST_VALUE", "LAST_VALUE"]:
+            # Для FIRST_VALUE и LAST_VALUE нужен столбец
+            # Используем первый доступный столбец
+            if self.available_partition_columns.count() > 0:
+                col = self.available_partition_columns.item(0).text()
+                func_expr = f'{function_name}("{col}")'
+            else:
+                notification.notify(
+                    title="Ошибка",
+                    message="Нет доступных столбцов",
+                    timeout=3
+                )
+                return
+        elif function_name == "NTH_VALUE":
+            col = getattr(self, 'nth_column', None)
+            pos = getattr(self, 'position_spin', None)
+            if col and pos:
+                func_expr = f'NTH_VALUE("{col.currentText()}", {pos.value()})'
+            else:
+                notification.notify(
+                    title="Ошибка",
+                    message="Укажите столбец и позицию для NTH_VALUE",
+                    timeout=3
+                )
+                return
+        else:
+            func_expr = f"{function_name}()"
+        
+        # Формируем OVER clause
+        over_parts = []
+        
+        # PARTITION BY
+        partition_cols = []
+        for i in range(self.partition_columns.count()):
+            partition_cols.append(f'"{self.partition_columns.item(i).text()}"')
+        
+        if partition_cols:
+            over_parts.append(f"PARTITION BY {', '.join(partition_cols)}")
+        
+        # ORDER BY
+        order_cols = []
+        for i in range(self.order_columns.count()):
+            order_cols.append(f'"{self.order_columns.item(i).text()}"')
+        
+        if order_cols:
+            over_parts.append(f"ORDER BY {', '.join(order_cols)}")
+        
+        # Полное выражение
+        if over_parts:
+            over_clause = " ".join(over_parts)
+            self.window_function_expression = f"{func_expr} OVER ({over_clause})"
+        else:
+            self.window_function_expression = f"{func_expr} OVER ()"
+        
+        self.accept()
+    
+    def get_window_function_expression(self):
+        """Возвращает сформированное выражение оконной функции"""
+        return self.window_function_expression
+    
+    def apply_styles(self):
+        """Применяет стили к диалогу"""
+        self.setStyleSheet("""
+            QDialog {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
+                                          stop: 0 #0a0a0f, 
+                                          stop: 1 #1a1a2e);
+            }
             
-    def display_results(self, results, columns):
-        """Отображает результаты в таблице"""
-        self.results_table.clear()
-        self.results_table.setRowCount(len(results))
-        self.results_table.setColumnCount(len(columns))
-        self.results_table.setHorizontalHeaderLabels(columns)
-        
-        for row_idx, row_data in enumerate(results):
-            for col_idx, value in enumerate(row_data):
-                item = QTableWidgetItem(str(value) if value is not None else "NULL")
-                item.setTextAlignment(Qt.AlignCenter)
-                self.results_table.setItem(row_idx, col_idx, item)
-                
-        self.results_table.resizeColumnsToContents()
-        self.results_table.setSortingEnabled(True)
-        
-    def copy_sql_to_clipboard(self):
-        """Копирует SQL запрос в буфер обмена"""
-        from PySide6.QtWidgets import QApplication
-        
-        sql = self.get_window_function_sql()
-        if sql:
-            clipboard = QApplication.clipboard()
-            clipboard.setText(sql)
-            QMessageBox.information(self, "Успех", "SQL запрос скопирован в буфер обмена")
+            #headerLabel {
+                font-size: 24px;
+                font-weight: bold;
+                color: #64ffda;
+                padding: 15px;
+                font-family: 'Consolas', 'Fira Code', monospace;
+            }
+            
+            QGroupBox {
+                border: 2px solid #44475a;
+                border-radius: 8px;
+                margin-top: 15px;
+                padding-top: 20px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #f8f8f2;
+                background: rgba(15, 15, 25, 0.5);
+            }
+            
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top left;
+                padding: 5px 10px;
+                color: #64ffda;
+                background: rgba(15, 15, 25, 0.8);
+                border-radius: 4px;
+            }
+            
+            QComboBox {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #44475a;
+                border-radius: 6px;
+                padding: 8px;
+                color: #f8f8f2;
+                font-family: 'Consolas', 'Fira Code', monospace;
+            }
+            
+            QComboBox:hover {
+                border: 2px solid #64ffda;
+            }
+            
+            QComboBox::drop-down {
+                border: none;
+                padding-right: 10px;
+            }
+            
+            QComboBox QAbstractItemView {
+                background: rgba(15, 15, 25, 0.95);
+                color: #f8f8f2;
+                selection-background-color: #64ffda;
+                selection-color: #0a0a0f;
+                border: 1px solid #44475a;
+            }
+            
+            QListWidget {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #44475a;
+                border-radius: 6px;
+                padding: 5px;
+                color: #f8f8f2;
+            }
+            
+            QListWidget::item {
+                padding: 5px;
+                border-radius: 4px;
+            }
+            
+            QListWidget::item:selected {
+                background: #64ffda;
+                color: #0a0a0f;
+            }
+            
+            QListWidget::item:hover {
+                background: rgba(100, 255, 218, 0.3);
+            }
+            
+            QPushButton {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #44475a, 
+                                          stop: 1 #2a2a3a);
+                border: 2px solid #6272a4;
+                border-radius: 6px;
+                color: #f8f8f2;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 8px 16px;
+                min-width: 100px;
+            }
+            
+            QPushButton:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #6272a4, 
+                                          stop: 1 #44475a);
+                border: 2px solid #64ffda;
+                color: #64ffda;
+            }
+            
+            QPushButton:pressed {
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                          stop: 0 #2a2a3a, 
+                                          stop: 1 #1a1a2a);
+            }
+            
+            #okButton {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #64ffda, 
+                                          stop: 1 #00d4aa);
+                color: #0a0a0f;
+                border: none;
+            }
+            
+            #okButton:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #50e3c2, 
+                                          stop: 1 #00acc1);
+            }
+            
+            QSpinBox {
+                background: rgba(15, 15, 25, 0.8);
+                border: 2px solid #44475a;
+                border-radius: 6px;
+                padding: 8px;
+                color: #f8f8f2;
+            }
+            
+            QSpinBox:hover {
+                border: 2px solid #64ffda;
+            }
+            
+            QScrollArea {
+                border: none;
+                background: transparent;
+            }
+            
+            QLabel {
+                color: #f8f8f2;
+            }
+            
+            #paramLabel {
+                font-weight: bold;
+                color: #64ffda;
+                font-size: 12px;
+            }
+        """)
