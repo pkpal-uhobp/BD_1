@@ -1,226 +1,95 @@
-from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QPushButton, 
-                             QTextEdit, QLabel, QTableWidget, QTableWidgetItem,
-                             QHeaderView, QMessageBox, QSplitter)
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont
-from tabs.modules.search_operations.window_function_dialog import WindowFunctionDialog
-
+from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
+                             QLineEdit, QPushButton, QTextEdit, QCheckBox,
+                             QComboBox, QListWidget, QGroupBox, QMessageBox)
+from PyQt6.QtCore import Qt
+from tabs.modules.search_operations.join_dialog import JoinDialog
+from .window_functions_dialog import WindowFunctionDialog
 
 class AdvancedSelectDialog(QDialog):
-    """Dialog for advanced SELECT operations with window functions support"""
-    
-    query_executed = Signal(str)  # Changed from pyqtSignal to Signal
-    
-    def __init__(self, db_instance, table_name, parent=None):
+    def __init__(self, parent=None, connection=None, table_name=None):
         super().__init__(parent)
-        self.db_instance = db_instance
+        self.connection = connection
         self.table_name = table_name
-        self.setWindowTitle(f"Advanced SELECT - {table_name}")
-        self.setMinimumSize(900, 700)
-        self.init_ui()
+        self.setWindowTitle("Advanced SELECT Builder")
+        self.setMinimumSize(800, 600)
         
-    def init_ui(self):
-        """Initialize the user interface"""
-        layout = QVBoxLayout(self)
+        layout = QVBoxLayout()
         
-        # Create splitter for query editor and results
-        splitter = QSplitter(Qt.Vertical)
+        # SELECT clause
+        select_group = QGroupBox("SELECT Clause")
+        select_layout = QVBoxLayout()
         
-        # Top section - Query editor
-        top_widget = self.create_query_editor_section()
-        splitter.addWidget(top_widget)
+        self.distinct_check = QCheckBox("DISTINCT")
+        select_layout.addWidget(self.distinct_check)
         
-        # Bottom section - Results table
-        bottom_widget = self.create_results_section()
-        splitter.addWidget(bottom_widget)
+        columns_label = QLabel("Columns (comma-separated, * for all):")
+        select_layout.addWidget(columns_label)
+        self.columns_input = QLineEdit()
+        self.columns_input.setText("*")
+        select_layout.addWidget(self.columns_input)
         
-        # Set initial sizes (60% editor, 40% results)
-        splitter.setSizes([420, 280])
+        select_group.setLayout(select_layout)
+        layout.addWidget(select_group)
         
-        layout.addWidget(splitter)
+        # Additional features buttons
+        features_layout = QHBoxLayout()
+        self.join_button = QPushButton("Add JOIN")
+        self.join_button.clicked.connect(self.add_join)
+        features_layout.addWidget(self.join_button)
         
-        # Button layout at the bottom
+        self.window_func_button = QPushButton("Add Window Function")
+        self.window_func_button.clicked.connect(self.add_window_function)
+        features_layout.addWidget(self.window_func_button)
+        
+        layout.addLayout(features_layout)
+        
+        # Query preview
+        preview_group = QGroupBox("Query Preview")
+        preview_layout = QVBoxLayout()
+        self.query_preview = QTextEdit()
+        self.query_preview.setReadOnly(True)
+        preview_layout.addWidget(self.query_preview)
+        preview_group.setLayout(preview_layout)
+        layout.addWidget(preview_group)
+        
+        # Buttons
         button_layout = QHBoxLayout()
-        
-        self.window_func_btn = QPushButton("Add Window Function")
-        self.window_func_btn.clicked.connect(self.add_window_function)
-        
-        self.execute_btn = QPushButton("Execute Query")
-        self.execute_btn.clicked.connect(self.execute_query)
-        self.execute_btn.setDefault(True)
-        
-        self.clear_btn = QPushButton("Clear")
-        self.clear_btn.clicked.connect(self.clear_query)
-        
-        self.close_btn = QPushButton("Close")
-        self.close_btn.clicked.connect(self.close)
-        
-        button_layout.addWidget(self.window_func_btn)
-        button_layout.addStretch()
-        button_layout.addWidget(self.execute_btn)
-        button_layout.addWidget(self.clear_btn)
-        button_layout.addWidget(self.close_btn)
+        self.ok_button = QPushButton("OK")
+        self.ok_button.clicked.connect(self.accept)
+        self.cancel_button = QPushButton("Cancel")
+        self.cancel_button.clicked.connect(self.reject)
+        button_layout.addWidget(self.ok_button)
+        button_layout.addWidget(self.cancel_button)
         
         layout.addLayout(button_layout)
-        
-    def create_query_editor_section(self):
-        """Create the query editor section"""
-        from PySide6.QtWidgets import QWidget, QVBoxLayout
-        
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        
-        # Label
-        label = QLabel("Enter your SELECT query:")
-        label_font = QFont()
-        label_font.setBold(True)
-        label.setFont(label_font)
-        layout.addWidget(label)
-        
-        # Query text editor
-        self.query_text = QTextEdit()
-        self.query_text.setPlaceholderText(
-            f"SELECT * FROM {self.table_name}\n"
-            "-- Add your advanced SELECT query here\n"
-            "-- You can use window functions, CTEs, subqueries, etc."
-        )
-        font = QFont("Courier New", 10)
-        self.query_text.setFont(font)
-        layout.addWidget(self.query_text)
-        
-        # Info label
-        info_label = QLabel(
-            "💡 Tip: Use the 'Add Window Function' button to insert window function templates"
-        )
-        info_label.setStyleSheet("color: #666; font-style: italic;")
-        layout.addWidget(info_label)
-        
-        return widget
-        
-    def create_results_section(self):
-        """Create the results display section"""
-        from PySide6.QtWidgets import QWidget, QVBoxLayout
-        
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        
-        # Results label
-        self.results_label = QLabel("Query Results:")
-        results_font = QFont()
-        results_font.setBold(True)
-        self.results_label.setFont(results_font)
-        layout.addWidget(self.results_label)
-        
-        # Results table with sorting capability
-        self.results_table = QTableWidget()
-        self.results_table.setSortingEnabled(True)
-        self.results_table.setAlternatingRowColors(True)
-        self.results_table.horizontalHeader().setStretchLastSection(True)
-        self.results_table.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.results_table.setSelectionBehavior(QTableWidget.SelectRows)
-        layout.addWidget(self.results_table)
-        
-        return widget
+        self.setLayout(layout)
         
     def add_window_function(self):
-        """Open dialog to add window function template"""
-        dialog = WindowFunctionDialog(self.db_instance, self.table_name, self)
-        if dialog.exec() == QDialog.Accepted:
-            window_func_query = dialog.get_query()
-            if window_func_query:
-                # Insert the window function at cursor position
-                cursor = self.query_text.textCursor()
-                cursor.insertText(window_func_query)
-                
-    def execute_query(self):
-        """Execute the query and display results"""
-        query = self.query_text.toPlainText().strip()
-        
-        if not query:
-            QMessageBox.warning(self, "Empty Query", "Please enter a query to execute.")
-            return
-            
-        # Basic validation - query should start with SELECT
-        if not query.upper().startswith('SELECT'):
-            QMessageBox.warning(
-                self, 
-                "Invalid Query", 
-                "Query must start with SELECT."
-            )
-            return
-            
-        try:
-            # Execute query
-            cursor = self.db_instance.connection.cursor()
-            cursor.execute(query)
-            results = cursor.fetchall()
-            
-            # Get column names
-            column_names = [desc[0] for desc in cursor.description] if cursor.description else []
-            
-            # Display results in table
-            self.display_results(results, column_names)
-            
-            # Update results label with row count
-            self.results_label.setText(f"Query Results: ({len(results)} rows)")
-            
-            # Emit signal
-            self.query_executed.emit(query)
-            
-            QMessageBox.information(
-                self, 
-                "Success", 
-                f"Query executed successfully.\n{len(results)} rows returned."
-            )
-            
-        except Exception as e:
-            QMessageBox.critical(
-                self, 
-                "Query Error", 
-                f"Error executing query:\n{str(e)}"
-            )
-            
-    def display_results(self, results, column_names):
-        """Display query results in the table"""
-        # Clear existing content
-        self.results_table.clear()
-        
-        if not results:
-            self.results_table.setRowCount(0)
-            self.results_table.setColumnCount(0)
-            return
-            
-        # Set up table dimensions
-        self.results_table.setRowCount(len(results))
-        self.results_table.setColumnCount(len(column_names))
-        self.results_table.setHorizontalHeaderLabels(column_names)
-        
-        # Populate table
-        for row_idx, row_data in enumerate(results):
-            for col_idx, value in enumerate(row_data):
-                # Convert value to string, handle None
-                display_value = str(value) if value is not None else "NULL"
-                item = QTableWidgetItem(display_value)
-                
-                # Center align for better readability
-                item.setTextAlignment(Qt.AlignCenter)
-                
-                self.results_table.setItem(row_idx, col_idx, item)
-        
-        # Resize columns to content
-        self.results_table.resizeColumnsToContents()
-        
-        # Enable sorting after populating data
-        self.results_table.setSortingEnabled(True)
-        
-    def clear_query(self):
-        """Clear the query text"""
-        self.query_text.clear()
-        self.results_table.clear()
-        self.results_table.setRowCount(0)
-        self.results_table.setColumnCount(0)
-        self.results_label.setText("Query Results:")
-        
+        dialog = WindowFunctionDialog(self, self.connection, self.table_name)
+        if dialog.exec():
+            window_func_query = dialog.get_window_function_sql()
+            current_columns = self.columns_input.text()
+            if current_columns == "*":
+                self.columns_input.setText(window_func_query)
+            else:
+                self.columns_input.setText(f"{current_columns}, {window_func_query}")
+            self.update_preview()
+    
+    def add_join(self):
+        dialog = JoinDialog(self, self.connection, self.table_name)
+        if dialog.exec():
+            join_clause = dialog.get_join_clause()
+            # Update preview with join clause
+            self.update_preview()
+    
+    def update_preview(self):
+        query = self.get_query()
+        self.query_preview.setPlainText(query)
+    
     def get_query(self):
-        """Get the current query text"""
-        return self.query_text.toPlainText().strip()
+        distinct = "DISTINCT " if self.distinct_check.isChecked() else ""
+        columns = self.columns_input.text() or "*"
+        
+        query = f"SELECT {distinct}{columns}\nFROM {self.table_name}"
+        
+        return query
