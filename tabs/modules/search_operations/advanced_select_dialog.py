@@ -5,15 +5,38 @@ from PySide6.QtCore import Qt
 from .window_functions_dialog import WindowFunctionDialog
 
 class AdvancedSelectDialog(QDialog):
-    def __init__(self, parent=None, connection=None, table_name=None, db_instance=None):
+    def __init__(self, db_instance, parent=None, connection=None, table_name=None):
         super().__init__(parent)
-        self.connection = connection
-        self.db_instance = db_instance if db_instance else connection
+        self.db_instance = db_instance
+        self.connection = connection if connection else db_instance
         self.table_name = table_name
         self.setWindowTitle("Advanced SELECT Builder")
         self.setMinimumSize(800, 600)
         
         layout = QVBoxLayout()
+        
+        # Table selection
+        table_group = QGroupBox("FROM Clause")
+        table_layout = QVBoxLayout()
+        
+        table_label = QLabel("Table:")
+        table_layout.addWidget(table_label)
+        self.table_combo = QComboBox()
+        if table_name:
+            self.table_combo.addItem(table_name)
+            self.table_combo.setCurrentText(table_name)
+        else:
+            # Load tables from database
+            if self.db_instance and hasattr(self.db_instance, 'get_tables'):
+                try:
+                    tables = self.db_instance.get_tables()
+                    self.table_combo.addItems(tables)
+                except Exception:
+                    pass
+        table_layout.addWidget(self.table_combo)
+        
+        table_group.setLayout(table_layout)
+        layout.addWidget(table_group)
         
         # SELECT clause
         select_group = QGroupBox("SELECT Clause")
@@ -78,7 +101,7 @@ class AdvancedSelectDialog(QDialog):
         
     def add_window_function(self):
         """Добавляет оконную функцию (RANK, LAG, LEAD, etc.)"""
-        table_name = self.table_name
+        table_name = self.table_combo.currentText() if hasattr(self, 'table_combo') else self.table_name
         
         if not table_name:
             QMessageBox.warning(self, "Ошибка", "Сначала выберите таблицу")
@@ -122,7 +145,11 @@ class AdvancedSelectDialog(QDialog):
             else:
                 columns = f"{columns}, {', '.join(special_funcs)}"
         
-        query = f"SELECT {distinct}{columns}\nFROM {self.table_name}"
+        table_name = self.table_combo.currentText() if hasattr(self, 'table_combo') else self.table_name
+        if not table_name:
+            table_name = "your_table"
+        
+        query = f"SELECT {distinct}{columns}\nFROM {table_name}"
         
         return query
     
