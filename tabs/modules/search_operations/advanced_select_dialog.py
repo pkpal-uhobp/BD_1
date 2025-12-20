@@ -1,14 +1,14 @@
-from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
+from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
                              QLineEdit, QPushButton, QTextEdit, QCheckBox,
                              QComboBox, QListWidget, QGroupBox, QMessageBox)
-from PyQt6.QtCore import Qt
-from tabs.modules.search_operations.join_dialog import JoinDialog
+from PySide6.QtCore import Qt
 from .window_functions_dialog import WindowFunctionDialog
 
 class AdvancedSelectDialog(QDialog):
-    def __init__(self, parent=None, connection=None, table_name=None):
+    def __init__(self, parent=None, connection=None, table_name=None, db_instance=None):
         super().__init__(parent)
         self.connection = connection
+        self.db_instance = db_instance if db_instance else connection
         self.table_name = table_name
         self.setWindowTitle("Advanced SELECT Builder")
         self.setMinimumSize(800, 600)
@@ -31,17 +31,26 @@ class AdvancedSelectDialog(QDialog):
         select_group.setLayout(select_layout)
         layout.addWidget(select_group)
         
-        # Additional features buttons
-        features_layout = QHBoxLayout()
-        self.join_button = QPushButton("Add JOIN")
-        self.join_button.clicked.connect(self.add_join)
-        features_layout.addWidget(self.join_button)
+        # Группа дополнительных функций
+        special_funcs_group = QGroupBox("Специальные функции")
+        special_funcs_layout = QVBoxLayout()
         
-        self.window_func_button = QPushButton("Add Window Function")
-        self.window_func_button.clicked.connect(self.add_window_function)
-        features_layout.addWidget(self.window_func_button)
+        special_funcs_buttons_layout = QHBoxLayout()
         
-        layout.addLayout(features_layout)
+        self.add_window_func_btn = QPushButton("+ Оконная функция")
+        self.add_window_func_btn.setObjectName("addWindowFuncBtn")
+        self.add_window_func_btn.clicked.connect(self.add_window_function)
+        
+        special_funcs_buttons_layout.addWidget(self.add_window_func_btn)
+        special_funcs_layout.addLayout(special_funcs_buttons_layout)
+        
+        # List to display added special functions
+        self.special_functions = QListWidget()
+        self.special_functions.setObjectName("specialFunctions")
+        special_funcs_layout.addWidget(self.special_functions)
+        
+        special_funcs_group.setLayout(special_funcs_layout)
+        layout.addWidget(special_funcs_group)
         
         # Query preview
         preview_group = QGroupBox("Query Preview")
@@ -64,23 +73,35 @@ class AdvancedSelectDialog(QDialog):
         layout.addLayout(button_layout)
         self.setLayout(layout)
         
+        # Apply styles
+        self.apply_styles()
+        
     def add_window_function(self):
-        dialog = WindowFunctionDialog(self, self.connection, self.table_name)
+        """Добавляет оконную функцию (RANK, LAG, LEAD, etc.)"""
+        table_name = self.table_name
+        
+        if not table_name:
+            QMessageBox.warning(self, "Ошибка", "Сначала выберите таблицу")
+            return
+        
+        # Create dialog for window function selection
+        dialog = WindowFunctionDialog(self.db_instance if hasattr(self, 'db_instance') else self.connection, self)
         if dialog.exec():
-            window_func_query = dialog.get_window_function_sql()
-            current_columns = self.columns_input.text()
-            if current_columns == "*":
-                self.columns_input.setText(window_func_query)
-            else:
-                self.columns_input.setText(f"{current_columns}, {window_func_query}")
-            self.update_preview()
-    
-    def add_join(self):
-        dialog = JoinDialog(self, self.connection, self.table_name)
-        if dialog.exec():
-            join_clause = dialog.get_join_clause()
-            # Update preview with join clause
-            self.update_preview()
+            window_func_sql = dialog.get_window_function_expression()
+            if window_func_sql:
+                if hasattr(self, 'special_functions'):
+                    self.special_functions.addItem(window_func_sql)
+                else:
+                    # Fallback: add to columns input
+                    current_columns = self.columns_input.text()
+                    if current_columns == "*":
+                        self.columns_input.setText(window_func_sql)
+                    else:
+                        self.columns_input.setText(f"{current_columns}, {window_func_sql}")
+                
+                # Update preview if method exists
+                if hasattr(self, 'update_preview'):
+                    self.update_preview()
     
     def update_preview(self):
         query = self.get_query()
@@ -90,6 +111,40 @@ class AdvancedSelectDialog(QDialog):
         distinct = "DISTINCT " if self.distinct_check.isChecked() else ""
         columns = self.columns_input.text() or "*"
         
+        # Add special functions to columns
+        if hasattr(self, 'special_functions') and self.special_functions.count() > 0:
+            special_funcs = []
+            for i in range(self.special_functions.count()):
+                special_funcs.append(self.special_functions.item(i).text())
+            
+            if columns == "*":
+                columns = f"*, {', '.join(special_funcs)}"
+            else:
+                columns = f"{columns}, {', '.join(special_funcs)}"
+        
         query = f"SELECT {distinct}{columns}\nFROM {self.table_name}"
         
         return query
+    
+    def apply_styles(self):
+        """Применяет стили к диалогу"""
+        self.setStyleSheet("""
+            #addWindowFuncBtn {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #667eea, 
+                                          stop: 1 #764ba2);
+                border: none;
+                border-radius: 6px;
+                color: #f8f8f2;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 10px 15px;
+            }
+            
+            #addWindowFuncBtn:hover {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                          stop: 0 #764ba2, 
+                                          stop: 1 #667eea);
+                border: 2px solid #64ffda;
+            }
+        """)
